@@ -11,6 +11,8 @@ import AuditMenuAnalytics from './AuditMenuAnalytics';
 import AuditSecuritySettings from './AuditSecuritySettings';
 import AdminWhatsAppBot from './bot/AdminWhatsAppBot';
 import AdminDatabaseTablesTab from './database/AdminDatabaseTablesTab';
+import StoreOnboardingWizard from './onboarding/StoreOnboardingWizard.jsx';
+import { Store, Plus } from 'lucide-react';
 import { auditService } from '../../services/auditService';
 import { storageService } from '../../services/storageService';
 import { supabaseSync } from '../../services/supabaseClient';
@@ -20,6 +22,7 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
   const portalRef = useRef(null);
   const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'shifts' | 'security' | 'menu' | 'settings' | 'bot' | 'database'
   const [botSubTab, setBotSubTab] = useState('connection'); // 'connection' | 'security' | 'templates' | 'flows'
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Sidebar collapse state (persisted in localStorage)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -311,6 +314,28 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
             <span>
               {isRefreshing ? 'Actualizando BD...' : refreshSuccess ? '¡BD Actualizada!' : 'Actualizar BD'}
             </span>
+          </button>
+
+          <button
+            type="button"
+            className="qty-btn tactile-btn"
+            style={{ 
+              width: 'auto', 
+              padding: '0.45rem 0.95rem', 
+              fontSize: '0.82rem', 
+              gap: '6px', 
+              minHeight: '38px',
+              color: '#fff',
+              background: 'linear-gradient(135deg, var(--accent-amber, #f59e0b) 0%, #ea580c 100%)',
+              borderColor: 'transparent',
+              fontWeight: 800,
+              cursor: 'pointer'
+            }}
+            onClick={() => setShowOnboarding(true)}
+            title="Crear y configurar un nuevo comercio gastronómico"
+          >
+            <Store size={16} />
+            <span>+ Nuevo Comercio</span>
           </button>
 
           <button
@@ -666,6 +691,17 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
           </div>
         </div>
       </div>
+
+      {showOnboarding && (
+        <StoreOnboardingWizard
+          isOpen={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
+          onStoreCreated={() => {
+            setShowOnboarding(false);
+            if (onRefreshSystem) onRefreshSystem();
+          }}
+        />
+      )}
     </div>
   );
 }
