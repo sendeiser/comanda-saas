@@ -4,7 +4,9 @@ import { Search, ShoppingBag, Plus, Minus, RotateCcw, GripVertical, Trash2, Send
 import ItemModifierModal from './ItemModifierModal';
 import PaymentModal from './PaymentModal';
 import WhatsAppImportModal from './WhatsAppImportModal';
+import TableMapModal from './TableMapModal';
 import { printerService } from '../../services/printerService';
+import { updateTableStatus, TABLE_STATUSES } from '../../services/tableService.js';
 
 export default function FastOrderPad({ 
   products, 
@@ -21,6 +23,7 @@ export default function FastOrderPad({
   const [selectedProductForModal, setSelectedProductForModal] = useState(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isWhatsAppImportOpen, setIsWhatsAppImportOpen] = useState(false);
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
 
   // Toggle para ver fotos de productos en Mostrador (por defecto activado)
   const [showPhotos, setShowPhotos] = useState(() => {
@@ -269,6 +272,12 @@ export default function FastOrderPad({
     };
 
     onSaveOrder(orderPayload);
+
+    if (channel === 'mesa' && tableNumber) {
+      const storeId = settings?.storeSlug || settings?.storeId || 'default';
+      updateTableStatus(storeId, tableNumber, TABLE_STATUSES.OCCUPIED, orderPayload.id || `order-${Date.now()}`, total).catch(console.warn);
+    }
+
     setIsPaymentModalOpen(false);
     clearCart();
     setMobileTab('catalog');
@@ -696,21 +705,41 @@ export default function FastOrderPad({
           )}
 
           {channel === 'mesa' && (
-            <div className="customer-fields-bar" style={{ display: 'grid', gridTemplateColumns: '130px 1fr', gap: '0.4rem' }}>
-              <input 
-                type="text" 
-                className="custom-input-sm" 
-                placeholder="Nº Mesa / Barra"
-                value={tableNumber}
-                onChange={e => setTableNumber(e.target.value)}
-              />
-              <input 
-                type="text" 
-                className="custom-input-sm" 
-                placeholder="Nombre del Cliente (opcional)"
-                value={customer.name}
-                onChange={e => setCustomer({ ...customer, name: e.target.value })}
-              />
+            <div className="customer-fields-bar">
+              <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr auto', gap: '0.4rem', alignItems: 'center' }}>
+                <input 
+                  type="text" 
+                  className="custom-input-sm" 
+                  placeholder="Nº Mesa"
+                  value={tableNumber}
+                  onChange={e => setTableNumber(e.target.value)}
+                />
+                <input 
+                  type="text" 
+                  className="custom-input-sm" 
+                  placeholder="Nombre del Cliente (opcional)"
+                  value={customer.name}
+                  onChange={e => setCustomer({ ...customer, name: e.target.value })}
+                />
+                <button
+                  type="button"
+                  onClick={() => setIsTableModalOpen(true)}
+                  className="btn btn-secondary"
+                  style={{
+                    padding: '0.35rem 0.6rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
+                  }}
+                  title="Abrir plano y mapa interactivo de mesas"
+                >
+                  <Utensils size={13} />
+                  <span>Salón</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -902,6 +931,16 @@ export default function FastOrderPad({
           onApplyOrder={handleApplyWhatsAppImport}
           onApply={handleApplyWhatsAppImport}
           onClose={() => setIsWhatsAppImportOpen(false)}
+        />
+      )}
+
+      {isTableModalOpen && (
+        <TableMapModal
+          isOpen={isTableModalOpen}
+          storeId={settings?.storeSlug || settings?.storeId || 'default'}
+          selectedTableNumber={tableNumber}
+          onSelectTable={(selectedNum) => setTableNumber(String(selectedNum))}
+          onClose={() => setIsTableModalOpen(false)}
         />
       )}
     </div>
