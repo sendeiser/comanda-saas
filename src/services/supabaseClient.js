@@ -2,7 +2,7 @@
 // SUPABASE CLIENT - CLOUD CRUD SERVICE (FUENTE DE VERDAD)
 // =========================================================
 
-import { storageService } from './storageService';
+import { storageService } from './storageService.js';
 
 export const DEFAULT_SUPABASE_URL = 'https://yqynuvjpipmvurualgtg.supabase.co';
 export const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxeW51dmpwaXBtdnVydWFsZ3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzMyOTgsImV4cCI6MjEwNTUwOTI5OH0.mLO52rFPD384yQHdGlBasrx4QvqXiHYH3zRmJ9Bq2go';
