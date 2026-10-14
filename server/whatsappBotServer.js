@@ -15,9 +15,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import QRCode from 'qrcode';
 import qrcodeTerminal from 'qrcode-terminal';
-import pino from 'pino';
 import { geminiBotService } from './geminiBotService.js';
 import { botUpdateService } from './botUpdateService.js';
+import { loadBotConfig, compileBotVariables } from './botStoreConfig.js';
 import makeWASocket, { 
   useMultiFileAuthState, 
   fetchLatestBaileysVersion, 
@@ -73,8 +73,12 @@ async function pushOrderToSupabase(order) {
       ? order.customer
       : { name: order.customer || 'Cliente' };
 
+    const { store } = loadBotConfig();
+    const storeId = order.store_id || order.storeId || store?.id || store?.slug || 'default';
+
     const body = JSON.stringify({
       id: order.id,
+      store_id: storeId,
       order_number: Number(order.orderNumber) || 1,
       channel: order.channel || 'mostrador',
       table_number: order.tableNumber || '',
@@ -565,13 +569,27 @@ const DEFAULT_SERVER_VARIABLES = [
 ];
 
 function getBotVariables() {
+  const { store, variables: dynamicVars } = loadBotConfig();
+  const baseDefaults = DEFAULT_SERVER_VARIABLES.map(def => {
+    if (def.key === 'nombre_local' && dynamicVars.nombre_local) return { ...def, value: dynamicVars.nombre_local, defaultValue: dynamicVars.nombre_local };
+    if (def.key === 'direccion' && dynamicVars.direccion) return { ...def, value: dynamicVars.direccion, defaultValue: dynamicVars.direccion };
+    if (def.key === 'horarios' && dynamicVars.horarios) return { ...def, value: dynamicVars.horarios, defaultValue: dynamicVars.horarios };
+    if (def.key === 'telefono_contacto' && dynamicVars.telefono_contacto) return { ...def, value: dynamicVars.telefono_contacto, defaultValue: dynamicVars.telefono_contacto };
+    if (def.key === 'catalogo_url' && dynamicVars.link_carta) return { ...def, value: dynamicVars.link_carta, defaultValue: dynamicVars.link_carta };
+    if (def.key === 'alias_banco' && dynamicVars.alias_banco) return { ...def, value: dynamicVars.alias_banco, defaultValue: dynamicVars.alias_banco };
+    if (def.key === 'banco' && dynamicVars.banco) return { ...def, value: dynamicVars.banco, defaultValue: dynamicVars.banco };
+    if (def.key === 'titular' && dynamicVars.titular) return { ...def, value: dynamicVars.titular, defaultValue: dynamicVars.titular };
+    if (def.key === 'cbu' && dynamicVars.cbu) return { ...def, value: dynamicVars.cbu, defaultValue: dynamicVars.cbu };
+    return def;
+  });
+
   try {
     if (fs.existsSync(VARIABLES_FILE)) {
       const raw = fs.readFileSync(VARIABLES_FILE, 'utf-8');
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
         const map = new Map(parsed.map(v => [v.key, v]));
-        DEFAULT_SERVER_VARIABLES.forEach(def => {
+        baseDefaults.forEach(def => {
           if (!map.has(def.key)) map.set(def.key, def);
         });
         return Array.from(map.values());
@@ -580,7 +598,7 @@ function getBotVariables() {
   } catch (e) {
     console.error('[WHATSAPP BOT] Error al leer bot_variables.json:', e);
   }
-  return DEFAULT_SERVER_VARIABLES;
+  return baseDefaults;
 }
 
 function saveBotVariables(vars) {
