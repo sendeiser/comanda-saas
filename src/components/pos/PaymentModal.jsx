@@ -1,18 +1,39 @@
-import React, { useState } from 'react';
-import { X, DollarSign, Smartphone, CreditCard, Printer, CheckCircle, Copy, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, DollarSign, Smartphone, CreditCard, Printer, CheckCircle, Copy, AlertTriangle, Users } from 'lucide-react';
+import { getCustomers, saveCustomer } from '../../services/customerCrmService.js';
 
 export default function PaymentModal({ 
   cartTotal, 
   settings, 
+  customer,
+  channel,
   onConfirmOrder, 
   onClose 
 }) {
-  const [method, setMethod] = useState('efectivo'); // 'efectivo' | 'transferencia' | 'tarjeta'
+  const [method, setMethod] = useState('efectivo'); // 'efectivo' | 'transferencia' | 'tarjeta' | 'a_cuenta'
   const [cashPaid, setCashPaid] = useState('');
   const [transferProof, setTransferProof] = useState('');
   const [transferConfirmed, setTransferConfirmed] = useState(false);
   const [autoPrint, setAutoPrint] = useState(settings?.autoPrintOnConfirm ?? true);
   const [copiedAlias, setCopiedAlias] = useState(false);
+
+  // CRM Fiados State
+  const [storeCustomers, setStoreCustomers] = useState([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [newFiadoName, setNewFiadoName] = useState(customer?.name || '');
+  const [newFiadoPhone, setNewFiadoPhone] = useState(customer?.phone || '');
+
+  const storeId = settings?.storeSlug || settings?.storeId || 'default';
+
+  useEffect(() => {
+    getCustomers(storeId).then(list => {
+      setStoreCustomers(list || []);
+      if (customer?.name) {
+        const found = list.find(c => c.name.toLowerCase() === customer.name.toLowerCase());
+        if (found) setSelectedCustomerId(found.id);
+      }
+    }).catch(console.warn);
+  }, [storeId, customer]);
 
   const numCashPaid = parseFloat(cashPaid) || 0;
   const cashChange = Math.max(0, numCashPaid - cartTotal);
@@ -25,10 +46,31 @@ export default function PaymentModal({
     }
   };
 
-  const handleFinalize = () => {
+  const selectedCustomerObj = storeCustomers.find(c => c.id === selectedCustomerId);
+
+  const handleFinalize = async () => {
     if (method === 'efectivo' && numCashPaid > 0 && numCashPaid < cartTotal) {
       alert('El monto recibido en efectivo es menor al total del pedido.');
       return;
+    }
+
+    let finalCustomerId = selectedCustomerId;
+    let finalCustomerName = selectedCustomerObj?.name || newFiadoName.trim() || customer?.name || 'Cliente';
+
+    if (method === 'a_cuenta') {
+      if (!finalCustomerId && !newFiadoName.trim()) {
+        alert('Por favor selecciona un cliente existente o escribe su nombre para anotar en cuenta corriente.');
+        return;
+      }
+      if (!finalCustomerId && newFiadoName.trim()) {
+        const created = await saveCustomer(storeId, {
+          name: newFiadoName.trim(),
+          phone: newFiadoPhone.trim(),
+          address: customer?.address || ''
+        });
+        finalCustomerId = created.id;
+        finalCustomerName = created.name;
+      }
     }
 
     onConfirmOrder({
@@ -37,6 +79,8 @@ export default function PaymentModal({
       cashChange: method === 'efectivo' ? cashChange : null,
       transferProof: method === 'transferencia' ? transferProof.trim() : null,
       transferConfirmed: method === 'transferencia' ? transferConfirmed : null,
+      customerId: method === 'a_cuenta' ? finalCustomerId : null,
+      customerName: finalCustomerName,
       autoPrint
     });
   };
@@ -67,35 +111,52 @@ export default function PaymentModal({
         </div>
 
         {/* Method Tabs */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem' }}>
           <button
             type="button"
             className={`cat-pill-btn ${method === 'efectivo' ? 'active' : ''}`}
-            style={{ justifyContent: 'center' }}
+            style={{ justifyContent: 'center', fontSize: '0.78rem', padding: '0.5rem 0.2rem' }}
             onClick={() => setMethod('efectivo')}
           >
-            <DollarSign size={16} />
+            <DollarSign size={15} />
             <span>Efectivo</span>
           </button>
 
           <button
             type="button"
             className={`cat-pill-btn ${method === 'transferencia' ? 'active' : ''}`}
-            style={{ justifyContent: 'center' }}
+            style={{ justifyContent: 'center', fontSize: '0.78rem', padding: '0.5rem 0.2rem' }}
             onClick={() => setMethod('transferencia')}
           >
-            <Smartphone size={16} />
-            <span>Transferencia</span>
+            <Smartphone size={15} />
+            <span>Transfer</span>
           </button>
 
           <button
             type="button"
             className={`cat-pill-btn ${method === 'tarjeta' ? 'active' : ''}`}
-            style={{ justifyContent: 'center' }}
+            style={{ justifyContent: 'center', fontSize: '0.78rem', padding: '0.5rem 0.2rem' }}
             onClick={() => setMethod('tarjeta')}
           >
-            <CreditCard size={16} />
-            <span>Tarjeta / Débito</span>
+            <CreditCard size={15} />
+            <span>Tarjeta</span>
+          </button>
+
+          <button
+            type="button"
+            className={`cat-pill-btn ${method === 'a_cuenta' ? 'active' : ''}`}
+            style={{ 
+              justifyContent: 'center', 
+              fontSize: '0.78rem', 
+              padding: '0.5rem 0.2rem',
+              borderColor: method === 'a_cuenta' ? '#fbbf24' : 'inherit',
+              color: method === 'a_cuenta' ? '#fbbf24' : 'inherit'
+            }}
+            onClick={() => setMethod('a_cuenta')}
+            title="Anotar en libreta de cuenta corriente / fiado"
+          >
+            <Users size={15} />
+            <span>A Cuenta</span>
           </button>
         </div>
 
@@ -216,6 +277,96 @@ export default function PaymentModal({
             <CreditCard size={32} style={{ color: 'var(--accent-blue)', margin: '0 auto 0.5rem' }} />
             <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>Cobro con Posnet / Lector de Tarjetas</div>
             <div style={{ fontSize: '0.8rem', marginTop: '4px' }}>Pase la tarjeta por la terminal de cobro y confirme.</div>
+          </div>
+        )}
+
+        {/* A CUENTA / FIADO PANEL */}
+        {method === 'a_cuenta' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', background: 'var(--bg-main)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(245, 158, 11, 0.4)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Users size={18} style={{ color: '#fbbf24' }} />
+              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#fbbf24' }}>
+                Imputar a Cuenta Corriente (Fiado)
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '3px' }}>
+                Seleccionar Cliente de la Libreta:
+              </label>
+              <select
+                className="input-field"
+                value={selectedCustomerId}
+                onChange={e => {
+                  setSelectedCustomerId(e.target.value);
+                  if (e.target.value) {
+                    const match = storeCustomers.find(c => c.id === e.target.value);
+                    if (match) {
+                      setNewFiadoName(match.name);
+                      setNewFiadoPhone(match.phone || '');
+                    }
+                  }
+                }}
+                style={{ width: '100%' }}
+              >
+                <option value="">-- O registrar un nuevo cliente abajo --</option>
+                {storeCustomers.map(c => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} {c.phone ? `(${c.phone})` : ''} — Saldo actual: ${Number(c.currentBalance || 0).toLocaleString('es-AR')}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {!selectedCustomerId && (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                    Nombre del Cliente:
+                  </label>
+                  <input
+                    type="text"
+                    className="custom-input-sm"
+                    placeholder="Ej: Marcelo Morales"
+                    value={newFiadoName}
+                    onChange={e => setNewFiadoName(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '2px' }}>
+                    Teléfono / WhatsApp:
+                  </label>
+                  <input
+                    type="text"
+                    className="custom-input-sm"
+                    placeholder="Ej: 3826 430159"
+                    value={newFiadoPhone}
+                    onChange={e => setNewFiadoPhone(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedCustomerObj && (
+              <div style={{
+                background: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: '8px',
+                padding: '0.6rem 0.8rem',
+                fontSize: '0.8rem',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <div>
+                  <div style={{ color: 'var(--text-muted)' }}>Saldo actual: ${Number(selectedCustomerObj.currentBalance || 0).toLocaleString('es-AR')}</div>
+                  <div style={{ color: '#fff', fontWeight: 700 }}>Nuevo saldo tras este pedido:</div>
+                </div>
+                <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#fbbf24' }}>
+                  ${(Number(selectedCustomerObj.currentBalance || 0) + cartTotal).toLocaleString('es-AR')}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

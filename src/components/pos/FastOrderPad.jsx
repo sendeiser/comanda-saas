@@ -7,6 +7,7 @@ import WhatsAppImportModal from './WhatsAppImportModal';
 import TableMapModal from './TableMapModal';
 import { printerService } from '../../services/printerService';
 import { updateTableStatus, TABLE_STATUSES } from '../../services/tableService.js';
+import { addCustomerCharge } from '../../services/customerCrmService.js';
 
 export default function FastOrderPad({ 
   products, 
@@ -276,6 +277,12 @@ export default function FastOrderPad({
     if (channel === 'mesa' && tableNumber) {
       const storeId = settings?.storeSlug || settings?.storeId || 'default';
       updateTableStatus(storeId, tableNumber, TABLE_STATUSES.OCCUPIED, orderPayload.id || `order-${Date.now()}`, total).catch(console.warn);
+    }
+
+    if (paymentData.paymentMethod === 'a_cuenta' && paymentData.customerId) {
+      const storeId = settings?.storeSlug || settings?.storeId || 'default';
+      const orderDesc = `Comanda #${orderPayload.orderNumber || ''} ${channel.toUpperCase()}`;
+      addCustomerCharge(storeId, paymentData.customerId, total, orderPayload.id || `order-${Date.now()}`, orderDesc).catch(console.warn);
     }
 
     setIsPaymentModalOpen(false);
