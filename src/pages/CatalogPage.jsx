@@ -13,6 +13,8 @@ import {
 import { supabaseSync, DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY } from '../services/supabaseClient';
 import { storageService } from '../services/storageService';
 import { chatbotService } from '../services/chatbotService';
+import { getStoreBySlug, getActiveStore, resolveStoreFromUrl } from '../services/storeService.js';
+import { applyStoreTheme } from '../services/themeService.js';
 import ProductModal from '../components/catalog/ProductModal';
 import '../styles/catalog.css';
 
@@ -59,7 +61,7 @@ function getMesaFromUrl() {
   return '';
 }
 
-function generateWhatsAppMessage(items, subtotal, serviceType, customerName, customerAddress, customerPhone, deliveryFee, notes, paymentMethod = 'efectivo', tableNumber = '', orderNumber = '') {
+function generateWhatsAppMessage(items, subtotal, serviceType, customerName, customerAddress, customerPhone, deliveryFee, notes, paymentMethod = 'efectivo', tableNumber = '', orderNumber = '', storeName = 'ComandaFast') {
   const lines = items.map(item => {
     const mods = [...(item.selectedMods || []).map(m => `  + ${m.name}`),
                   ...(item.selectedOptions || []).map(o => `  → ${o.name}`),
@@ -78,7 +80,7 @@ function generateWhatsAppMessage(items, subtotal, serviceType, customerName, cus
     const isGenericMesaName = customerName && mesaLabel && customerName.trim().toLowerCase() === mesaLabel.trim().toLowerCase();
     const showCustomerName = customerName && !isGenericMesaName ? customerName.trim() : '';
 
-    return `🍔 *Pedido${orderNumStr} — ${mesaLabel}*\n\n` +
+    return `🍽️ *Pedido${orderNumStr} — ${mesaLabel}*\n\n` +
       `${lines.join('\n')}\n\n` +
       `💰 *TOTAL:* ${formatPrice(total)}\n` +
       `🪑 *Mesa:* ${mesaLabel}\n` +
@@ -91,7 +93,7 @@ function generateWhatsAppMessage(items, subtotal, serviceType, customerName, cus
   const paymentLabel = paymentMethod === 'transferencia' ? 'Transferencia Bancaria / MP 🏦' : 'Efectivo 💵';
   const deliveryTypeLabel = serviceType === 'delivery' ? 'Delivery con cadete 🛵' : 'Para llevar / Mostrador 🏃';
 
-  return `🍔 *Mi Pedido${orderNumStr} — ComandaFast*\n\n${lines.join('\n')}\n\n` +
+  return `🛍️ *Mi Pedido${orderNumStr} — ${storeName}*\n\n${lines.join('\n')}\n\n` +
     `💵 *Subtotal:* ${formatPrice(subtotal)}\n` +
     (deliveryFee ? `🛵 *Delivery:* ${formatPrice(deliveryFee)}\n` : '') +
     `💰 *TOTAL:* ${formatPrice(total)}\n\n` +
@@ -530,6 +532,47 @@ export default function CatalogPage({ initialCashShift }) {
       return DEFAULT_SETTINGS;
     }
   });
+  const [storeProfile, setStoreProfile] = useState(() => getActiveStore());
+  const [storeNotFound, setStoreNotFound] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadStore = async () => {
+      const slug = resolveStoreFromUrl(typeof window !== 'undefined' ? window.location.pathname : '');
+      if (slug) {
+        const found = await getStoreBySlug(slug);
+        if (!isMounted) return;
+        if (found) {
+          setStoreProfile(found);
+          setStoreNotFound(false);
+          applyStoreTheme(found.theme);
+          setSettings(prev => ({
+            ...prev,
+            nombre_local: found.name,
+            direccion: found.contactInfo?.address || prev.direccion,
+            telefono_whatsapp: found.contactInfo?.whatsapp || prev.telefono_whatsapp,
+            telefono_contacto: found.contactInfo?.phone || prev.telefono_contacto,
+            costo_envio: found.deliverySettings?.baseFee ?? prev.costo_envio,
+            catalogo_instagram: found.contactInfo?.instagram || prev.catalogo_instagram,
+            alias_banco: found.paymentSettings?.transferAlias || prev.alias_banco
+          }));
+        } else {
+          setStoreNotFound(true);
+        }
+      } else {
+        const active = getActiveStore();
+        if (!isMounted) return;
+        if (active) {
+          setStoreProfile(active);
+          setStoreNotFound(false);
+          if (active.theme) applyStoreTheme(active.theme);
+        }
+      }
+    };
+    loadStore();
+    return () => { isMounted = false; };
+  }, []);
+
   const [loading, setLoading] = useState(() => {
     try {
       const local = storageService.getProducts();
@@ -1980,6 +2023,43 @@ export default function CatalogPage({ initialCashShift }) {
           )}
         </div>
         <Toast message={toast} />
+      </div>
+    );
+  }
+
+  if (storeNotFound) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'var(--brand-bg, #0b0f19)',
+        color: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '24px',
+        textAlign: 'center'
+      }}>
+        <AlertCircle size={64} color="var(--brand-primary, #f59e0b)" style={{ marginBottom: 16 }} />
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 8 }}>Comercio No Encontrado</h1>
+        <p style={{ color: '#94a3b8', maxWidth: 420, marginBottom: 24, lineHeight: 1.5 }}>
+          El enlace ingresado no corresponde a ningún comercio gastronómico activo en el sistema.
+        </p>
+        <button
+          type="button"
+          onClick={() => { window.location.href = '/carta'; }}
+          style={{
+            background: 'var(--brand-primary, #f59e0b)',
+            color: 'var(--brand-primary-text, #000)',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            fontWeight: 700,
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          Ver Carta Demo
+        </button>
       </div>
     );
   }

@@ -103,8 +103,8 @@ export default function App() {
     const pathname = (window.location.pathname || '').toLowerCase();
 
     return (
+      pathname.startsWith('/carta') ||
       pathname === '/catalog' ||
-      pathname === '/carta' ||
       pathname === '/menu' ||
       hash.startsWith('#catalog') ||
       hash.startsWith('#carta') ||
