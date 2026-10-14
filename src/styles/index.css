@@ -5,8 +5,16 @@
    ========================================================= */
 
 :root {
+  /* Dynamic White-Label Brand Tokens */
+  --brand-primary: #f59e0b;
+  --brand-primary-text: #ffffff;
+  --brand-accent: #10b981;
+  --brand-bg: #0b0f19;
+  --brand-surface: #111827;
+  --brand-font: 'Plus Jakarta Sans', sans-serif;
+
   /* Core Dark Canvas */
-  --bg-main: #0b0f19;
+  --bg-main: var(--brand-bg, #0b0f19);
   --bg-card: #131b2e;
   --bg-card-hover: #1a253e;
   --bg-card-active: #223050;
@@ -16,7 +24,7 @@
   /* Borders & Dividers */
   --border-subtle: #1e293b;
   --border-active: #334155;
-  --border-focus: #f59e0b;
+  --border-focus: var(--brand-primary, #f59e0b);
   --border-glass: rgba(255, 255, 255, 0.08);
 
   /* Typography Colors */
@@ -26,10 +34,10 @@
   --text-inverse: #0b0f19;
   
   /* Brand Accents */
-  --accent-amber: #f59e0b;
+  --accent-amber: var(--brand-primary, #f59e0b);
   --accent-amber-glow: rgba(245, 158, 11, 0.2);
   --accent-orange: #ea580c;
-  --accent-emerald: #10b981;
+  --accent-emerald: var(--brand-accent, #10b981);
   --accent-emerald-glow: rgba(16, 185, 129, 0.2);
   --accent-rose: #ef4444;
   --accent-rose-glow: rgba(239, 68, 68, 0.2);

@@ -10,7 +10,8 @@
     "printer-server": "node server/printerServer.js",
     "bot-server": "node server/whatsappBotServer.js",
     "bot": "node server/whatsappBotServer.js",
-    "bot:qr": "node server/whatsappBotServer.js --reset"
+    "bot:qr": "node server/whatsappBotServer.js --reset",
+    "test": "node --test tests/*.test.js"
   },
   "dependencies": {
     "@google/genai": "^2.23.0",
