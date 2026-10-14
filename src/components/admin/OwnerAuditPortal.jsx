@@ -12,7 +12,7 @@ import AuditSecuritySettings from './AuditSecuritySettings';
 import AdminWhatsAppBot from './bot/AdminWhatsAppBot';
 import AdminDatabaseTablesTab from './database/AdminDatabaseTablesTab';
 import StoreOnboardingWizard from './onboarding/StoreOnboardingWizard.jsx';
-import { Store, Plus } from 'lucide-react';
+import { Store, Plus, Building2 } from 'lucide-react';
 import { auditService } from '../../services/auditService';
 import { storageService } from '../../services/storageService';
 import { supabaseSync } from '../../services/supabaseClient';
@@ -336,6 +336,28 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
           >
             <Store size={16} />
             <span>+ Nuevo Comercio</span>
+          </button>
+
+          <button
+            type="button"
+            className="qty-btn tactile-btn"
+            style={{ 
+              width: 'auto', 
+              padding: '0.45rem 0.95rem', 
+              fontSize: '0.82rem', 
+              gap: '6px', 
+              minHeight: '38px',
+              color: '#38bdf8',
+              background: 'rgba(56, 189, 248, 0.12)',
+              borderColor: 'rgba(56, 189, 248, 0.35)',
+              fontWeight: 800,
+              cursor: 'pointer'
+            }}
+            onClick={() => { window.location.hash = '#saas'; }}
+            title="Abrir Centro de Control SaaS (Abonos y Cobranzas de Comercios)"
+          >
+            <Building2 size={16} />
+            <span>SaaS & Abonos</span>
           </button>
 
           <button

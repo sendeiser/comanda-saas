@@ -10,6 +10,7 @@ import MenuManagement from './components/pos/MenuManagement';
 import SettingsModal from './components/pos/SettingsModal';
 import OwnerAuditPortal from './components/admin/OwnerAuditPortal';
 import OwnerLogin from './components/admin/OwnerLogin';
+import SaasAdminPortal from './components/admin/SaasAdminPortal';
 import CashierLogin from './components/pos/CashierLogin';
 import { chatbotService } from './services/chatbotService';
 import { authService } from './services/authService';
@@ -95,6 +96,13 @@ export default function App() {
     return hash === '#admin' || hash === '#dueno' || hash === '#dueÃ±o' || hash === '#auditoria' || search.includes('portal=admin') || search.includes('portal=dueno');
   });
 
+  const [isSaasPortalRoute, setIsSaasPortalRoute] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hash = (window.location.hash || '').toLowerCase();
+    const search = (window.location.search || '').toLowerCase();
+    return hash === '#saas' || hash === '#superadmin' || search.includes('portal=saas') || search.includes('portal=superadmin');
+  });
+
   // Helper para detectar si la URL corresponde a la carta digital / catálogo público
   const checkIsCatalogRoute = () => {
     if (typeof window === 'undefined') return false;
@@ -127,7 +135,9 @@ export default function App() {
       const hash = window.location.hash.toLowerCase();
       const search = window.location.search.toLowerCase();
       const isMatch = hash === '#admin' || hash === '#dueno' || hash === '#dueÃ±o' || hash === '#auditoria' || search.includes('portal=admin') || search.includes('portal=dueno');
+      const isSaas = hash === '#saas' || hash === '#superadmin' || search.includes('portal=saas') || search.includes('portal=superadmin');
       setIsOwnerPortalRoute(isMatch);
+      setIsSaasPortalRoute(isSaas);
       setIsCatalogRoute(checkIsCatalogRoute());
     };
     handleHash();
@@ -996,6 +1006,18 @@ export default function App() {
   }
 
   if (!settings) return null;
+
+  // SUPER-ADMIN SAAS WEB PORTAL (Multi-tenant subscriptions & client management)
+  if (isSaasPortalRoute) {
+    return (
+      <SaasAdminPortal 
+        onBackToPos={() => {
+          window.location.hash = '';
+          setIsSaasPortalRoute(false);
+        }}
+      />
+    );
+  }
 
   // SECRET OWNER AUDIT PORTAL (Completely independent page without POS header)
   if (isOwnerPortalRoute) {
