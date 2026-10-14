@@ -20,6 +20,7 @@ import { printerService } from './services/printerService';
 import { supabaseSync } from './services/supabaseClient';
 import CatalogPage from './pages/CatalogPage';
 import CatalogQRModal from './components/pos/CatalogQRModal';
+import CustomerCrmModal from './components/pos/CustomerCrmModal';
 import WhatsAppLiveMonitor from './components/pos/WhatsAppLiveMonitor';
 import WhatsAppToastAlert from './components/pos/WhatsAppToastAlert';
 import { liveChatService } from './services/liveChatService';
@@ -50,6 +51,7 @@ export default function App() {
   const [currentCashier, setCurrentCashier] = useState(() => authService.getCurrentCashier());
   const [activeWhatsAppCount, setActiveWhatsAppCount] = useState(0);
   const [orderToLoadInPOS, setOrderToLoadInPOS] = useState(null);
+  const [isCrmModalOpen, setIsCrmModalOpen] = useState(false);
 
   // Modo Cocina Enfocado (Zen Mode / Pantalla Completa para cocineros en móviles y tablets)
   const [isKitchenZenMode, setIsKitchenZenMode] = useState(() => {
@@ -1077,6 +1079,7 @@ export default function App() {
         onOpenCashModal={() => setIsCashModalOpen(true)}
         onOpenSettings={() => setIsSettingsModalOpen(true)}
         onOpenCatalogQR={() => setIsCatalogQROpen(true)}
+        onOpenCrm={() => setIsCrmModalOpen(true)}
         isKitchenZenMode={isKitchenZenMode}
         onToggleKitchenZenMode={handleToggleKitchenZenMode}
       />
@@ -1166,6 +1169,15 @@ export default function App() {
         <CatalogQRModal 
           settings={settings}
           onClose={() => setIsCatalogQROpen(false)}
+        />
+      )}
+
+      {isCrmModalOpen && (
+        <CustomerCrmModal
+          isOpen={isCrmModalOpen}
+          storeId={settings?.storeSlug || settings?.storeId || 'default'}
+          storeConfig={settings}
+          onClose={() => setIsCrmModalOpen(false)}
         />
       )}
 

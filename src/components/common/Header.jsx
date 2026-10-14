@@ -15,7 +15,8 @@ import {
   Sun, 
   Moon,
   MessageSquare,
-  QrCode
+  QrCode,
+  Users
 } from 'lucide-react';
 import { supabaseSync } from '../../services/supabaseClient';
 
@@ -34,7 +35,8 @@ export default function Header({
   onOpenSettings,
   onOpenCatalogQR,
   isKitchenZenMode,
-  onToggleKitchenZenMode
+  onToggleKitchenZenMode,
+  onOpenCrm
 }) {
   const isCloudSynced = supabaseSync.isConfigured();
 
@@ -118,6 +120,16 @@ export default function Header({
               {activeWhatsAppCount}
             </span>
           )}
+        </button>
+
+        <button 
+          type="button"
+          className="nav-tab-btn"
+          onClick={onOpenCrm}
+          title="Directorio de Clientes y Cuentas Corrientes (Fiados)"
+        >
+          <Users size={17} style={{ color: 'var(--accent-blue, #3b82f6)' }} />
+          <span>Clientes & Fiados</span>
         </button>
       </nav>
 
