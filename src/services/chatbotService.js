@@ -1293,9 +1293,13 @@ export const chatbotService = {
       return `${numBadge} *${p.name}* — ${priceStr}${photoBadge}${desc}`;
     }).join('\n\n')) + (availableProds.length > 8 ? `\n\n⏩ _Mostrando las primeras 8 opciones de ${availableProds.length}. Escribí *SIGUIENTE* para ver más._` : '');
 
-    let rawTemplate = settings.template_menu || DEFAULT_TEMPLATES.template_menu;
-    if (!rawTemplate || rawTemplate.includes('Consultar estado') || rawTemplate.includes('1️⃣ 📋') || rawTemplate.includes('5️⃣ 👤')) {
+    let rawTemplate = settings.template_menu;
+    if (!rawTemplate || !rawTemplate.includes('{catalogo_lista}') || rawTemplate.trim() === 'Hola bienvenido a nuestro menu!' || rawTemplate.includes('Consultar estado') || rawTemplate.includes('1️⃣ 📋') || rawTemplate.includes('5️⃣ 👤')) {
       rawTemplate = DEFAULT_TEMPLATES.template_menu;
+    }
+
+    if (!rawTemplate.includes('{catalogo_lista}')) {
+      rawTemplate = rawTemplate + `\n\n¿Qué te preparamos hoy? *Elegí lo que más te guste:*\n\n{catalogo_lista}\n\n───────────────────\n👉 *Respondé con el NÚMERO (1, 2, 3...) o el nombre de lo que quieras pedir.*\n👉 Podés agregar aclaraciones como *Sin cebolla*, *Extra cheddar*, etc.\n\n_Si querés consultar horarios, datos de pago o un pedido en curso, escribí *HORARIOS*, *DATOS* o *ESTADO*._`;
     }
 
     if (!rawTemplate.includes('{promos_alerta}') && promosAlerta) {

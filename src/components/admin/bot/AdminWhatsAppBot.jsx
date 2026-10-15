@@ -52,6 +52,9 @@ export default function AdminWhatsAppBot({ initialTab }) {
       if (cloudTpls && typeof cloudTpls === 'object' && Object.keys(cloudTpls).length > 0) {
         setSettings(prev => {
           const merged = { ...prev, ...cloudTpls };
+          if (!merged.template_menu || merged.template_menu.trim() === 'Hola bienvenido a nuestro menu!' || !merged.template_menu.includes('{catalogo_lista}')) {
+            merged.template_menu = DEFAULT_TEMPLATES.template_menu;
+          }
           if (merged[selectedNodeId]) {
             setCurrentNodeText(merged[selectedNodeId]);
           }
@@ -62,6 +65,9 @@ export default function AdminWhatsAppBot({ initialTab }) {
           if (serverTpls && typeof serverTpls === 'object' && Object.keys(serverTpls).length > 0) {
             setSettings(prev => {
               const merged = { ...prev, ...serverTpls };
+              if (!merged.template_menu || merged.template_menu.trim() === 'Hola bienvenido a nuestro menu!' || !merged.template_menu.includes('{catalogo_lista}')) {
+                merged.template_menu = DEFAULT_TEMPLATES.template_menu;
+              }
               if (merged[selectedNodeId]) {
                 setCurrentNodeText(merged[selectedNodeId]);
               }

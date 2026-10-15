@@ -1400,11 +1400,15 @@ function buildMainMenuMessage(customerName = '') {
       `_Si necesitás consultar por un pedido en curso o hablar con nosotros, podés escribir *ESTADO* o *HUMANO*._`;
   }
 
-  // MODO PLANTILLAS CLÁSICO: directo al grano para pedir sin menú burocrático
+  // MODO PLANTILLAS CLÁSICO: siempre muestra el menú catálogo como prediseñado
   const catalogList = formatCatalogListForTemplate(availableProds, 8);
-  let rawMenu = tpls.template_menu || DEFAULT_SERVER_TEMPLATES.template_menu;
-  if (!rawMenu || rawMenu.includes('Consultar estado') || rawMenu.includes('1️⃣ 📋') || rawMenu.includes('5️⃣ 👤')) {
+  let rawMenu = tpls.template_menu;
+  if (!rawMenu || !rawMenu.includes('{catalogo_lista}') || rawMenu.trim() === 'Hola bienvenido a nuestro menu!' || rawMenu.includes('Consultar estado') || rawMenu.includes('1️⃣ 📋') || rawMenu.includes('5️⃣ 👤')) {
     rawMenu = DEFAULT_SERVER_TEMPLATES.template_menu;
+  }
+
+  if (!rawMenu.includes('{catalogo_lista}')) {
+    rawMenu = rawMenu + `\n\n¿Qué te preparamos hoy? *Elegí lo que más te guste:*\n\n{catalogo_lista}\n\n───────────────────\n👉 *Respondé con el NÚMERO (1, 2, 3...) o el nombre de lo que quieras pedir.*\n👉 Podés agregar aclaraciones como *Sin cebolla*, *Extra cheddar*, etc.\n\n_Si querés consultar horarios, datos de pago o un pedido en curso, escribí *HORARIOS*, *DATOS* o *ESTADO*._`;
   }
 
   if (!rawMenu.includes('{promos_alerta}') && promosAlerta) {

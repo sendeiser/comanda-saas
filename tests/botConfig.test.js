@@ -35,3 +35,10 @@ test('loadBotConfig falls back to default store when no store is specified', () 
   assert.ok(config.store.name);
   assert.ok(typeof config.store.slug === 'string');
 });
+
+test('DEFAULT_TEMPLATES template_menu includes predesigned catalog placeholder', async () => {
+  const { DEFAULT_TEMPLATES } = await import('../src/services/whatsappBotConstants.js');
+  assert.ok(DEFAULT_TEMPLATES.template_menu.includes('{catalogo_lista}'));
+  assert.ok(DEFAULT_TEMPLATES.template_menu.includes('{cliente}'));
+  assert.ok(DEFAULT_TEMPLATES.template_menu.includes('{nombre_local}'));
+});

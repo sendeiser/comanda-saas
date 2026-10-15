@@ -234,12 +234,17 @@ class MultiTenantBotEngine:
         slug = store.get("slug", "demo")
         catalog_link = f"https://comandasaas.app/#catalog?store={slug}"
 
-        # Generar lista rápida de catálogo en texto
+        # Generar lista rápida de catálogo en texto prediseñado
         catalog_lines = []
-        for idx, p in enumerate(self.products[:12], 1):
+        for idx, p in enumerate(self.products[:8], 1):
             price_val = f"${int(p.get('price', 0)):,}".replace(",", ".")
-            catalog_lines.append(f"{idx}. *{p.get('name')}* — {price_val}")
-        catalog_text = "\n".join(catalog_lines) if catalog_lines else "Consultar carta online."
+            desc_val = f"\n   _{p.get('description')}_" if p.get('description') else ""
+            img_badge = " 📸" if p.get('image') else ""
+            num_badge = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"][idx - 1] if idx <= 8 else f"{idx}."
+            catalog_lines.append(f"{num_badge} *{p.get('name')}* — {price_val}{img_badge}{desc_val}")
+        catalog_text = "\n\n".join(catalog_lines) if catalog_lines else "Consultar carta online."
+        if len(self.products) > 8:
+            catalog_text += f"\n\n⏩ _Mostrando las primeras 8 opciones de {len(self.products)}. Escribí *SIGUIENTE* para ver más._"
 
         replacements = {
             "{cliente}": (extra_vars or {}).get("cliente", "Cliente"),
@@ -410,22 +415,38 @@ class MultiTenantBotEngine:
             "menu", "carta", "que tienen", "que hay", "precios", "promos"
         ])
 
-        if is_greeting or bot_mode in ["catalog", "catalog_direct"]:
+        if is_greeting or bot_mode in ["catalog", "catalog_direct", "templates"]:
             if bot_mode == "catalog_direct":
                 custom_tpl = self.templates.get("template_catalog_direct_welcome")
-            else:
-                custom_tpl = self.templates.get("template_menu")
-
-            if custom_tpl:
-                compiled = self.compile_text(custom_tpl)
-            else:
-                compiled = (
-                    f"¡Hola! 👋 Te damos la bienvenida a *{store_name}* 🍔\n\n"
-                    f"📖 *Accedé a nuestra Carta Digital Interactiva y armá tu pedido acá:*\n"
-                    f"{catalog_link}\n\n"
-                    f"🛵 Hacemos envíos rápidos a domicilio y retiro por el local.\n"
-                    f"Armá tu carrito con fotos y agregados, ¡y al confirmar entra directo a nuestra cocina!"
+                if not custom_tpl:
+                    custom_tpl = (
+                        f"🍔 *¡Hola {{cliente}}! Bienvenido a {store_name}* 🔥\n\n"
+                        f"📱 *Hacé tu pedido directo desde nuestra Carta Online con fotos reales y precios:*\n"
+                        f"👉 {catalog_link}\n\n"
+                        f"Armá tu pedido en un toque y al enviarlo ingresa directamente a nuestra cocina y POS. ¡Te esperamos! 🛵✨"
+                    )
+            elif bot_mode == "catalog":
+                custom_tpl = (
+                    f"🍔 *¡Hola {{cliente}}! Bienvenido a {store_name}* 🔥\n\n"
+                    f"📱 *¡Hacé tu pedido directo desde nuestra Carta Digital interactiva con fotos reales y precios!* 📸\n"
+                    f"👉 {catalog_link}\n\n"
+                    f"Allí podés ver fotos reales de cada hamburguesa, armar tu combo con adicionales y enviar tu pedido directo a la cocina en un toque. ¡Te esperamos! 🛵✨\n\n"
+                    f"_Si necesitás consultar por un pedido en curso o hablar con nosotros, podés escribir *ESTADO* o *HUMANO*._"
                 )
+            else: # modo templates: bienvenida con menú catálogo prediseñado
+                custom_tpl = self.templates.get("template_menu")
+                if not custom_tpl or "{catalogo_lista}" not in custom_tpl or "Consultar estado" in custom_tpl or custom_tpl.strip() == "Hola bienvenido a nuestro menu!":
+                    custom_tpl = (
+                        f"🍔 *¡Hola {{cliente}}! Bienvenido a {store_name}* 🔥\n\n"
+                        f"{{promos_alerta}}¿Qué te preparamos hoy? *Elegí lo que más te guste:*\n\n"
+                        f"{{catalogo_lista}}\n\n"
+                        f"───────────────────\n"
+                        f"👉 *Respondé con el NÚMERO (1, 2, 3...) o el nombre de lo que quieras pedir.*\n"
+                        f"👉 Podés agregar aclaraciones como *Sin cebolla*, *Extra cheddar*, etc.\n\n"
+                        f"_Si querés consultar horarios, datos de pago o un pedido en curso, escribí *HORARIOS*, *DATOS* o *ESTADO*._"
+                    )
+
+            compiled = self.compile_text(custom_tpl)
             return {
                 "reply": compiled,
                 "order_created": None,
