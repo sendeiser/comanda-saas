@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Flame,
   User,
@@ -16,9 +16,12 @@ import {
   Moon,
   MessageSquare,
   QrCode,
-  Users
+  Users,
+  WifiOff,
+  RefreshCw
 } from 'lucide-react';
 import { supabaseSync } from '../../services/supabaseClient';
+import { offlineSyncService } from '../../services/offlineSyncService';
 
 export default function Header({ 
   currentCashier,
@@ -39,6 +42,17 @@ export default function Header({
   onOpenCrm
 }) {
   const isCloudSynced = supabaseSync.isConfigured();
+  const [offlineState, setOfflineState] = useState(() => ({
+    isOnline: offlineSyncService.isOnline(),
+    pendingCount: offlineSyncService.getPendingCount(),
+    isSyncing: false
+  }));
+
+  useEffect(() => {
+    return offlineSyncService.subscribe(state => {
+      setOfflineState(state);
+    });
+  }, []);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -178,19 +192,43 @@ export default function Header({
           </div>
         )}
 
-        {/* Cloud Status (Desktop Only) */}
+        {/* Connection & Offline Resilience Pill */}
         <div 
-          className="desktop-only-action"
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            color: isCloudSynced ? 'var(--accent-blue)' : 'var(--text-muted)', 
-            cursor: 'pointer' 
+          className={`connection-status-pill tactile-btn ${!offlineState.isOnline ? 'offline' : (offlineState.pendingCount > 0 ? 'syncing' : 'online')}`}
+          onClick={() => {
+            if (!offlineState.isOnline || offlineState.pendingCount > 0) {
+              offlineSyncService.processQueue();
+            } else {
+              onOpenSettings();
+            }
           }}
-          onClick={onOpenSettings}
-          title={isCloudSynced ? 'Sincronizado con Supabase Cloud' : 'Operando en modo local (Offline)'}
+          title={
+            !offlineState.isOnline 
+              ? `⚠️ Modo Local / Sin Conexión (${offlineState.pendingCount} pedidos guardados localmente). Clic para reintentar sincronización con la nube.`
+              : (offlineState.pendingCount > 0 
+                  ? `🔄 Sincronizando ${offlineState.pendingCount} elementos con Supabase...` 
+                  : '🟢 Conexión en Tiempo Real con Supabase Cloud')
+          }
         >
-          <Cloud size={18} />
+          {!offlineState.isOnline ? (
+            <>
+              <WifiOff size={13} style={{ color: '#f87171' }} />
+              <span className="conn-text-full">Sin Internet ({offlineState.pendingCount})</span>
+              <span className="conn-text-short">Offline ({offlineState.pendingCount})</span>
+            </>
+          ) : offlineState.pendingCount > 0 ? (
+            <>
+              <RefreshCw size={13} className="spin-animation" style={{ color: '#38bdf8' }} />
+              <span className="conn-text-full">Subiendo ({offlineState.pendingCount})...</span>
+              <span className="conn-text-short">Sync ({offlineState.pendingCount})</span>
+            </>
+          ) : (
+            <>
+              <span className="conn-pulse-dot" />
+              <Cloud size={13} style={{ color: '#34d399' }} />
+              <span className="conn-text-full">En Línea</span>
+            </>
+          )}
         </div>
 
         {/* Theme Toggle Button (Light / Dark) */}

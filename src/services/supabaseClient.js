@@ -1149,6 +1149,76 @@ export const supabaseSync = {
 
     const interval = setInterval(poll, 2000);
     return () => clearInterval(interval);
+  },
+
+  // --- BOT CONFIG & MULTI-TENANT BOT PERSISTENCE ---
+  async fetchBotConfig(storeId, type) {
+    if (!this.isConfigured()) return null;
+    try {
+      const cleanStoreId = storeId || '00000000-0000-0000-0000-000000000001';
+      const cleanType = type || 'templates';
+      const configId = `bot_${cleanType}_${cleanStoreId}`;
+      const query = `id=eq.${encodeURIComponent(configId)}&select=*`;
+      const res = await fetch(this._url('bot_config', query), { headers: this._headers() });
+      if (res.ok) {
+        const rows = await res.json();
+        if (Array.isArray(rows) && rows.length > 0 && rows[0].data) {
+          return rows[0].data;
+        }
+      }
+    } catch (e) {
+      console.warn('[Supabase] fetchBotConfig error:', e);
+    }
+    return null;
+  },
+
+  async saveBotConfig(storeId, type, data) {
+    if (!this.isConfigured()) return false;
+    try {
+      const cleanStoreId = storeId || '00000000-0000-0000-0000-000000000001';
+      const cleanType = type || 'templates';
+      const configId = `bot_${cleanType}_${cleanStoreId}`;
+      const payload = {
+        id: configId,
+        store_id: cleanStoreId,
+        type: cleanType,
+        data: data || {},
+        updated_at: new Date().toISOString()
+      };
+      const res = await fetch(this._url('bot_config'), {
+        method: 'POST',
+        headers: this._headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
+        body: JSON.stringify(payload)
+      });
+      return res.ok;
+    } catch (e) {
+      console.warn('[Supabase] saveBotConfig error:', e);
+      return false;
+    }
+  },
+
+  async fetchBotVariables(storeId) {
+    return this.fetchBotConfig(storeId, 'variables');
+  },
+
+  async saveBotVariables(variables, storeId) {
+    return this.saveBotConfig(storeId, 'variables', variables);
+  },
+
+  async fetchBotTemplates(storeId) {
+    return this.fetchBotConfig(storeId, 'templates');
+  },
+
+  async saveBotTemplates(templates, storeId) {
+    return this.saveBotConfig(storeId, 'templates', templates);
+  },
+
+  async fetchBotFlows(storeId) {
+    return this.fetchBotConfig(storeId, 'flows');
+  },
+
+  async saveBotFlows(flows, storeId) {
+    return this.saveBotConfig(storeId, 'flows', flows);
   }
 };
 

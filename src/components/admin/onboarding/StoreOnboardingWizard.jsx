@@ -101,7 +101,8 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
           transferAlias: transferAlias.trim().toUpperCase(),
           transferBank: transferBank.trim()
         },
-        isActive: true
+        isActive: true,
+        onboardingCompleted: true
       };
 
       const saved = await saveStoreConfig(storePayload);
@@ -111,6 +112,8 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
       if (seedProducts && tmpl.sampleProducts?.length > 0) {
         const seededList = tmpl.sampleProducts.map((p, idx) => ({
           id: `prod_${Date.now()}_${idx}`,
+          store_id: saved.id,
+          storeId: saved.id,
           name: p.name,
           category: p.category,
           price: p.price,
@@ -121,6 +124,42 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
           modifiers: []
         }));
         storageService.saveProducts(seededList);
+
+        if (supabaseSync && supabaseSync.isConfigured()) {
+          for (const sp of seededList) {
+            supabaseSync.createProduct(sp).catch(() => {});
+          }
+        }
+      }
+
+      // Seed initial tables if enabled
+      if (hasTables && supabaseSync && supabaseSync.isConfigured()) {
+        for (let t = 1; t <= 8; t++) {
+          supabaseSync.createRestaurantTable({
+            store_id: saved.id,
+            table_number: t,
+            label: `Mesa ${t}`,
+            capacity: 4,
+            status: 'free'
+          }).catch(() => {});
+        }
+      }
+
+      // Seed initial admin cashier
+      if (supabaseSync && supabaseSync.isConfigured()) {
+        supabaseSync.createCashier({
+          id: `csh-${saved.slug}-admin`,
+          store_id: saved.id,
+          username: 'admin',
+          pin: '1234',
+          name: 'Administrador ' + saved.name,
+          role: 'admin'
+        }).catch(() => {});
+      }
+
+      // Mark onboarding as completed for this store
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('cf_onboarding_completed_' + (saved.id || saved.slug), 'true');
       }
 
       setCreatedStore(saved);

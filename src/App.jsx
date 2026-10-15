@@ -25,6 +25,7 @@ import CustomerCrmModal from './components/pos/CustomerCrmModal';
 import WhatsAppLiveMonitor from './components/pos/WhatsAppLiveMonitor';
 import WhatsAppToastAlert from './components/pos/WhatsAppToastAlert';
 import { liveChatService } from './services/liveChatService';
+import { offlineSyncService } from './services/offlineSyncService';
 
 const isLocalEnv = () => {
   if (typeof window === 'undefined') return false;
@@ -706,8 +707,18 @@ export default function App() {
     const savedOrder = storageService.saveOrder(orderData);
     setOrders(storageService.getOrders());
     
-    // Sync to Supabase CLOUD (fuente de verdad)
-    supabaseSync.createOrder(savedOrder);
+    // Sync to Supabase CLOUD (fuente de verdad) con encolado offline automático
+    if (supabaseSync.isConfigured()) {
+      supabaseSync.createOrder(savedOrder).then(res => {
+        if (!res) {
+          offlineSyncService.enqueue('CREATE_ORDER', savedOrder);
+        }
+      }).catch(() => {
+        offlineSyncService.enqueue('CREATE_ORDER', savedOrder);
+      });
+    } else {
+      offlineSyncService.enqueue('CREATE_ORDER', savedOrder);
+    }
 
     // Sync to Local WhatsApp Bot / LAN Microservice (puerto 3002) solo en red local
     if (isLocalEnv()) {

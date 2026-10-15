@@ -21,8 +21,17 @@ import { authService } from '../../services/authService';
 export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, theme, onToggleTheme, onRefreshSystem }) {
   const portalRef = useRef(null);
   const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'shifts' | 'security' | 'menu' | 'settings' | 'bot' | 'database'
-  const [botSubTab, setBotSubTab] = useState('connection'); // 'connection' | 'security' | 'templates' | 'flows'
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try {
+      const active = getActiveStore();
+      if (!active) return false;
+      if (active.slug === 'comandafast-demo' || active.slug === 'demo') return false;
+      const done = localStorage.getItem('cf_onboarding_completed_' + (active.id || active.slug));
+      return done !== 'true' && !active.onboardingCompleted;
+    } catch (_) {
+      return false;
+    }
+  });
 
   // Sidebar collapse state (persisted in localStorage)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
@@ -336,28 +345,6 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
           >
             <Store size={16} />
             <span>+ Nuevo Comercio</span>
-          </button>
-
-          <button
-            type="button"
-            className="qty-btn tactile-btn"
-            style={{ 
-              width: 'auto', 
-              padding: '0.45rem 0.95rem', 
-              fontSize: '0.82rem', 
-              gap: '6px', 
-              minHeight: '38px',
-              color: '#38bdf8',
-              background: 'rgba(56, 189, 248, 0.12)',
-              borderColor: 'rgba(56, 189, 248, 0.35)',
-              fontWeight: 800,
-              cursor: 'pointer'
-            }}
-            onClick={() => { window.location.hash = '#saas'; }}
-            title="Abrir Centro de Control SaaS (Abonos y Cobranzas de Comercios)"
-          >
-            <Building2 size={16} />
-            <span>SaaS & Abonos</span>
           </button>
 
           <button

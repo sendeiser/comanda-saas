@@ -984,6 +984,7 @@ export const storageService = {
 
   // SETTINGS
   getSettings() {
+    if (typeof localStorage === 'undefined') return DEFAULT_SETTINGS;
     const raw = localStorage.getItem(KEYS.SETTINGS);
     if (!raw) {
       localStorage.setItem(KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
@@ -1002,6 +1003,7 @@ export const storageService = {
   },
 
   saveSettings(settings) {
+    if (typeof localStorage === 'undefined') return;
     const updated = { ...settings };
     if (updated.supabaseUrl && updated.supabaseUrl.includes('yqynuvjpipmvurualgtg')) {
       updated.supabaseUrl = DEFAULT_SETTINGS.supabaseUrl;
