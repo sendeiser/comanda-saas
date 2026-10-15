@@ -3151,6 +3151,27 @@ class WhatsAppBotServer {
           }
 
           // -------------------------------------------------------------
+          // ACTUALIZACIÓN DE DIRECCIÓN EN CUALQUIER MOMENTO
+          // -------------------------------------------------------------
+          const addrUpdateMatch = text.match(/(?:mi\s+direcci[oó]n\s+es|la\s+direcci[oó]n\s+es|cambiar\s+direcci[oó]n\s+a|mi\s+domicilio\s+es|estoy\s+en)[:\s]+(.+)/i);
+          if (addrUpdateMatch) {
+            const newAddr = addrUpdateMatch[1].trim();
+            session.shippingAddress = newAddr;
+            session.shippingMethod = 'delivery';
+            const allOrders = getStoredOrders();
+            const lastCustOrder = allOrders.slice().reverse().find(o => o.remoteJid === remoteJid || o.customer?.remoteJid === remoteJid);
+            if (lastCustOrder) {
+              if (lastCustOrder.customer) lastCustOrder.customer.address = newAddr;
+              saveStoredOrder(lastCustOrder);
+              await pushOrderToSupabase(lastCustOrder);
+            }
+            await this.safeSendMessage(remoteJid, {
+              text: `📍 *¡Dirección de entrega actualizada con éxito!* 🛵\n\n• *Destino registrado:* ${newAddr}\n• Ya le dimos aviso al cadete para que te lo lleve allí. ¡Gracias por avisar! 🙌`
+            }, msg.key);
+            continue;
+          }
+
+          // -------------------------------------------------------------
           // EVALUACIÓN DE FLUJOS PERSONALIZADOS CON CONDICIONES
           // -------------------------------------------------------------
           const activeFlows = getCustomFlows().filter(f => f.enabled);
@@ -3456,7 +3477,7 @@ class WhatsAppBotServer {
                 text: '🛍️ *Retiro por el local seleccionado.* (Sin costo de envío)\n\n👤 *¿A nombre de quién registramos el pedido?*\n(Escribí tu nombre y apellido):'
               }, msg.key);
               continue;
-            } else if (lower === '2' || lower.includes('envio') || lower.includes('envío') || lower.includes('delivery') || lower.includes('domicilio')) {
+            } else if (lower === '2' || lower.includes('envio') || lower.includes('envío') || lower.includes('delivery') || lower.includes('domicilio') || /(?:calle|av|avenida|entre|dpto|piso|barrio|\b[a-zá-ÿ]{3,}\s+\d{2,5}\b)/i.test(text)) {
               session.shippingMethod = 'delivery';
               const biz = getBusinessContext();
               const rawCost = String(biz.costo_envio || '').replace(/\D/g, '');
@@ -3474,6 +3495,16 @@ class WhatsAppBotServer {
                 session.deliveryFee = costoEnvio;
               }
               session.total = session.subtotal + session.deliveryFee;
+
+              const candidateAddr = text.replace(/^(?:2|delivery|envio|envío|a\s+domicilio)\s*(?:a|en|es)?[:\s]*/i, '').trim();
+              if (candidateAddr.length >= 4 && !candidateAddr.toLowerCase().startsWith('delivery')) {
+                session.shippingAddress = candidateAddr;
+                session.step = 'ASK_NAME';
+                await this.safeSendMessage(remoteJid, {
+                  text: `🛵 *Envío a domicilio registrado:* "${candidateAddr}".\n\n👤 *¿A nombre de quién preparamos el pedido?*\n(Escribí tu nombre y apellido):`
+                }, msg.key);
+                continue;
+              }
 
               session.step = 'ASK_ADDRESS';
               const feeText = session.deliveryFee > 0 

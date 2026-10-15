@@ -126,6 +126,17 @@ class SupabaseClient:
             print(f"[SupabaseClient POST {table}] Error: {e}", file=sys.stderr)
             return None
 
+    def patch(self, table, query, data):
+        url = f"{self.url}/rest/v1/{table}?{query}"
+        payload = json.dumps(data).encode("utf-8")
+        req = urllib.request.Request(url, data=payload, headers=self._headers({"Prefer": "return=representation"}), method="PATCH")
+        try:
+            with urllib.request.urlopen(req, timeout=10) as res:
+                return json.loads(res.read().decode("utf-8"))
+        except Exception as e:
+            print(f"[SupabaseClient PATCH {table}] Error: {e}", file=sys.stderr)
+            return None
+
     def list_all_stores(self):
         """Devuelve todos los comercios activos registrados en la base de datos."""
         res = self.get("stores", "is_active=eq.true&order=name.asc")
@@ -324,6 +335,19 @@ def extract_order_items_local(text, products):
     for w, n in word_to_num.items():
         clean_text = re.sub(rf"\b{w}\b", str(n), clean_text)
 
+    # Detección por número exacto de lista (ej: "1", "2", "el 1", "opcion 2")
+    num_match = re.search(r"^(?:el\s+|la\s+|quiero\s+el\s+|quiero\s+la\s+|opcion\s+|opci[oó]n\s+)?(\d{1,2})$", text.strip(), re.IGNORECASE)
+    if num_match:
+        idx = int(num_match.group(1)) - 1
+        if 0 <= idx < len(products):
+            target_p = products[idx]
+            return [{
+                "id": target_p.get("id"),
+                "name": target_p.get("name"),
+                "qty": 1,
+                "price": float(target_p.get("price", 0))
+            }]
+
     matched = []
     seen_ids = set()
     sorted_prods = sorted(products, key=lambda p: len(p.get("name", "")), reverse=True)
@@ -377,6 +401,8 @@ class MultiTenantBotEngine:
 
         if target_slug:
             self.load_store_context(target_slug)
+        else:
+            self.load_store_context("demo")
 
     def load_store_context(self, slug_or_id):
         """Carga todo el contexto de Supabase (negocio, plantillas, flujos, variables y menú)."""
@@ -423,10 +449,11 @@ class MultiTenantBotEngine:
 
     def get_mode(self):
         """Determina el modo operativo configurado en Supabase: catalog, templates, catalog_direct, flows o ai."""
-        menu_mode = self.templates.get("menu_mode")
+        menu_mode = (self.templates or {}).get("menu_mode")
         if menu_mode in ["catalog", "templates", "catalog_direct"]:
             return menu_mode
-        mode = self.templates.get("bot_mode") or self.current_store.get("bot_mode") or "catalog"
+        store = self.current_store or {}
+        mode = (self.templates or {}).get("bot_mode") or store.get("bot_mode") or "templates"
         return str(mode).lower()
 
     def compile_text(self, text, extra_vars=None):
@@ -495,6 +522,113 @@ class MultiTenantBotEngine:
 
         return result
 
+    def get_session(self, phone):
+        clean_phone = re.sub(r"[^\d+]", "", phone or "5491100000000")
+        if clean_phone not in SESSIONS:
+            SESSIONS[clean_phone] = {
+                "step": "IDLE",
+                "items": [],
+                "subtotal": 0,
+                "delivery_fee": 0,
+                "total": 0,
+                "shipping_method": "local",
+                "shipping_address": "",
+                "customer_name": "Cliente WhatsApp",
+                "payment_method": "efectivo",
+                "active_order_id": None,
+                "last_active": time.time()
+            }
+        return SESSIONS[clean_phone]
+
+    def reset_session(self, phone):
+        clean_phone = re.sub(r"[^\d+]", "", phone or "5491100000000")
+        SESSIONS[clean_phone] = {
+            "step": "IDLE",
+            "items": [],
+            "subtotal": 0,
+            "delivery_fee": 0,
+            "total": 0,
+            "shipping_method": "local",
+            "shipping_address": "",
+            "customer_name": "Cliente WhatsApp",
+            "payment_method": "efectivo",
+            "active_order_id": None,
+            "last_active": time.time()
+        }
+        return SESSIONS[clean_phone]
+
+    def _create_comanda(self, store, order_num, phone, cust_name, cust_addr, items, subtotal, delivery_fee, total, payment_method):
+        new_order = {
+            "id": f"ord-bot-{int(time.time() * 1000)}",
+            "store_id": store.get("id"),
+            "order_number": order_num,
+            "channel": "whatsapp",
+            "table_number": "",
+            "customer": {
+                "name": cust_name or "Cliente WhatsApp",
+                "phone": phone,
+                "address": cust_addr or "Retiro por el local (Mostrador)"
+            },
+            "items": items,
+            "subtotal": subtotal,
+            "delivery_fee": delivery_fee,
+            "total": total,
+            "payment_method": payment_method or "efectivo",
+            "status": "pendiente",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        created = self.sb.create_order(new_order)
+        return created[0] if created and isinstance(created, list) else new_order
+
+    def _build_order_confirmation(self, order_num, items, subtotal, delivery_fee, total, cust_addr, payment_method, store_name, store):
+        items_text = "\n".join([f"• {it['qty']}x {it['name']} (${int(it.get('unitPrice', it.get('price', 0)) * it['qty']):,})".replace(",", ".") for it in items])
+        alias = self.variables.get("alias_banco") or store.get("payment_settings", {}).get("transferAlias") or store.get("bank_alias") or "comandafast.mp"
+        banco = self.variables.get("banco") or store.get("payment_settings", {}).get("bankName") or "Mercado Pago"
+        titular = self.variables.get("titular") or store.get("payment_settings", {}).get("bankHolder") or store.get("name", "ComandaFast Burgers")
+        cbu = self.variables.get("cbu") or store.get("payment_settings", {}).get("transferCbu") or ""
+        cbu_line = f"\n• *CBU/CVU:* `{cbu}`" if cbu and cbu != "—" else ""
+
+        if payment_method == "transferencia":
+            payment_block = (
+                f"💳 *Medio de Pago: TRANSFERENCIA BANCARIA / MERCADO PAGO*\n"
+                f"• *Alias:* `{alias}`\n"
+                f"• *Banco / Billetera:* {banco}\n"
+                f"• *Titular:* {titular}"
+                f"{cbu_line}\n"
+                f"• *Total exacto a transferir:* ${int(total):,}\n\n"
+                f"📸 *IMPORTANTE:* Por favor enviá la captura o foto del comprobante por este chat para confirmar tu pago y pasarlo a la cocina. 🔥"
+            )
+        else:
+            payment_block = (
+                f"💳 *¿Abonás por Transferencia Bancaria o Mercado Pago?*\n"
+                f"• *Alias:* `{alias}`\n"
+                f"• *Banco / Billetera:* {banco}\n"
+                f"• *Titular:* {titular}"
+                f"{cbu_line}\n"
+                f"• *Monto exacto:* ${int(total):,}\n"
+                f"📸 *Enviá la captura del comprobante por acá para comenzar a cocinar.*\n\n"
+                f"💵 *¿Abonás en Efectivo al recibir?*\n"
+                f"Respondé *EFECTIVO* (y avísanos con cuánto pagás si necesitás vuelto)."
+            )
+
+        shipping_line = f"🛵 Envío: ${int(delivery_fee):,}\n" if delivery_fee > 0 else "🛍️ Retiro en local: ¡Sin costo!\n"
+        subtotal_line = f"💵 Subtotal: ${int(subtotal):,}\n" if delivery_fee > 0 else ""
+
+        reply = (
+            f"✅ *¡Comanda #{order_num} Registrada en {store_name}!* 🔥\n\n"
+            f"📋 *Tu Pedido:*\n{items_text}\n\n"
+            f"{subtotal_line}"
+            f"{shipping_line}"
+            f"💰 *Total a abonar: ${int(total):,}*\n\n"
+            f"{payment_block}\n\n"
+            f"📍 *Entrega:* {cust_addr}\n"
+            f"⏱️ Tiempo estimado: {self.templates.get('delay_minutes', '25 a 40')} min.\n"
+            f"¡Ya dimos aviso a la cocina para su preparación! 🚀"
+        ).replace(",", ".")
+
+        return reply
+
     def process_message(self, phone, raw_text, override_store_id=None):
         """Procesa un mensaje entrante respetando el modo y configuración del negocio."""
         # Refrescar contexto si se solicita un store específico
@@ -517,6 +651,212 @@ class MultiTenantBotEngine:
         bot_mode = self.get_mode()
 
         catalog_link = f"https://comandasaas.app/#catalog?store={store_slug}"
+
+        session = self.get_session(phone)
+        session["last_active"] = time.time()
+
+        # COMANDOS GLOBALES DE CANCELACIÓN O REINICIO
+        if text_lower in ["cancelar", "cancelar pedido", "anular", "anular pedido", "borrar", "reiniciar", "reset"]:
+            self.reset_session(phone)
+            return {
+                "reply": "❌ *Pedido cancelado.*\n\nEscribí *MENU* en cualquier momento para ver la carta o realizar un nuevo pedido.",
+                "order_created": None,
+                "mode": bot_mode,
+                "store": store_name
+            }
+
+        # ACTUALIZACIÓN DE DIRECCIÓN EN CUALQUIER MOMENTO
+        addr_update_match = re.search(
+            r"(?:mi\s+direcci[oó]n\s+es|la\s+direcci[oó]n\s+es|cambiar\s+direcci[oó]n\s+a|mi\s+domicilio\s+es|estoy\s+en)[:\s]+(.+)",
+            text, re.IGNORECASE
+        )
+        if addr_update_match:
+            new_addr = addr_update_match.group(1).strip()
+            session["shipping_address"] = new_addr
+            session["shipping_method"] = "delivery"
+            if session.get("active_order_id"):
+                self.sb.patch("orders", f"order_number=eq.{session['active_order_id']}&store_id=eq.{store.get('id')}", {
+                    "customer": {
+                        "name": session.get("customer_name", "Cliente WhatsApp"),
+                        "phone": phone,
+                        "address": new_addr
+                    },
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                })
+            reply = (
+                f"📍 *¡Dirección de entrega actualizada con éxito!* 🛵\n\n"
+                f"• *Destino registrado:* {new_addr}\n"
+                f"• Ya le dimos aviso al cadete para que te lo lleve allí. ¡Gracias por avisar! 🙌"
+            )
+            return {
+                "reply": reply,
+                "order_created": None,
+                "mode": bot_mode,
+                "store": store_name
+            }
+
+        # MÁQUINA DE ESTADOS: ASK_SHIPPING_METHOD (Esperando opción 1 Retiro o 2 Delivery)
+        if session.get("step") == "ASK_SHIPPING_METHOD":
+            is_local = (
+                text_lower in ["1", "retiro", "local", "mostrador", "take away", "paso a buscar", "lo busco", "retiro en local", "retiro por el local"]
+                or "retiro" in text_lower or "take away" in text_lower or "mostrador" in text_lower
+                or ("local" in text_lower and "envio" not in text_lower and "delivery" not in text_lower)
+            )
+            is_delivery = (
+                text_lower in ["2", "delivery", "envio", "envío", "a domicilio", "a mi casa", "cadete", "mandamelo", "mandámelo", "enviar"]
+                or "delivery" in text_lower or "envio" in text_lower or "envío" in text_lower or "domicilio" in text_lower
+            )
+
+            # Si el usuario directamente escribió una dirección o calle (ej: "San Martín 450")
+            has_explicit_address = (
+                any(w in text_lower for w in ["calle", "av", "avenida", "entre", "dpto", "piso", "barrio"])
+                or bool(re.search(r"\b[a-zá-ÿ]{3,}\s+\d{2,5}\b", text_lower))
+            )
+
+            if is_local:
+                session["shipping_method"] = "local"
+                session["shipping_address"] = "Retiro por el local (Mostrador)"
+                session["delivery_fee"] = 0
+                session["total"] = session.get("subtotal", 0)
+                order_num = self.sb.get_next_order_number(store.get("id"))
+                created_record = self._create_comanda(
+                    store, order_num, phone, session.get("customer_name"),
+                    session["shipping_address"], session.get("items", []), session.get("subtotal", 0),
+                    0, session["total"], session.get("payment_method")
+                )
+                session["step"] = "CONFIRMED"
+                session["active_order_id"] = order_num
+                reply = self._build_order_confirmation(
+                    order_num, session.get("items", []), session.get("subtotal", 0), 0,
+                    session["total"], session["shipping_address"],
+                    session.get("payment_method"), store_name, store
+                )
+                return {
+                    "reply": reply,
+                    "order_created": created_record,
+                    "mode": bot_mode,
+                    "store": store_name
+                }
+
+            elif is_delivery or has_explicit_address:
+                # Verificar si ya vino la dirección incluida en el texto (ej: "2 a San Martin 450" o "San Martin 450")
+                addr_candidate = re.sub(r"^(?:2|delivery|envio|envío|a\s+domicilio)\s*(?:a|en|es)?[:\s]*", "", text, flags=re.IGNORECASE).strip()
+                if len(addr_candidate) >= 4 and not addr_candidate.lower().startswith("delivery"):
+                    session["shipping_method"] = "delivery"
+                    session["shipping_address"] = addr_candidate
+                    session["delivery_fee"] = delivery_fee
+                    session["total"] = session.get("subtotal", 0) + delivery_fee
+                    order_num = self.sb.get_next_order_number(store.get("id"))
+                    created_record = self._create_comanda(
+                        store, order_num, phone, session.get("customer_name"),
+                        session["shipping_address"], session.get("items", []), session.get("subtotal", 0),
+                        delivery_fee, session["total"], session.get("payment_method")
+                    )
+                    session["step"] = "CONFIRMED"
+                    session["active_order_id"] = order_num
+                    reply = self._build_order_confirmation(
+                        order_num, session.get("items", []), session.get("subtotal", 0), delivery_fee,
+                        session["total"], session["shipping_address"],
+                        session.get("payment_method"), store_name, store
+                    )
+                    return {
+                        "reply": reply,
+                        "order_created": created_record,
+                        "mode": bot_mode,
+                        "store": store_name
+                    }
+                else:
+                    session["shipping_method"] = "delivery"
+                    session["delivery_fee"] = delivery_fee
+                    session["total"] = session.get("subtotal", 0) + delivery_fee
+                    session["step"] = "ASK_ADDRESS"
+                    reply = (
+                        f"🛵 *Envío a domicilio seleccionado.* (Costo de envío: ${int(delivery_fee):,})\n\n"
+                        f"📍 *Por favor escribí tu dirección exacta y entrecalles para que el cadete pueda llevártelo:*\n"
+                        f"_(Ejemplo: San Martín 450 entre Belgrano y Moreno)_"
+                    ).replace(",", ".")
+                    return {
+                        "reply": reply,
+                        "order_created": None,
+                        "mode": bot_mode,
+                        "store": store_name
+                    }
+            else:
+                reply = (
+                    f"⚠️ Por favor elegí cómo preferís recibir tu pedido:\n\n"
+                    f"1️⃣ *Retiro por el local* (Take Away - Sin costo)\n"
+                    f"2️⃣ *Envío a domicilio* (Delivery - Costo: ${int(delivery_fee):,})\n\n"
+                    f"👉 *Respondé con 1 para Retiro o 2 para Delivery* (o escribí *CANCELAR* para anular)."
+                ).replace(",", ".")
+                return {
+                    "reply": reply,
+                    "order_created": None,
+                    "mode": bot_mode,
+                    "store": store_name
+                }
+
+        # MÁQUINA DE ESTADOS: ASK_ADDRESS (Esperando la dirección de entrega)
+        if session.get("step") == "ASK_ADDRESS":
+            # Verificar si cambió de idea a retiro en el local
+            if (
+                text_lower in ["1", "retiro", "local", "mostrador", "paso a buscar", "lo busco", "take away"]
+                or "retiro" in text_lower or "paso a buscar" in text_lower
+            ):
+                session["shipping_method"] = "local"
+                session["shipping_address"] = "Retiro por el local (Mostrador)"
+                session["delivery_fee"] = 0
+                session["total"] = session.get("subtotal", 0)
+                order_num = self.sb.get_next_order_number(store.get("id"))
+                created_record = self._create_comanda(
+                    store, order_num, phone, session.get("customer_name"),
+                    session["shipping_address"], session.get("items", []), session.get("subtotal", 0),
+                    0, session["total"], session.get("payment_method")
+                )
+                session["step"] = "CONFIRMED"
+                session["active_order_id"] = order_num
+                reply = self._build_order_confirmation(
+                    order_num, session.get("items", []), session.get("subtotal", 0), 0,
+                    session["total"], session["shipping_address"],
+                    session.get("payment_method"), store_name, store
+                )
+                return {
+                    "reply": reply,
+                    "order_created": created_record,
+                    "mode": bot_mode,
+                    "store": store_name
+                }
+
+            cust_addr = text.strip()
+            if len(cust_addr) < 3:
+                reply = "📍 *Por favor escribí una dirección válida para el cadete (Calle, número y entrecalles):*"
+                return {
+                    "reply": reply,
+                    "order_created": None,
+                    "mode": bot_mode,
+                    "store": store_name
+                }
+
+            session["shipping_address"] = cust_addr
+            session["total"] = session.get("subtotal", 0) + session.get("delivery_fee", delivery_fee)
+            order_num = self.sb.get_next_order_number(store.get("id"))
+            created_record = self._create_comanda(
+                store, order_num, phone, session.get("customer_name"),
+                cust_addr, session.get("items", []), session.get("subtotal", 0),
+                session.get("delivery_fee", delivery_fee), session["total"], session.get("payment_method")
+            )
+            session["step"] = "CONFIRMED"
+            session["active_order_id"] = order_num
+            reply = self._build_order_confirmation(
+                order_num, session.get("items", []), session.get("subtotal", 0), session.get("delivery_fee", delivery_fee),
+                session["total"], cust_addr, session.get("payment_method"),
+                store_name, store
+            )
+            return {
+                "reply": reply,
+                "order_created": created_record,
+                "mode": bot_mode,
+                "store": store_name
+            }
 
         # 1. EVALUAR FLUJOS INTERACTIVOS (Si hay flujos configurados en bot_config)
         if self.flows and len(self.flows) > 0:
@@ -683,8 +1023,11 @@ class MultiTenantBotEngine:
                 "store": store_name
             }
 
-        # 4. CONSULTA DE HORARIOS O DIRECCIÓN
-        if any(w in text_lower for w in ["horario", "abierto", "donde estan", "direccion", "ubicacion"]):
+        # 4. CONSULTA DE HORARIOS O DIRECCIÓN DEL LOCAL (No confundir con dirección del cliente)
+        is_hours_or_location = any(w in text_lower for w in ["horario", "horarios", "que hora abren", "a que hora abren", "abierto", "donde estan", "donde queda", "ubicacion", "donde estan ubicados"]) or (
+            "direccion" in text_lower and not any(k in text_lower for k in ["mi direccion", "mi dir", "la direccion es", "calle", "enviar a", "delivery a", "para delivery", "mi casa", "mi domicilio"])
+        )
+        if is_hours_or_location:
             custom_hours = self.templates.get("template_hours") or self.templates.get("menu_response_3")
             if custom_hours:
                 reply = self.compile_text(custom_hours)
@@ -749,7 +1092,7 @@ class MultiTenantBotEngine:
             "datos para transferir", "datos de transferencia", "pasame los datos", "datos bancarios",
             "alias", "cbu", "cvu", "transferencia", "como pago", "como te pago", "como abonar",
             "formas de pago", "medios de pago", "cuenta bancaria", "mercado pago"
-        ]) or bool(re.search(r"\bmp\b", text_lower)) or text_lower in ["datos", "cuenta", "2", "pago"]
+        ]) or bool(re.search(r"\bmp\b", text_lower)) or text_lower in ["datos", "cuenta", "pago", "alias", "cbu"]
 
         if is_bank_query:
             alias = self.variables.get("alias_banco") or store.get("payment_settings", {}).get("transferAlias") or store.get("bank_alias") or "comandafast.mp"
@@ -815,93 +1158,126 @@ class MultiTenantBotEngine:
                         })
 
             if matched_items:
-                order_num = self.sb.get_next_order_number(store.get("id"))
-                total = subtotal + delivery_fee
-
-                # Parsear datos de envío
+                # Extraer posible nombre del cliente
                 name_match = re.search(r"nombre[:\s]+([^\n,]+)", text, re.IGNORECASE)
-                addr_match = re.search(r"(?:direccion|dir|calle)[:\s]+([^\n,]+)", text, re.IGNORECASE)
-                cust_name = name_match.group(1).strip() if name_match else "Cliente WhatsApp"
-                cust_addr = addr_match.group(1).strip() if addr_match else "A coordinar por chat"
+                if name_match:
+                    session["customer_name"] = name_match.group(1).strip()
 
-                # Detectar forma de pago
+                # Detectar forma de pago preferida
                 is_transf = any(t in text_lower for t in ["transf", "alias", "banco", "mp", "mercado"])
-                payment_method = "transferencia" if is_transf else "efectivo"
+                session["payment_method"] = "transferencia" if is_transf else "efectivo"
 
-                new_order = {
-                    "id": f"ord-bot-{int(time.time() * 1000)}",
-                    "store_id": store.get("id"),
-                    "order_number": order_num,
-                    "channel": "whatsapp",
-                    "table_number": "",
-                    "customer": {
-                        "name": cust_name,
-                        "phone": phone,
-                        "address": cust_addr
-                    },
-                    "items": matched_items,
-                    "subtotal": subtotal,
-                    "delivery_fee": delivery_fee,
-                    "total": total,
-                    "payment_method": payment_method,
-                    "status": "pendiente",
-                    "created_at": datetime.now(timezone.utc).isoformat(),
-                    "updated_at": datetime.now(timezone.utc).isoformat()
-                }
+                session["items"] = matched_items
+                session["subtotal"] = subtotal
 
-                # INSERTAR EN SUPABASE CLOUD DIRECTO A COCINA Y POS
-                created = self.sb.create_order(new_order)
-                created_record = created[0] if created and isinstance(created, list) else new_order
-
-                # Formatear comprobante WhatsApp
+                # Formatear lista de ítems para mostrar
                 items_text = "\n".join([f"• {it['qty']}x {it['name']} (${int(it['unitPrice'] * it['qty']):,})".replace(",", ".") for it in matched_items])
 
-                alias = self.variables.get("alias_banco") or store.get("payment_settings", {}).get("transferAlias") or store.get("bank_alias") or "comandafast.mp"
-                banco = self.variables.get("banco") or store.get("payment_settings", {}).get("bankName") or "Mercado Pago"
-                titular = self.variables.get("titular") or store.get("payment_settings", {}).get("bankHolder") or store.get("name", "ComandaFast Burgers")
-                cbu = self.variables.get("cbu") or store.get("payment_settings", {}).get("transferCbu") or ""
-                cbu_line = f"\n• *CBU/CVU:* `{cbu}`" if cbu and cbu != "—" else ""
+                # Detección de intención de envío y/o dirección explícita
+                addr_match = re.search(r"(?:direcci[oó]n|dir|calle|enviar\s+a|llevar\s+a)[:\s]+([^\n,]+)", text, re.IGNORECASE)
+                delivery_addr_match = re.search(r"(?:delivery|envio|envío|a\s+domicilio)\s+(?:a|en)\s+([^\n,]+)", text, re.IGNORECASE)
+                explicit_addr = (addr_match.group(1).strip() if addr_match else None) or (delivery_addr_match.group(1).strip() if delivery_addr_match else None)
 
-                if payment_method == "transferencia":
-                    payment_block = (
-                        f"💳 *Medio de Pago: TRANSFERENCIA BANCARIA / MERCADO PAGO*\n"
-                        f"• *Alias:* `{alias}`\n"
-                        f"• *Banco / Billetera:* {banco}\n"
-                        f"• *Titular:* {titular}"
-                        f"{cbu_line}\n"
-                        f"• *Total exacto a transferir:* ${int(total):,}\n\n"
-                        f"📸 *IMPORTANTE:* Por favor enviá la captura o foto del comprobante por este chat para confirmar tu pago y pasarlo a la cocina. 🔥"
+                has_delivery_intent = any(w in text_lower for w in ["delivery", "envio", "envío", "a domicilio", "a mi casa", "mandamelo", "mandámelo", "enviar"])
+                has_pickup_intent = any(w in text_lower for w in ["retiro", "retirar", "paso a buscar", "pasar a buscar", "lo busco", "take away", "mostrador", "en el local"])
+
+                # CASO 1: Especificó delivery CON dirección explícita en el mismo mensaje
+                if explicit_addr and len(explicit_addr) >= 4:
+                    session["shipping_method"] = "delivery"
+                    session["shipping_address"] = explicit_addr
+                    session["delivery_fee"] = delivery_fee
+                    total = subtotal + delivery_fee
+                    session["total"] = total
+
+                    order_num = self.sb.get_next_order_number(store.get("id"))
+                    created_record = self._create_comanda(
+                        store, order_num, phone, session.get("customer_name"),
+                        explicit_addr, matched_items, subtotal, delivery_fee, total, session.get("payment_method")
                     )
+                    session["step"] = "CONFIRMED"
+                    session["active_order_id"] = order_num
+                    reply = self._build_order_confirmation(
+                        order_num, matched_items, subtotal, delivery_fee, total,
+                        explicit_addr, session.get("payment_method"), store_name, store
+                    )
+                    return {
+                        "reply": reply,
+                        "order_created": created_record,
+                        "mode": bot_mode,
+                        "store": store_name
+                    }
+
+                # CASO 2: Especificó retiro por el local
+                elif has_pickup_intent:
+                    session["shipping_method"] = "local"
+                    session["shipping_address"] = "Retiro por el local (Mostrador)"
+                    session["delivery_fee"] = 0
+                    total = subtotal
+                    session["total"] = total
+
+                    order_num = self.sb.get_next_order_number(store.get("id"))
+                    created_record = self._create_comanda(
+                        store, order_num, phone, session.get("customer_name"),
+                        session["shipping_address"], matched_items, subtotal, 0, total, session.get("payment_method")
+                    )
+                    session["step"] = "CONFIRMED"
+                    session["active_order_id"] = order_num
+                    reply = self._build_order_confirmation(
+                        order_num, matched_items, subtotal, 0, total,
+                        session["shipping_address"], session.get("payment_method"), store_name, store
+                    )
+                    return {
+                        "reply": reply,
+                        "order_created": created_record,
+                        "mode": bot_mode,
+                        "store": store_name
+                    }
+
+                # CASO 3: Pidió delivery pero falta la dirección exacta
+                elif has_delivery_intent:
+                    session["shipping_method"] = "delivery"
+                    session["delivery_fee"] = delivery_fee
+                    total = subtotal + delivery_fee
+                    session["total"] = total
+                    session["step"] = "ASK_ADDRESS"
+
+                    reply = (
+                        f"🛵 *¡Anotamos tu pedido para Delivery!* 🔥\n\n"
+                        f"📋 *Tu Pedido:*\n{items_text}\n\n"
+                        f"💵 Subtotal: ${int(subtotal):,}\n"
+                        f"🛵 Envío: ${int(delivery_fee):,}\n"
+                        f"💰 *Total: ${int(total):,}*\n\n"
+                        f"📍 *Por favor escribí tu dirección exacta y entrecalles para el cadete:*\n"
+                        f"_(Ejemplo: San Martín 450 entre Belgrano y Moreno)_"
+                    ).replace(",", ".")
+                    return {
+                        "reply": reply,
+                        "order_created": None,
+                        "mode": bot_mode,
+                        "store": store_name
+                    }
+
+                # CASO 4: Caso estándar: No especificó forma de entrega -> Preguntar Retiro o Delivery
                 else:
-                    payment_block = (
-                        f"💳 *¿Abonás por Transferencia Bancaria o Mercado Pago?*\n"
-                        f"• *Alias:* `{alias}`\n"
-                        f"• *Banco / Billetera:* {banco}\n"
-                        f"• *Titular:* {titular}"
-                        f"{cbu_line}\n"
-                        f"• *Monto exacto:* ${int(total):,}\n"
-                        f"📸 *Enviá la captura del comprobante por acá para comenzar a cocinar.*\n\n"
-                        f"💵 *¿Abonás en Efectivo al recibir?*\n"
-                        f"Respondé *EFECTIVO* (y avísanos con cuánto pagás si necesitás vuelto)."
-                    )
+                    session["delivery_fee"] = delivery_fee
+                    session["total"] = subtotal
+                    session["step"] = "ASK_SHIPPING_METHOD"
 
-                reply = (
-                    f"✅ *¡Comanda #{order_num} Registrada en {store_name}!* 🔥\n\n"
-                    f"📋 *Tu Pedido:*\n{items_text}\n\n"
-                    f"🛵 Envío: ${int(delivery_fee):,}\n"
-                    f"💰 *Total a abonar: ${int(total):,}*\n\n"
-                    f"{payment_block}\n\n"
-                    f"📍 Dirección: {cust_addr}\n"
-                    f"⏱️ Tiempo estimado: {self.templates.get('delay_minutes', '25 a 40')} min.\n"
-                    f"¡Ya dimos aviso a la cocina para su preparación! 🚀"
-                ).replace(",", ".")
-
-                return {
-                    "reply": reply,
-                    "order_created": created_record,
-                    "mode": bot_mode,
-                    "store": store_name
-                }
+                    reply = (
+                        f"🍔 *¡Anotado tu pedido!* 🔥\n\n"
+                        f"📋 *Detalle:*\n{items_text}\n\n"
+                        f"💰 *Subtotal: ${int(subtotal):,}*\n\n"
+                        f"🛵 *¿Cómo preferís recibir tu pedido?*\n"
+                        f"1️⃣ *Retiro por el local* (Take Away - Sin costo)\n"
+                        f"2️⃣ *Envío a domicilio* (Delivery - Costo: ${int(delivery_fee):,})\n\n"
+                        f"👉 *Respondé con 1 para Retiro o 2 para Delivery:*"
+                    ).replace(",", ".")
+                    return {
+                        "reply": reply,
+                        "order_created": None,
+                        "mode": bot_mode,
+                        "store": store_name
+                    }
 
         # 4.5. CONSULTA INTELIGENTE CON GROQ IA EN MODO TEXTO
         ai_reply = call_groq_ai(text, store_name, self.products, phone)
@@ -1087,21 +1463,24 @@ class BotHttpHandler(BaseHTTPRequestHandler):
             sim_terminal_logs.append(f"[{time_str}] 🤖 BOT ({result.get('mode', 'auto')}):\n{reply}")
             print(f"[{time_str}] 🤖 Bot respondió ({result.get('mode', 'auto')}):\n{reply}\n")
 
-            # Actualizar estado de sesión en memoria
+            # Sincronizar estado de sesión en memoria para el simulador y consola
+            sess = active_engine.get_session(clean_phone)
+            sim_session["step"] = sess.get("step", "IDLE")
+            sim_session["items"] = sess.get("items", [])
+            sim_session["subtotal"] = sess.get("subtotal", 0)
+            sim_session["deliveryFee"] = sess.get("delivery_fee", 0)
+            sim_session["total"] = sess.get("total", 0)
+            sim_session["shippingMethod"] = sess.get("shipping_method", "local")
+            sim_session["shippingAddress"] = sess.get("shipping_address", "")
+            sim_session["customerName"] = sess.get("customer_name", cust_name)
+            sim_session["paymentMethod"] = sess.get("payment_method", "efectivo")
+
             if result.get("order_created"):
                 ord_c = result["order_created"]
                 order_id = ord_c.get("id") or ord_c.get("order_number", "N/A")
                 total_val = ord_c.get("total", 0)
                 sim_terminal_logs.append(f"[{time_str}] 🔥 [SUPABASE] ¡Comanda #{order_id} creada en Cocina y POS! Total: ${total_val}")
                 print(f"[{time_str}] 🔥 [SUPABASE] Comanda #{order_id} creada exitosamente!")
-
-                sim_session["step"] = "CONFIRMED"
-                sim_session["items"] = ord_c.get("items", [])
-                sim_session["total"] = total_val
-                sim_session["customerName"] = cust_name
-                sim_session["paymentMethod"] = ord_c.get("payment_method", "efectivo")
-            elif any(w in reply.lower() for w in ["anotadísimo", "anotadisimo", "agregué al pedido", "agregue al pedido"]):
-                sim_session["step"] = "SELECTING"
 
             self._send_json(200, {
                 "success": True,
@@ -1115,11 +1494,18 @@ class BotHttpHandler(BaseHTTPRequestHandler):
 
         # 2. Reset de sesión del simulador
         elif path == "/api/bot/tester/reset":
+            phone = payload.get("jid") or "sim_cliente@s.whatsapp.net"
+            clean_phone = re.sub(r"\D", "", str(phone)) or "5491122334455"
+            if active_engine:
+                active_engine.reset_session(clean_phone)
             sim_chat_messages.clear()
             sim_session["step"] = "IDLE"
             sim_session["items"] = []
             sim_session["total"] = 0
             sim_session["subtotal"] = 0
+            sim_session["deliveryFee"] = 0
+            sim_session["shippingAddress"] = ""
+            sim_session["shippingMethod"] = "local"
             time_str = datetime.now().strftime("%H:%M:%S")
             sim_terminal_logs.append(f"[{time_str}] 🧹 [RESET] Memoria y carrito vaciados.")
             print(f"[{time_str}] 🧹 Sesión del simulador reiniciada.")
