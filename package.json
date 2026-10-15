@@ -12,7 +12,8 @@
     "bot": "node server/whatsappBotServer.js",
     "bot:qr": "node server/whatsappBotServer.js --reset",
     "bot:python": "python server/whatsapp_bot.py",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "test:visual": "playwright test tests/e2e/visual-regression-master.spec.js"
   },
   "dependencies": {
     "@google/genai": "^2.23.0",
