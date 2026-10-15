@@ -208,7 +208,7 @@ export default function AdminDatabaseTablesTab() {
         p.name?.toLowerCase().includes(q) || 
         p.id?.toLowerCase().includes(q) ||
         p.description?.toLowerCase().includes(q) ||
-        (p.modifiers || []).some(m => m.toLowerCase().includes(q))
+        (p.modifiers || []).some(m => (typeof m === 'object' && m ? (m.name || m.label || '') : String(m)).toLowerCase().includes(q))
       );
     }
 
@@ -310,7 +310,7 @@ export default function AdminDatabaseTablesTab() {
         emoji: item.emoji || '🍔',
         description: item.description || '',
         image: item.image || '',
-        modifiersText: (item.modifiers || []).join(', ')
+        modifiersText: (item.modifiers || []).map(m => typeof m === 'object' && m ? (m.name || m.label || (m.price ? `${m.name} (+$${m.price})` : JSON.stringify(m))) : String(m)).join(', ')
       });
     } else if (activeTable === 'orders') {
       setFormData({
@@ -1127,18 +1127,23 @@ export default function AdminDatabaseTablesTab() {
                       </td>
                       <td style={{ maxWidth: '260px' }}>
                         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                          {(prod.modifiers || []).slice(0, 3).map((m, idx) => (
-                            <span key={idx} style={{
-                              background: 'var(--bg-main)',
-                              border: '1px solid var(--border-subtle)',
-                              padding: '2px 6px',
-                              borderRadius: '4px',
-                              fontSize: '0.68rem',
-                              color: 'var(--text-secondary)'
-                            }}>
-                              {m}
-                            </span>
-                          ))}
+                          {(prod.modifiers || []).slice(0, 3).map((m, idx) => {
+                            const modText = typeof m === 'object' && m 
+                              ? (m.name || m.label || (m.price ? `${m.name || 'Extra'} (+$${m.price})` : JSON.stringify(m))) 
+                              : String(m);
+                            return (
+                              <span key={idx} style={{
+                                background: 'var(--bg-main)',
+                                border: '1px solid var(--border-subtle)',
+                                padding: '2px 6px',
+                                borderRadius: '4px',
+                                fontSize: '0.68rem',
+                                color: 'var(--text-secondary)'
+                              }}>
+                                {modText}
+                              </span>
+                            );
+                          })}
                           {(prod.modifiers || []).length > 3 && (
                             <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 700 }}>
                               +{prod.modifiers.length - 3} más

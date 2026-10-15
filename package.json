@@ -11,6 +11,7 @@
     "bot-server": "node server/whatsappBotServer.js",
     "bot": "node server/whatsappBotServer.js",
     "bot:qr": "node server/whatsappBotServer.js --reset",
+    "bot:python": "python server/whatsapp_bot.py",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {
