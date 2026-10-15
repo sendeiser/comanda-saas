@@ -154,6 +154,56 @@ class SupabaseClient:
 
 
 # ---------------------------------------------------------------------------
+# SERVICIO GROQ IA MULTI-PROVEEDOR (LLAMA 3.3 / QWEN 27B)
+# ---------------------------------------------------------------------------
+def call_groq_ai(user_message, store_name, products, customer_name="Cliente"):
+    groq_key = os.getenv("GROQ_API_KEY", "")
+    if not groq_key:
+        try:
+            cfg_path = os.path.join(os.path.dirname(__file__), "..", "data", "ai_config.json")
+            if os.path.exists(cfg_path):
+                with open(cfg_path, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+                    groq_key = cfg.get("groqApiKey") or ""
+        except Exception:
+            pass
+    if not groq_key:
+        return None
+    models = ["qwen/qwen3.8-27b", "openai/gpt-oss-120b", "llama-3.3-70b-versatile"]
+    prods_summary = "\n".join([f"- {p.get('name')} (${int(p.get('price', 0)):,}): {p.get('description', '')}" for p in (products or [])[:15]])
+    system_prompt = (
+        f"Eres el asistente virtual gastronómico de '{store_name}'. Responde consultas de clientes con calidez, brevedad (estilo WhatsApp) y emojis pertinentes 🍔.\n"
+        f"Carta disponible:\n{prods_summary}\n"
+        f"Recomienda 2 o 3 opciones tentadoras con sus precios, responde dudas sobre ingredientes o vegetarianos/celíacos y recuérdale que puede pedir escribiendo el producto o MENU."
+    )
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+    for m in models:
+        try:
+            req_data = json.dumps({
+                "model": m,
+                "messages": [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                "temperature": 0.6,
+                "max_tokens": 300
+            }).encode("utf-8")
+            req = urllib.request.Request("https://api.groq.com/openai/v1/chat/completions", data=req_data, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=6) as res:
+                resp = json.loads(res.read().decode("utf-8"))
+                reply = resp.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                if reply:
+                    return reply
+        except Exception:
+            continue
+    return None
+
+
+# ---------------------------------------------------------------------------
 # MOTOR CONVERSACIONAL INTELIGENTE MULTI-MODAL
 # ---------------------------------------------------------------------------
 class MultiTenantBotEngine:
@@ -409,13 +459,34 @@ class MultiTenantBotEngine:
                 "paused_for_human": (bot_mode == "catalog_direct")
             }
 
-        # 3. SALUDO O SOLICITUD DE CARTA DIGITAL
-        is_greeting = any(w in text_lower for w in [
-            "hola", "buenas", "buen dia", "buenas tardes", "buenas noches",
-            "menu", "carta", "que tienen", "que hay", "precios", "promos"
-        ])
+        # 2.5 CONSULTA INTELIGENTE CON GROQ IA (PREGUNTAS, INGREDIENTES, DUDAS, RECOMENDACIONES)
+        is_inquiry = (
+            ("?" in text or "¿" in text) or
+            any(w in text_lower for w in [
+                "recomendas", "recomendás", "recomiendan", "sugeris", "sugieres",
+                "vegetariano", "vegano", "sin tacc", "celiaco", "celíaco", "gluten",
+                "ingredientes", "que trae", "que tiene", "de que es", "de que estan",
+                "vienen con", "con papas", "delivery", "demora", "cuanto tarda",
+                "cuanto sale", "cuanto cuesta"
+            ])
+        ) and not any(v in text_lower for v in ["quiero", "dame", "anotame", "pedir", "comprar"])
 
-        if is_greeting or bot_mode in ["catalog", "catalog_direct", "templates"]:
+        if is_inquiry:
+            ai_reply = call_groq_ai(text, store_name, self.products, phone)
+            if ai_reply:
+                return {
+                    "reply": ai_reply,
+                    "order_created": None,
+                    "mode": bot_mode,
+                    "store": store_name
+                }
+
+        # 3. SALUDO O SOLICITUD DE CARTA DIGITAL
+        is_greeting = any(text_lower.startswith(w) for w in [
+            "hola", "buenas", "buen dia", "buenos dias", "buenas tardes", "buenas noches", "que tal", "holis"
+        ]) or any(w in text_lower for w in ["menu", "carta", "que tienen", "que hay", "precios", "promos", "inicio", "comenzar"])
+
+        if is_greeting:
             if bot_mode == "catalog_direct":
                 custom_tpl = self.templates.get("template_catalog_direct_welcome")
                 if not custom_tpl:
@@ -562,6 +633,16 @@ class MultiTenantBotEngine:
                     "mode": bot_mode,
                     "store": store_name
                 }
+
+        # 4.5. CONSULTA INTELIGENTE CON GROQ IA EN MODO TEXTO
+        ai_reply = call_groq_ai(text, store_name, self.products, phone)
+        if ai_reply:
+            return {
+                "reply": ai_reply,
+                "order_created": None,
+                "mode": bot_mode,
+                "store": store_name
+            }
 
         # 5. RESPUESTA POR DEFECTO AMIGABLE CON ENLACE
         return {

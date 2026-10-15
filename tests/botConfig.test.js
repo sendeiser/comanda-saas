@@ -42,3 +42,13 @@ test('DEFAULT_TEMPLATES template_menu includes predesigned catalog placeholder',
   assert.ok(DEFAULT_TEMPLATES.template_menu.includes('{cliente}'));
   assert.ok(DEFAULT_TEMPLATES.template_menu.includes('{nombre_local}'));
 });
+
+test('geminiBotService initializes with Groq enabled and valid keys', async () => {
+  const { geminiBotService } = await import('../server/geminiBotService.js');
+  const safeConfig = geminiBotService.getConfigSafe();
+  assert.equal(safeConfig.enabled, true);
+  assert.ok(safeConfig.hasGroq, 'Debe tener Groq disponible');
+  assert.ok(safeConfig.groqApiKeyMasked.startsWith('gsk_'), 'La clave Groq enmascarada debe comenzar con gsk_');
+  assert.ok(safeConfig.groqModel);
+});
+

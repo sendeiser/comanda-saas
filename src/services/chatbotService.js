@@ -568,6 +568,28 @@ export const chatbotService = {
     return null;
   },
 
+  // Consulta inteligente con IA (Groq Cloud / Gemini) y motor de reglas
+  async computeBotResponseAsync(userInput, prevState, persona, options = {}) {
+    const syncRes = this.computeBotResponse(userInput, prevState, persona, options);
+    const text = (userInput || '').trim();
+    const isQuestion = text.includes('?') || text.includes('¿') || /\b(que|cual|como|de que|recomendas|recomendás|recomiendas|ingredientes|celiaco|celíaco|vegano|vegetariano|gluten|sin tacc|papas|horarios|abren)\b/i.test(text);
+    const isFallback = syncRes.reply && syncRes.reply.includes('No encontramos esa opción');
+
+    if (isQuestion || isFallback) {
+      try {
+        const prods = options.availableProducts || this.getDatabaseProducts();
+        const aiReply = await this.queryGeminiAI(text, persona, prods);
+        if (aiReply) {
+          return {
+            ...syncRes,
+            reply: aiReply
+          };
+        }
+      } catch (_) {}
+    }
+    return syncRes;
+  },
+
   // 6. Inyección directa de pedido a ComandaFast (POS y Cocina KDS)
   injectOrderToPos({ items = [], customer = {}, paymentMethod = 'efectivo', shippingMethod = 'local' }) {
     if (!items || items.length === 0) return null;

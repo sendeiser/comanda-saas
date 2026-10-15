@@ -37,12 +37,12 @@ export class GeminiBotService {
 
     return {
       enabled: parsed.enabled ?? true,
-      mode: parsed.mode || 'cascade', // 'cascade' | 'only_groq' | 'only_gemini' | 'only_deepseek'
+      mode: parsed.mode || 'only_groq', // Groq Cloud activado por defecto
       groqApiKey: parsed.groqApiKey || process.env.GROQ_API_KEY || '',
       geminiApiKey: parsed.geminiApiKey || parsed.apiKey || process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY_1,
       deepseekApiKey: parsed.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '',
       model: parsed.model || 'gemini-2.0-flash',
-      groqModel: parsed.groqModel || 'llama-3.3-70b-versatile',
+      groqModel: parsed.groqModel || 'qwen/qwen3.8-27b',
       deepseekModel: parsed.deepseekModel || 'deepseek-chat',
       systemPrompt: parsed.systemPrompt || ''
     };
@@ -112,43 +112,50 @@ export class GeminiBotService {
   // --- LLAMADAS A APIS EXTERNAS ---
 
   async callGroq(apiKey, model, systemPrompt, userMessage) {
+    const keysToTry = [apiKey, DEFAULT_GROQ_KEY_1, DEFAULT_GROQ_KEY_2].filter(Boolean);
+    const uniqueKeys = [...new Set(keysToTry)];
+
     const candidateModels = [
       model,
       'qwen/qwen3.8-27b',
-      'llama-3.3-70b-versatile',
       'openai/gpt-oss-120b',
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
       'allam-2-7b'
     ].filter(Boolean);
+    const uniqueModels = [...new Set(candidateModels)];
 
     let lastErr = null;
-    for (const m of candidateModels) {
-      try {
-        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: m,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: userMessage }
-            ],
-            temperature: 0.6,
-            max_tokens: 350
-          })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const reply = data.choices?.[0]?.message?.content?.trim();
-          if (reply) return reply;
-        } else {
-          const errText = await res.text();
-          lastErr = new Error(`Groq (${m}): ${errText}`);
+    for (const key of uniqueKeys) {
+      for (const m of uniqueModels) {
+        try {
+          const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${key}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: m,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userMessage }
+              ],
+              temperature: 0.6,
+              max_tokens: 350
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const reply = data.choices?.[0]?.message?.content?.trim();
+            if (reply) return reply;
+          } else {
+            const errText = await res.text();
+            lastErr = new Error(`Groq (${m}): ${errText}`);
+          }
+        } catch (err) {
+          lastErr = err;
         }
-      } catch (err) {
-        lastErr = err;
       }
     }
     throw lastErr || new Error('Groq no pudo procesar la solicitud.');
@@ -432,10 +439,11 @@ Cliente: ${context.customerName || 'Cliente'}
 
     // Ejecutores individuales
     const execGroq = async () => {
-      if (!groqKey) return null;
-      const reply = await this.callGroq(groqKey, this.config.groqModel || 'llama-3.3-70b-versatile', systemPrompt, userMessage);
+      const activeGroqKey = groqKey || DEFAULT_GROQ_KEY_1;
+      if (!activeGroqKey) return null;
+      const reply = await this.callGroq(activeGroqKey, this.config.groqModel || 'qwen/qwen3.8-27b', systemPrompt, userMessage);
       if (reply) {
-        this.activeProviderInUse = 'Groq (Llama 3.3)';
+        this.activeProviderInUse = 'Groq Cloud';
         return reply;
       }
       return null;

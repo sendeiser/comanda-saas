@@ -1326,7 +1326,7 @@ function isCustomerInquiry(text) {
   if (!text) return false;
   const cleanNorm = normalizeSearchText(text);
   const hasQuestionMarks = text.includes('?') || text.includes('¿');
-  const hasInquiryKeywords = /\b(que\s+trae|que\s+tiene|como\s+es|cual\s+es|cuales\s+son|que\s+lleva|de\s+que\s+es|ingredientes|sin\s+tacc|celiaco|celíaco|celiacos|celíacos|vegano|vegana|veganos|vegetariano|vegetariana|gluten|recomendas|recomendás|recomiendas|recomiendan|recomendacion|recomendación|sugeris|sugerís|sugieres|sugerencia|cual\s+me\s+recomendas|que\s+me\s+recomendas|que\s+esta\s+bueno|a\s+que\s+hora|hasta\s+que\s+hora|abren|abierto|demora|cuanto\s+demora|cuanto\s+tardan|delivery|envio|envío|envios|envíos|llegan|cuanto\s+sale|precio|precios|cuanto\s+cuesta)\b/i.test(cleanNorm);
+  const hasInquiryKeywords = /\b(que\s+trae|que\s+tiene|como\s+es|cual\s+es|cuales\s+son|que\s+lleva|de\s+que\s+es|de\s+que\s+estan|ingredientes|sin\s+tacc|celiaco|celíaco|celiacos|celíacos|vegano|vegana|veganos|vegetariano|vegetariana|gluten|recomendas|recomendás|recomiendas|recomiendan|recomendacion|recomendación|sugeris|sugerís|sugieres|sugerencia|cual\s+me\s+recomendas|que\s+me\s+recomendas|que\s+esta\s+bueno|que\s+tienen|que\s+hay|que\s+opciones|a\s+que\s+hora|hasta\s+que\s+hora|abren|abierto|demora|cuanto\s+demora|cuanto\s+tardan|delivery|envio|envío|envios|envíos|llegan|cuanto\s+sale|precio|precios|cuanto\s+cuesta|consulta|pregunta|queria\s+saber|queria\s+consultar|quisiera\s+saber|info|informacion|información|papas|aderezos|bebidas|tamaño|medidas)\b/i.test(cleanNorm);
   const hasBuyVerb = /^(quiero|dame|anotame|sumar|agregar|pedir|comprar|llevar|trae|traeme)\b/i.test(cleanNorm);
   return (hasQuestionMarks || hasInquiryKeywords) && !hasBuyVerb;
 }

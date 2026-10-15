@@ -123,14 +123,14 @@ export default function AdminWhatsAppBot({ initialTab }) {
   // AI Multi-Provider State (Groq + Gemini + DeepSeek con Cascada y Modo Individual)
   const [aiConfig, setAiConfig] = useState({
     enabled: true,
-    mode: 'cascade', // 'cascade' | 'only_groq' | 'only_gemini' | 'only_deepseek'
+    mode: 'only_groq', // 'cascade' | 'only_groq' | 'only_gemini' | 'only_deepseek'
     model: 'gemini-2.0-flash',
     groqApiKey: '',
-    hasGroq: false,
-    groqApiKeyMasked: '',
-    geminiApiKey: (typeof atob === 'function' ? atob('QVEuQWI4Uk42S1pNWmJTTENxMDhNNVVXbVVJdXp3RWdWZkxadVFMdHJJeFJOMnRYdXNCeEE=') : ''),
+    hasGroq: true,
+    groqApiKeyMasked: 'gsk_••••••••••••••••••••••••••••••••••••••••',
+    geminiApiKey: '',
     hasGemini: true,
-    geminiApiKeyMasked: 'AQ.Ab8...sBxA',
+    geminiApiKeyMasked: '••••••••••••••••',
     deepseekApiKey: '',
     hasDeepSeek: false,
     deepseekApiKeyMasked: '',

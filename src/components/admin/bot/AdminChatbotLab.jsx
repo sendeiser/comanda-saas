@@ -124,9 +124,9 @@ export default function AdminChatbotLab() {
     const configuredDelay = Number(chatbotService.getSettings()?.bot_typing_delay_ms) || 2500;
     const delayMs = simulationSpeed === 'fast' ? 300 : simulationSpeed === 'human' ? configuredDelay : Math.max(500, Math.round(configuredDelay * 0.5));
     
-    setTimeout(() => {
-      // 2. Computar respuesta del bot
-      const { reply, image, newState, systemNote, generatedOrder } = chatbotService.computeBotResponse(
+    setTimeout(async () => {
+      // 2. Computar respuesta del bot (motor de reglas + Groq IA)
+      const { reply, image, newState, systemNote, generatedOrder } = await chatbotService.computeBotResponseAsync(
         message,
         sessionState,
         selectedPersona,
