@@ -48,3 +48,7 @@ ComandaFast-Bot-Portatil.zip
 
 # Scratch scripts
 scratch/
+
+# Python cache
+__pycache__/
+*.pyc

@@ -1,8 +1,8 @@
 {
-  "sim_cliente@s.whatsapp.net": {
-    "pausedUntil": 1790803469371,
-    "reason": "pedido_catalogo_directo",
-    "phoneDigits": "",
-    "timestamp": 1790801969371
+  "93832234401799@lid": {
+    "pausedUntil": 1792034134064,
+    "reason": "operador_celular",
+    "phoneDigits": "93832234401799",
+    "timestamp": 1792032634064
   }
 }
