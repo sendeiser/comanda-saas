@@ -214,11 +214,14 @@ class MultiTenantBotEngine:
         return self.current_store
 
     def get_mode(self):
-        """Determina el modo operativo configurado en Supabase: auto_order, catalog_link, flows o ai."""
-        mode = self.templates.get("bot_mode") or self.current_store.get("bot_mode") or "auto_order"
+        """Determina el modo operativo configurado en Supabase: catalog, templates, catalog_direct, flows o ai."""
+        menu_mode = self.templates.get("menu_mode")
+        if menu_mode in ["catalog", "templates", "catalog_direct"]:
+            return menu_mode
+        mode = self.templates.get("bot_mode") or self.current_store.get("bot_mode") or "catalog"
         return str(mode).lower()
 
-    def compile_text(self, text):
+    def compile_text(self, text, extra_vars=None):
         """Reemplaza dinámicamente variables del negocio en los textos de respuesta."""
         if not text:
             return ""
@@ -229,22 +232,43 @@ class MultiTenantBotEngine:
         payment = store.get("payment_settings", {})
 
         slug = store.get("slug", "demo")
-        catalog_link = f"https://comandasaas.app/carta/{slug}"
+        catalog_link = f"https://comandasaas.app/#catalog?store={slug}"
+
+        # Generar lista rápida de catálogo en texto
+        catalog_lines = []
+        for idx, p in enumerate(self.products[:12], 1):
+            price_val = f"${int(p.get('price', 0)):,}".replace(",", ".")
+            catalog_lines.append(f"{idx}. *{p.get('name')}* — {price_val}")
+        catalog_text = "\n".join(catalog_lines) if catalog_lines else "Consultar carta online."
 
         replacements = {
+            "{cliente}": (extra_vars or {}).get("cliente", "Cliente"),
+            "{nombre_local}": store.get("name", "ComandaFast"),
             "{nombre_negocio}": store.get("name", "ComandaFast"),
             "{negocio}": store.get("name", "ComandaFast"),
+            "{catalogo_url}": catalog_link,
             "{enlace_carta}": catalog_link,
             "{carta}": catalog_link,
             "{link_carta}": catalog_link,
+            "{catalogo_lista}": catalog_text,
+            "{promos_alerta}": "🔥 *¡PROMOS DEL DÍA DISPONIBLES!* 🔥\n" if self.templates.get("promo_alert") else "",
             "{telefono}": contact.get("phone", contact.get("whatsapp", "")),
             "{whatsapp}": contact.get("whatsapp", contact.get("phone", "")),
             "{direccion}": contact.get("address", "Atención al público y delivery"),
+            "{horarios}": store.get("opening_hours", "Miércoles a Domingos de 19:30 a 00:30 hs"),
             "{costo_envio}": f"${int(delivery.get('baseFee', 1500)):,}".replace(",", "."),
-            "{alias_mp}": payment.get("transferAlias", "COMANDA.FAST"),
+            "{alias_banco}": payment.get("transferAlias", "COMANDA.FAST"),
             "{alias}": payment.get("transferAlias", "COMANDA.FAST"),
+            "{alias_mp}": payment.get("transferAlias", "COMANDA.FAST"),
+            "{banco}": payment.get("bankName", "Mercado Pago / Banco"),
+            "{titular}": payment.get("bankHolder", "Titular del Negocio"),
             "{cbu}": payment.get("transferCbu", "—"),
-            "{demora_estimada}": str(self.templates.get("delay_minutes", "30 a 45"))
+            "{demora_estimada}": str(self.templates.get("delay_minutes", "30 a 45")),
+            "{pedido_id}": str((extra_vars or {}).get("pedido_id", "1")),
+            "{total}": str((extra_vars or {}).get("total", "0")),
+            "{subtotal}": str((extra_vars or {}).get("subtotal", "0")),
+            "{tipo_entrega}": (extra_vars or {}).get("tipo_entrega", "Delivery"),
+            "{detalle_pedido}": (extra_vars or {}).get("detalle_pedido", "")
         }
 
         # Sumar variables dinámicas cargadas de la tabla bot_config
@@ -279,7 +303,7 @@ class MultiTenantBotEngine:
         delivery_fee = float(store.get("delivery_settings", {}).get("baseFee", 1500))
         bot_mode = self.get_mode()
 
-        catalog_link = f"https://comandasaas.app/carta/{store_slug}"
+        catalog_link = f"https://comandasaas.app/#catalog?store={store_slug}"
 
         # 1. EVALUAR FLUJOS INTERACTIVOS (Si hay flujos configurados en bot_config)
         if self.flows and len(self.flows) > 0:
@@ -294,14 +318,104 @@ class MultiTenantBotEngine:
                         "store": store_name
                     }
 
-        # 2. SALUDO O SOLICITUD DE CARTA DIGITAL
+        # 2. DETECCIÓN DE PEDIDO COMPARTIDO DESDE LA CARTA WEB (OlaClick / Tripp style)
+        is_catalog_shared_order = "mi pedido" in text_lower or "pedido #" in text_lower or re.search(r"\d+x\s+.+—\s*\$?", text)
+        if is_catalog_shared_order:
+            # Parsear pedido compartido desde el catálogo
+            order_num = self.sb.get_next_order_number(store.get("id"))
+            subtotal_match = re.search(r"subtotal[^\d\n]*([$\d\.,]+)", text, re.IGNORECASE)
+            total_match = re.search(r"total[^\d\n]*([$\d\.,]+)", text, re.IGNORECASE)
+            name_match = re.search(r"nombre[:\s*]+([^\n,]+)", text, re.IGNORECASE)
+            addr_match = re.search(r"(?:direcci[oó]n|dir|calle)[:\s*]+([^\n,]+)", text, re.IGNORECASE)
+            pay_match = re.search(r"(?:forma de pago|pago)[:\s*]+([^\n,]+)", text, re.IGNORECASE)
+
+            def clean_curr(raw_val):
+                if not raw_val: return 0
+                c = re.sub(r"[^\d]", "", raw_val)
+                return float(c) if c else 0
+
+            subtotal_val = clean_curr(subtotal_match.group(1)) if subtotal_match else 0
+            total_val = clean_curr(total_match.group(1)) if total_match else subtotal_val
+            cust_name = name_match.group(1).strip() if name_match else "Cliente Web"
+            cust_addr = addr_match.group(1).strip() if addr_match else "Entrega a coordinar"
+            pay_str = pay_match.group(1).lower() if pay_match else ""
+            payment_method = "transferencia" if any(t in pay_str for t in ["transf", "mp", "alias", "cbu"]) else "efectivo"
+
+            # Parsear líneas de ítems
+            parsed_items = []
+            for line in text.split("\n"):
+                m = re.match(r"[•\*\-]?\s*(\d+)x\s+([^—\n]+?)\s*—\s*\$?([\d\.,]+)", line)
+                if m:
+                    parsed_items.append({
+                        "name": m.group(2).strip(),
+                        "qty": int(m.group(1)),
+                        "unitPrice": clean_curr(m.group(3)) / max(1, int(m.group(1))),
+                        "notes": "Desde carta web WhatsApp"
+                    })
+
+            new_order = {
+                "id": f"ord-web-{int(time.time() * 1000)}",
+                "store_id": store.get("id"),
+                "order_number": order_num,
+                "channel": "whatsapp",
+                "table_number": "",
+                "customer": {
+                    "name": cust_name,
+                    "phone": phone,
+                    "address": cust_addr
+                },
+                "items": parsed_items if parsed_items else [{"name": "Pedido Catálogo", "qty": 1, "unitPrice": total_val or subtotal_val}],
+                "subtotal": subtotal_val or total_val,
+                "delivery_fee": delivery_fee if "delivery" in text_lower or "domicilio" in text_lower else 0,
+                "total": total_val or subtotal_val,
+                "payment_method": payment_method,
+                "status": "pendiente",
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+
+            created = self.sb.create_order(new_order)
+            created_record = created[0] if created and isinstance(created, list) else new_order
+
+            # Elegir plantilla de confirmación según el modo
+            tpl_confirm = self.templates.get("template_catalog_direct_confirmation")
+            if not tpl_confirm:
+                tpl_confirm = (
+                    "🎉 *¡Recibimos tu pedido #{pedido_id}!* 🍔🔥\n\n"
+                    "¡Muchas gracias *{cliente}*! Tu comanda ya ingresó al sistema de nuestra cocina y caja.\n"
+                    "💵 *Total:* ${total}\n"
+                    "🚀 *Entrega:* {tipo_entrega}\n\n"
+                    "👩‍💼 *En instantes nuestra cajera confirma tu pedido y te avisa el tiempo estimado. ¡Muchas gracias!*"
+                )
+
+            compiled_reply = self.compile_text(tpl_confirm, {
+                "cliente": cust_name,
+                "pedido_id": str(order_num),
+                "total": f"{int(total_val or subtotal_val):,}".replace(",", "."),
+                "tipo_entrega": "A domicilio" if "delivery" in text_lower else "Retiro por el local",
+                "detalle_pedido": f"📍 Destino: {cust_addr}"
+            })
+
+            return {
+                "reply": compiled_reply,
+                "order_created": created_record,
+                "mode": bot_mode,
+                "store": store_name,
+                "paused_for_human": (bot_mode == "catalog_direct")
+            }
+
+        # 3. SALUDO O SOLICITUD DE CARTA DIGITAL
         is_greeting = any(w in text_lower for w in [
             "hola", "buenas", "buen dia", "buenas tardes", "buenas noches",
             "menu", "carta", "que tienen", "que hay", "precios", "promos"
         ])
 
-        if is_greeting or bot_mode == "catalog_link":
-            custom_tpl = self.templates.get("template_menu")
+        if is_greeting or bot_mode in ["catalog", "catalog_direct"]:
+            if bot_mode == "catalog_direct":
+                custom_tpl = self.templates.get("template_catalog_direct_welcome")
+            else:
+                custom_tpl = self.templates.get("template_menu")
+
             if custom_tpl:
                 compiled = self.compile_text(custom_tpl)
             else:
@@ -310,7 +424,7 @@ class MultiTenantBotEngine:
                     f"📖 *Accedé a nuestra Carta Digital Interactiva y armá tu pedido acá:*\n"
                     f"{catalog_link}\n\n"
                     f"🛵 Hacemos envíos rápidos a domicilio y retiro por el local.\n"
-                    f"Si querés pedir directamente por acá, escribí qué te gustaría pedir (ej: 'Quiero 2 Burger Clásica para delivery')."
+                    f"Armá tu carrito con fotos y agregados, ¡y al confirmar entra directo a nuestra cocina!"
                 )
             return {
                 "reply": compiled,
@@ -319,9 +433,9 @@ class MultiTenantBotEngine:
                 "store": store_name
             }
 
-        # 3. CONSULTA DE HORARIOS O DIRECCIÓN
+        # 4. CONSULTA DE HORARIOS O DIRECCIÓN
         if any(w in text_lower for w in ["horario", "abierto", "donde estan", "direccion", "ubicacion"]):
-            custom_hours = self.templates.get("template_hours")
+            custom_hours = self.templates.get("template_hours") or self.templates.get("menu_response_3")
             if custom_hours:
                 reply = self.compile_text(custom_hours)
             else:
@@ -339,8 +453,8 @@ class MultiTenantBotEngine:
                 "store": store_name
             }
 
-        # 4. MODO AUTO-PEDIDO: PARSING DE PRODUCTOS Y CREACIÓN DE COMANDA EN SUPABASE
-        if bot_mode in ["auto_order", "hybrid", "ai"]:
+        # 5. MODO TEXTO / AUTO-PEDIDO: PARSING DE PRODUCTOS Y CREACIÓN DE COMANDA EN SUPABASE
+        if bot_mode in ["templates", "auto_order", "hybrid", "ai"]:
             matched_items = []
             subtotal = 0
 
@@ -606,6 +720,8 @@ def main():
                         help="Slug del negocio a conectar (ej: fastburga-centro, demo)")
     parser.add_argument("-p", "--port", type=int, default=3002,
                         help="Puerto HTTP del servidor de webhook (default: 3002)")
+    parser.add_argument("-m", "--message", type=str, default=None,
+                        help="Simular un mensaje directo y devolver la respuesta en consola")
     parser.add_argument("-i", "--interactive", action="store_true",
                         help="Iniciar en modo chat interactivo en consola de inmediato")
     parser.add_argument("--list", action="store_true",
@@ -665,8 +781,17 @@ def main():
     print(f"   • ID:        {store.get('id')}")
     print(f"   • Modo Bot:  {active_engine.get_mode().upper()}")
     print(f"   • Productos: {len(active_engine.products)} cargados desde Supabase")
-    print(f"   • Enlace:    https://comandasaas.app/carta/{store.get('slug')}")
+    print(f"   • Enlace:    https://comandasaas.app/#catalog?store={store.get('slug')}")
     print("-" * 60)
+
+    # Si se pasó mensaje por comando directo
+    if args.message:
+        res = active_engine.process_message("5491100000000", args.message)
+        print(f"\n[RESPUESTA DEL BOT — Modo: {res.get('mode')}]")
+        print(res.get("reply"))
+        if res.get("order_created"):
+            print(f"\n[🔥 COMANDA GENERADA EN SUPABASE -> ID: {res['order_created'].get('id')} | TOTAL: ${res['order_created'].get('total')}]")
+        return
 
     # Si se solicitó modo interactivo
     if args.interactive:

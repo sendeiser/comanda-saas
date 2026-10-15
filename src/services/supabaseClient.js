@@ -1151,11 +1151,25 @@ export const supabaseSync = {
     return () => clearInterval(interval);
   },
 
+  _getActiveStoreId(providedId) {
+    if (providedId && typeof providedId === 'string' && providedId.length >= 10) return providedId;
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('comandafast_active_store');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.id) return parsed.id;
+        }
+      } catch (_) {}
+    }
+    return providedId || '00000000-0000-0000-0000-000000000001';
+  },
+
   // --- BOT CONFIG & MULTI-TENANT BOT PERSISTENCE ---
   async fetchBotConfig(storeId, type) {
     if (!this.isConfigured()) return null;
     try {
-      const cleanStoreId = storeId || '00000000-0000-0000-0000-000000000001';
+      const cleanStoreId = this._getActiveStoreId(storeId);
       const cleanType = type || 'templates';
       const configId = `bot_${cleanType}_${cleanStoreId}`;
       const query = `id=eq.${encodeURIComponent(configId)}&select=*`;
@@ -1175,7 +1189,7 @@ export const supabaseSync = {
   async saveBotConfig(storeId, type, data) {
     if (!this.isConfigured()) return false;
     try {
-      const cleanStoreId = storeId || '00000000-0000-0000-0000-000000000001';
+      const cleanStoreId = this._getActiveStoreId(storeId);
       const cleanType = type || 'templates';
       const configId = `bot_${cleanType}_${cleanStoreId}`;
       const payload = {
@@ -1198,27 +1212,27 @@ export const supabaseSync = {
   },
 
   async fetchBotVariables(storeId) {
-    return this.fetchBotConfig(storeId, 'variables');
+    return this.fetchBotConfig(this._getActiveStoreId(storeId), 'variables');
   },
 
   async saveBotVariables(variables, storeId) {
-    return this.saveBotConfig(storeId, 'variables', variables);
+    return this.saveBotConfig(this._getActiveStoreId(storeId), 'variables', variables);
   },
 
   async fetchBotTemplates(storeId) {
-    return this.fetchBotConfig(storeId, 'templates');
+    return this.fetchBotConfig(this._getActiveStoreId(storeId), 'templates');
   },
 
   async saveBotTemplates(templates, storeId) {
-    return this.saveBotConfig(storeId, 'templates', templates);
+    return this.saveBotConfig(this._getActiveStoreId(storeId), 'templates', templates);
   },
 
   async fetchBotFlows(storeId) {
-    return this.fetchBotConfig(storeId, 'flows');
+    return this.fetchBotConfig(this._getActiveStoreId(storeId), 'flows');
   },
 
   async saveBotFlows(flows, storeId) {
-    return this.saveBotConfig(storeId, 'flows', flows);
+    return this.saveBotConfig(this._getActiveStoreId(storeId), 'flows', flows);
   }
 };
 
