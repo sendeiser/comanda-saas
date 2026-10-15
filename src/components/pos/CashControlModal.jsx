@@ -31,6 +31,17 @@ export default function CashControlModal({
   const [resetFeedback, setResetFeedback] = useState(null);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  useEffect(() => {
     const updateCounter = () => setCurrentOrderCounter(storageService.getOrderCounter());
     window.addEventListener('comandafast:order-counter-reset', updateCounter);
     window.addEventListener('comandafast:new-order', updateCounter);
@@ -308,22 +319,22 @@ export default function CashControlModal({
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <div style={{ background: 'var(--bg-main)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>FONDO INICIAL:</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)' }}>${cashShift.initialCash.toLocaleString('es-AR')}</div>
+                <div className="tabular-nums" style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--text-primary)', fontVariantNumeric: 'tabular-nums' }}>${cashShift.initialCash.toLocaleString('es-AR')}</div>
               </div>
 
               <div style={{ background: 'var(--bg-main)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>VENTAS EN EFECTIVO:</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--accent-emerald)' }}>+${cashSales.toLocaleString('es-AR')}</div>
+                <div className="tabular-nums" style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--accent-emerald)', fontVariantNumeric: 'tabular-nums' }}>+${cashSales.toLocaleString('es-AR')}</div>
               </div>
 
               <div style={{ background: 'var(--bg-main)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>TRANSFERENCIAS ACREDITADAS:</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#60a5fa' }}>${transferSales.toLocaleString('es-AR')}</div>
+                <div className="tabular-nums" style={{ fontSize: '1.25rem', fontWeight: 900, color: '#60a5fa', fontVariantNumeric: 'tabular-nums' }}>${transferSales.toLocaleString('es-AR')}</div>
               </div>
 
               <div style={{ background: 'var(--bg-main)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 700 }}>VENTAS CON TARJETA:</div>
-                <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#c084fc' }}>${cardSales.toLocaleString('es-AR')}</div>
+                <div className="tabular-nums" style={{ fontSize: '1.25rem', fontWeight: 900, color: '#c084fc', fontVariantNumeric: 'tabular-nums' }}>${cardSales.toLocaleString('es-AR')}</div>
               </div>
             </div>
 
@@ -333,7 +344,7 @@ export default function CashControlModal({
                 <div style={{ fontSize: '0.8rem', color: 'var(--accent-amber)', fontWeight: 800 }}>EFECTIVO TEÓRICO EN CAJÓN:</div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>(Fondo Inicial + Efectivo Cobrado - Egresos)</div>
               </div>
-              <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--accent-amber)', fontFamily: 'var(--font-heading)' }}>
+              <div className="tabular-nums" style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--accent-amber)', fontFamily: 'var(--font-heading)', fontVariantNumeric: 'tabular-nums' }}>
                 ${expectedCashInDrawer.toLocaleString('es-AR')}
               </div>
             </div>

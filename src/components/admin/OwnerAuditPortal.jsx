@@ -110,6 +110,22 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
     };
   }, []);
 
+  // Quick escape back to POS
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && onBackToPos) {
+        // Only if no modal input is active
+        const tag = document.activeElement?.tagName?.toLowerCase();
+        if (tag !== 'input' && tag !== 'textarea') {
+          e.preventDefault();
+          onBackToPos();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBackToPos]);
+
   const handleRefreshSystem = async () => {
     if (isRefreshing) return;
     setIsRefreshing(true);

@@ -70,6 +70,18 @@ export default function CustomerCrmModal({
   }, [isOpen, storeId]);
 
   useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
     const handleUpdate = (e) => {
       if (e.detail?.storeId === storeId && Array.isArray(e.detail?.customers)) {
         setCustomers(e.detail.customers);
