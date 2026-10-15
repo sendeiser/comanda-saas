@@ -24,9 +24,66 @@ import socket
 import threading
 import urllib.request
 import urllib.error
+import urllib.parse
+import webbrowser
 from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import argparse
+
+def get_base_dir():
+    """Retorna el directorio base temporal si está congelado con PyInstaller (_MEIPASS), o el del script."""
+    if hasattr(sys, "_MEIPASS"):
+        return sys._MEIPASS
+    return os.path.dirname(os.path.abspath(__file__))
+
+def get_app_dir():
+    """Retorna el directorio permanente donde reside el ejecutable .exe o el script."""
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+def get_resource_path(filename):
+    """Busca un recurso en el paquete empaquetado (_MEIPASS) o junto al ejecutable/script."""
+    # 1. En carpeta temporal _MEIPASS (si fue empaquetado con PyInstaller)
+    if hasattr(sys, "_MEIPASS"):
+        p = os.path.join(sys._MEIPASS, filename)
+        if os.path.exists(p):
+            return p
+    # 2. Junto al ejecutable permanente
+    if getattr(sys, "frozen", False):
+        p = os.path.join(os.path.dirname(sys.executable), filename)
+        if os.path.exists(p):
+            return p
+    # 3. Junto al script python
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)
+    if os.path.exists(p):
+        return p
+    return p
+
+# Configuración persistente del local (se guarda al lado del .exe)
+CONFIG_FILE_PATH = os.path.join(get_app_dir(), "comanda_bot_config.json")
+
+def load_local_config():
+    """Carga la configuración persistente guardada localmente."""
+    if os.path.exists(CONFIG_FILE_PATH):
+        try:
+            with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_local_config(config_dict):
+    """Guarda la configuración persistente junto al ejecutable."""
+    try:
+        current = load_local_config()
+        current.update(config_dict)
+        with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as f:
+            json.dump(current, f, indent=2, ensure_ascii=False)
+        return True
+    except Exception as e:
+        print(f"[Aviso] No se pudo guardar configuración local: {e}", file=sys.stderr)
+        return False
 
 def get_local_ip():
     """Detecta la IP local de la máquina en la red Wi-Fi / Ethernet."""
@@ -40,7 +97,7 @@ def get_local_ip():
         return "127.0.0.1"
 
 # Estado en memoria para el Simulador Web y Consola
-TESTER_HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tester.html")
+TESTER_HTML_PATH = get_resource_path("tester.html")
 sim_chat_messages = []
 sim_session = {
     "step": "IDLE",
@@ -198,17 +255,37 @@ class SupabaseClient:
 # ---------------------------------------------------------------------------
 # SERVICIO GROQ IA MULTI-PROVEEDOR (LLAMA 3.3 / QWEN 27B)
 # ---------------------------------------------------------------------------
+def get_groq_api_key():
+    """Obtiene la clave de Groq desde variables de entorno, archivo local o configuración por defecto."""
+    key = os.getenv("GROQ_API_KEY", "").strip()
+    if key:
+        return key
+
+    local_cfg = load_local_config()
+    if local_cfg.get("groqApiKey"):
+        return local_cfg["groqApiKey"].strip()
+
+    for candidate in [
+        get_resource_path("ai_config.json"),
+        get_resource_path(os.path.join("data", "ai_config.json")),
+        os.path.join(get_app_dir(), "ai_config.json"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "ai_config.json")
+    ]:
+        if candidate and os.path.exists(candidate):
+            try:
+                with open(candidate, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    k = data.get("groqApiKey")
+                    if k:
+                        return k.strip()
+            except Exception:
+                pass
+
+    return ""
+
+
 def call_groq_ai(user_message, store_name, products, customer_name="Cliente"):
-    groq_key = os.getenv("GROQ_API_KEY", "")
-    if not groq_key:
-        try:
-            cfg_path = os.path.join(os.path.dirname(__file__), "..", "data", "ai_config.json")
-            if os.path.exists(cfg_path):
-                with open(cfg_path, "r", encoding="utf-8") as f:
-                    cfg = json.load(f)
-                    groq_key = cfg.get("groqApiKey") or ""
-        except Exception:
-            pass
+    groq_key = get_groq_api_key()
     if not groq_key:
         return None
     models = ["qwen/qwen3.8-27b", "openai/gpt-oss-120b", "llama-3.3-70b-versatile"]
@@ -247,16 +324,7 @@ def call_groq_ai(user_message, store_name, products, customer_name="Cliente"):
 
 def extract_order_items_groq(user_message, products):
     """Extrae productos y cantidades usando Groq Cloud en milisegundos con soporte para modismos y plurales."""
-    groq_key = os.getenv("GROQ_API_KEY", "")
-    if not groq_key:
-        try:
-            cfg_path = os.path.join(os.path.dirname(__file__), "..", "data", "ai_config.json")
-            if os.path.exists(cfg_path):
-                with open(cfg_path, "r", encoding="utf-8") as f:
-                    cfg = json.load(f)
-                    groq_key = cfg.get("groqApiKey") or ""
-        except Exception:
-            pass
+    groq_key = get_groq_api_key()
     if not groq_key or not products:
         return None
 
@@ -1342,15 +1410,19 @@ class BotHttpHandler(BaseHTTPRequestHandler):
         # 0. Servir el Simulador Web / Consola para Celular y PC
         accept_hdr = self.headers.get("Accept", "")
         if path in ["/simulador", "/tester", "/simulador-consola"] or (path == "/" and "text/html" in accept_hdr):
-            if os.path.exists(TESTER_HTML_PATH):
+            t_path = get_resource_path("tester.html")
+            if os.path.exists(t_path):
                 try:
-                    with open(TESTER_HTML_PATH, "r", encoding="utf-8") as f:
+                    with open(t_path, "r", encoding="utf-8") as f:
                         content = f.read()
                     self._send_html(200, content)
                     return
                 except Exception as e:
                     self._send_html(500, f"<h1>Error al cargar simulador</h1><p>{e}</p>")
                     return
+            else:
+                self._send_html(200, get_fallback_html(store))
+                return
 
         # 1. Endpoints de Estado y Health
         if path in ["/", "/health"]:
@@ -1588,7 +1660,209 @@ def run_interactive_chat(engine):
 
 
 # ---------------------------------------------------------------------------
-# ENTRYPOINT CLI
+# PLANTILLA DE RESPALDO HTML PARA SIMULADOR EMBEBIDO
+# ---------------------------------------------------------------------------
+def get_fallback_html(store):
+    store_name = store.get("name", "ComandaFast Gastronomía")
+    store_slug = store.get("slug", "demo")
+    return f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Simulador WhatsApp — {store_name}</title>
+  <style>
+    body {{ margin: 0; background: #0c1317; color: #e9edef; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; flex-direction: column; height: 100vh; }}
+    header {{ background: #202c33; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a3942; }}
+    h1 {{ font-size: 16px; margin: 0; }}
+    .badge {{ background: rgba(37,211,102,0.15); color: #25d366; font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: 600; }}
+    #chat {{ flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }}
+    .msg {{ max-width: 80%; padding: 10px 14px; border-radius: 10px; font-size: 14px; line-height: 1.45; word-break: break-word; }}
+    .in {{ background: #202c33; align-self: flex-start; border-top-left-radius: 2px; }}
+    .out {{ background: #005c4b; align-self: flex-end; border-top-right-radius: 2px; }}
+    footer {{ background: #202c33; padding: 12px; display: flex; gap: 8px; border-top: 1px solid #2a3942; }}
+    input {{ flex: 1; background: #2a3942; border: 1px solid #3b4a54; color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 15px; outline: none; }}
+    input:focus {{ border-color: #25d366; }}
+    button {{ background: #25d366; color: #0c1317; font-weight: 700; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; }}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>🍔 {store_name}</h1>
+      <span style="font-size: 12px; color: #8696a0;">Slug: <b>{store_slug}</b></span>
+    </div>
+    <span class="badge">🟢 BOT EN LÍNEA</span>
+  </header>
+  <div id="chat">
+    <div class="msg in">👋 ¡Hola! Escribí <b>HOLA</b> o <b>MENU</b> para comenzar tu pedido.</div>
+  </div>
+  <footer>
+    <input type="text" id="inp" placeholder="Escribí un mensaje como cliente de WhatsApp..." onkeydown="if(event.key==='Enter')sendMsg()">
+    <button onclick="sendMsg()">Enviar</button>
+  </footer>
+  <script>
+    async function sendMsg() {{
+      const inp = document.getElementById('inp');
+      const txt = inp.value.trim();
+      if(!txt) return;
+      inp.value = '';
+      addMsg(txt, 'out');
+      try {{
+        const res = await fetch('/api/webhook/whatsapp', {{
+          method: 'POST',
+          headers: {{ 'Content-Type': 'application/json' }},
+          body: JSON.stringify({{
+            entry: [{{
+              changes: [{{
+                value: {{
+                  messages: [{{
+                    from: '5491100000000',
+                    type: 'text',
+                    text: {{ body: txt }}
+                  }}]
+                }}
+              }}]
+            }}]
+          }})
+        }});
+        const data = await res.json();
+        if(data && data.reply) addMsg(data.reply, 'in');
+      }} catch(e) {{
+        addMsg('⚠️ Error: ' + e, 'in');
+      }}
+    }}
+    function addMsg(txt, cls) {{
+      const d = document.createElement('div');
+      d.className = 'msg ' + cls;
+      d.innerHTML = txt.replace(/\\n/g, '<br>');
+      document.getElementById('chat').appendChild(d);
+      document.getElementById('chat').scrollTop = 99999;
+    }}
+  </script>
+</body>
+</html>"""
+
+
+# ---------------------------------------------------------------------------
+# SOLICITUD INTERACTIVA Y VALIDACIÓN DE SLUG DEL COMERCIO
+# ---------------------------------------------------------------------------
+def prompt_for_store_slug(client):
+    """
+    Solicita interactivamente al usuario ingresar el SLUG de su negocio.
+    Verifica contra Supabase y reintenta si el comercio no existe.
+    Guarda el slug seleccionado en comanda_bot_config.json para recordar en futuras ejecuciones.
+    """
+    cfg = load_local_config()
+    saved_slug = cfg.get("last_slug", "").strip()
+    saved_name = cfg.get("last_store_name", "").strip()
+
+    print("\n" + "=" * 70)
+    print("🍔 COMANDA FAST — ASISTENTE WHATSAPP AUTOMÁTICO (PORTABLE)")
+    print(f"📡 Conectado a la nube Comanda Cloud (Supabase)")
+    print("=" * 70)
+
+    # Si hay un slug previamente guardado en esta máquina
+    if saved_slug:
+        prompt_info = f"\n👉 Último negocio configurado en esta PC: '{saved_slug}'"
+        if saved_name:
+            prompt_info += f" ({saved_name})"
+        print(prompt_info)
+        try:
+            choice = input(f"Presioná ENTER para continuar con '{saved_slug}', o escribí un nuevo SLUG: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            choice = ""
+
+        if not choice:
+            print(f"Verificando negocio '{saved_slug}' en Supabase...")
+            store = client.get_store_by_slug_or_id(saved_slug)
+            if store:
+                return store["slug"]
+            else:
+                print(f"⚠️ El negocio previo '{saved_slug}' ya no está disponible en la base de datos.")
+        else:
+            # El usuario escribió un slug nuevo
+            print(f"Verificando negocio '{choice}' en Supabase...")
+            store = client.get_store_by_slug_or_id(choice)
+            if store:
+                save_local_config({"last_slug": store["slug"], "last_store_name": store.get("name", "")})
+                return store["slug"]
+            else:
+                print(f"❌ No se encontró ningún comercio con el SLUG '{choice}'.")
+
+    # Solicitar obligatoriamente el SLUG del negocio
+    while True:
+        print("\n" + "-" * 60)
+        print("✍️  Por favor, escribí el SLUG de tu negocio (ej: fastburga-centro):")
+        print("    [Tip: escribí '?' o 'lista' para ver todos los comercios activos]")
+        print("-" * 60)
+
+        try:
+            user_slug = input("SLUG de tu negocio > ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nOperación cancelada.")
+            sys.exit(0)
+
+        if not user_slug:
+            print("⚠️ El SLUG no puede estar vacío. Por favor ingresá el identificador de tu local.")
+            continue
+
+        if user_slug.lower() in ["?", "lista", "list", "ver", "comercios"]:
+            print("\nConsultando comercios en Supabase...")
+            stores = client.list_all_stores()
+            if stores:
+                print("\nComercios activos encontrados en la base de datos:")
+                for idx, s in enumerate(stores, 1):
+                    print(f"  [{idx}] {s.get('slug', ''):<25} -> {s.get('name')}")
+                try:
+                    sub_pick = input("\nEscribí el número [1..N] o el SLUG de tu negocio: ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    continue
+
+                if sub_pick.isdigit() and 1 <= int(sub_pick) <= len(stores):
+                    selected = stores[int(sub_pick) - 1]
+                    save_local_config({"last_slug": selected["slug"], "last_store_name": selected.get("name", "")})
+                    return selected["slug"]
+                elif sub_pick:
+                    user_slug = sub_pick
+                else:
+                    continue
+            else:
+                print("⚠️ No se encontraron comercios registrados en la base de datos.")
+                continue
+
+        # Validar en Supabase
+        print(f"Buscando comercio con slug '{user_slug}'...")
+        store = client.get_store_by_slug_or_id(user_slug)
+        if store:
+            target_slug = store["slug"]
+            save_local_config({"last_slug": target_slug, "last_store_name": store.get("name", "")})
+            return target_slug
+        else:
+            print(f"\n❌ El comercio con SLUG '{user_slug}' no fue encontrado en Supabase.")
+            stores = client.list_all_stores()
+            if stores:
+                print("\nComercios disponibles registrados en el sistema:")
+                for idx, s in enumerate(stores, 1):
+                    print(f"  [{idx}] {s.get('slug', ''):<25} -> {s.get('name')}")
+                try:
+                    sub_pick = input("\nEscribí el número [1..N] de la lista o probá escribir el SLUG otra vez: ").strip()
+                except (EOFError, KeyboardInterrupt):
+                    continue
+
+                if sub_pick.isdigit() and 1 <= int(sub_pick) <= len(stores):
+                    selected = stores[int(sub_pick) - 1]
+                    save_local_config({"last_slug": selected["slug"], "last_store_name": selected.get("name", "")})
+                    return selected["slug"]
+                elif sub_pick:
+                    re_store = client.get_store_by_slug_or_id(sub_pick)
+                    if re_store:
+                        save_local_config({"last_slug": re_store["slug"], "last_store_name": re_store.get("name", "")})
+                        return re_store["slug"]
+
+
+# ---------------------------------------------------------------------------
+# ENTRYPOINT CLI Y SERVIDOR PRINCIPAL
 # ---------------------------------------------------------------------------
 def main():
     global active_engine
@@ -1622,30 +1896,16 @@ def main():
         print(f"\nTotal: {len(stores)} comercios activos.\n")
         return
 
-    # Si no se pasó slug, preguntar de forma interactiva en la consola
+    # Si se pasó slug por argumento CLI
     target_slug = args.slug
-    if not target_slug and sys.stdin.isatty() and not os.getenv("COMANDA_AUTO_START"):
-        print("\n" + "=" * 65)
-        print("🍔 COMANDA FAST — ASISTENTE WHATSAPP MULTI-NEGOCIO")
-        print(f"📡 Supabase Target: {DEFAULT_SUPABASE_URL}")
-        print("=" * 65)
-
-        stores = client.list_all_stores()
-        if stores:
-            print("\nComercios detectados en tu base de datos:")
-            for idx, s in enumerate(stores, 1):
-                print(f"  [{idx}] {s.get('slug', ''):<22} -> {s.get('name')}")
-            print()
-
-            choice = input("Escribí el número [1..N] o el SLUG del negocio (ENTER para 'demo'): ").strip()
-            if choice.isdigit() and 1 <= int(choice) <= len(stores):
-                target_slug = stores[int(choice) - 1]["slug"]
-            elif choice:
-                target_slug = choice
-            else:
-                target_slug = "demo"
-        else:
-            target_slug = "demo"
+    if target_slug:
+        st = client.get_store_by_slug_or_id(target_slug)
+        if st:
+            target_slug = st["slug"]
+            save_local_config({"last_slug": target_slug, "last_store_name": st.get("name", "")})
+    else:
+        # Preguntar interactivamente al cliente que escriba el slug de su negocio
+        target_slug = prompt_for_store_slug(client)
 
     if not target_slug:
         target_slug = "demo"
@@ -1654,7 +1914,7 @@ def main():
     active_engine = MultiTenantBotEngine(target_slug, client)
     store = active_engine.current_store
 
-    print(f"\n" + "-" * 60)
+    print(f"\n" + "=" * 65)
     print(f"✅ COMERCIO CONECTADO:")
     print(f"   • Nombre:    {store.get('name')}")
     print(f"   • Slug:      {store.get('slug')}")
@@ -1662,7 +1922,7 @@ def main():
     print(f"   • Modo Bot:  {active_engine.get_mode().upper()}")
     print(f"   • Productos: {len(active_engine.products)} cargados desde Supabase")
     print(f"   • Enlace:    https://comandasaas.app/#catalog?store={store.get('slug')}")
-    print("-" * 60)
+    print("=" * 65)
 
     # Si se pasó mensaje por comando directo
     if args.message:
@@ -1674,6 +1934,8 @@ def main():
         return
 
     local_ip = get_local_ip()
+    sim_url = f"http://localhost:{args.port}/simulador"
+    mobile_sim_url = f"http://{local_ip}:{args.port}/simulador"
 
     # Si se solicitó modo interactivo (consola CLI)
     if args.interactive:
@@ -1682,47 +1944,69 @@ def main():
             httpd = HTTPServer(("", args.port), BotHttpHandler)
             srv_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
             srv_thread.start()
-            print("\n" + "=" * 65)
-            print("🚀 SIMULADOR WEB Y CONSOLA EN VIVO INICIADO")
-            print(f"   👉 En tu Celular (Wi-Fi): http://{local_ip}:{args.port}/simulador")
-            print(f"   👉 En esta PC:            http://localhost:{args.port}/simulador")
-            print("=" * 65)
-        except Exception as srv_err:
+        except Exception:
             try:
                 httpd = HTTPServer(("", 5005), BotHttpHandler)
+                args.port = 5005
+                sim_url = f"http://localhost:5005/simulador"
+                mobile_sim_url = f"http://{local_ip}:5005/simulador"
                 srv_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
                 srv_thread.start()
-                print("\n" + "=" * 65)
-                print("🚀 SIMULADOR WEB Y CONSOLA EN VIVO INICIADO (Puerto 5005)")
-                print(f"   👉 En tu Celular (Wi-Fi): http://{local_ip}:5005/simulador")
-                print(f"   👉 En esta PC:            http://localhost:5005/simulador")
-                print("=" * 65)
             except Exception:
-                print(f"⚠️ Aviso: No se pudo enlazar el simulador web en segundo plano: {srv_err}")
+                pass
+
+        print("\n" + "=" * 65)
+        print("🚀 SIMULADOR WEB Y CONSOLA EN VIVO INICIADO")
+        print(f"   👉 En tu Celular (Wi-Fi): {mobile_sim_url}")
+        print(f"   👉 En esta PC:            {sim_url}")
+        print("=" * 65)
 
         run_interactive_chat(active_engine)
         return
 
-    # Si no, iniciar servidor HTTP daemon en primer plano
+    # Iniciar servidor HTTP daemon en primer plano
     try:
         httpd = HTTPServer(("", args.port), BotHttpHandler)
     except OSError:
         print(f"⚠️ Puerto {args.port} en uso. Iniciando servidor en puerto 5005...")
         httpd = HTTPServer(("", 5005), BotHttpHandler)
         args.port = 5005
+        sim_url = f"http://localhost:5005/simulador"
+        mobile_sim_url = f"http://{local_ip}:5005/simulador"
 
-    print(f"\n🚀 Servidor Webhook & Simulador escuchando:")
-    print(f"   • En tu Celular (Wi-Fi): http://{local_ip}:{args.port}/simulador")
-    print(f"   • En esta PC:            http://localhost:{args.port}/simulador")
-    print(f"   • Endpoint Health:       http://localhost:{args.port}/health")
-    print(f"   • Endpoint Webhook:      http://localhost:{args.port}/api/webhook/whatsapp")
-    print(f"\nPresiona Ctrl + C para detener el bot.\n")
+    print(f"\n" + "=" * 65)
+    print(f"🚀 SERVIDOR DE WHATSAPP BOT & SIMULADOR EN VIVO:")
+    print(f"   👉 En esta PC:            {sim_url}")
+    print(f"   👉 En tu Celular (Wi-Fi): {mobile_sim_url}")
+    print(f"   👉 Endpoint Webhook:      http://localhost:{args.port}/api/webhook/whatsapp")
+    print(f"   👉 Estado & Health:       http://localhost:{args.port}/health")
+    print("=" * 65)
+    print(f"\n💡 Podés abrir el simulador en tu celular conectado a la misma red Wi-Fi.")
+    print(f"   Presioná Ctrl + C en esta consola para detener el servidor.\n")
+
+    # Abrir navegador automáticamente en PC
+    def _open_browser():
+        time.sleep(1.2)
+        try:
+            webbrowser.open(sim_url)
+        except Exception:
+            pass
+
+    threading.Thread(target=_open_browser, daemon=True).start()
 
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         print("\n[Sistema] Deteniendo servidor de WhatsApp Bot...")
         httpd.server_close()
+    except Exception as e:
+        print(f"\n[Error de ejecución]: {e}")
+    finally:
+        if getattr(sys, "frozen", False):
+            try:
+                input("\nPresioná ENTER para salir...")
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":
