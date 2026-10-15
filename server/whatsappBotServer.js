@@ -24,8 +24,8 @@ import makeWASocket, {
   makeCacheableSignalKeyStore,
   DisconnectReason, 
   Browsers,
-  downloadMediaMessage 
 } from '@whiskeysockets/baileys';
+import pino from 'pino';
 
 const app = express();
 app.use(cors());
@@ -281,16 +281,21 @@ async function syncAllFromSupabaseCloud() {
           if (!row || !row.id) continue;
           cloudConfigTimestamps[row.id] = row.updated_at;
 
-          if (row.id === 'variables' && Array.isArray(row.data) && row.data.length > 0) {
+          const isVars = row.id === 'variables' || row.id.startsWith('bot_variables_');
+          const isFlows = row.id === 'flows' || row.id.startsWith('bot_flows_');
+          const isTemplates = row.id === 'templates' || row.id.startsWith('bot_templates_');
+          const isAi = row.id === 'ai_config' || row.id.startsWith('bot_ai_');
+
+          if (isVars && Array.isArray(row.data) && row.data.length > 0) {
             saveBotVariables(row.data);
-            console.log(`✅ [SUPABASE] Variables del bot sincronizadas: ${row.data.length} variables.`);
-          } else if (row.id === 'flows' && Array.isArray(row.data) && row.data.length > 0) {
+            console.log(`✅ [SUPABASE] Variables del bot sincronizadas (${row.id}): ${row.data.length} variables.`);
+          } else if (isFlows && Array.isArray(row.data) && row.data.length > 0) {
             saveStoredFlows(row.data);
-            console.log(`✅ [SUPABASE] Flujos conversacionales sincronizados: ${row.data.length} flujos.`);
-          } else if (row.id === 'templates' && row.data && typeof row.data === 'object') {
+            console.log(`✅ [SUPABASE] Flujos conversacionales sincronizados (${row.id}): ${row.data.length} flujos.`);
+          } else if (isTemplates && row.data && typeof row.data === 'object') {
             saveBotTemplates(row.data);
-            console.log(`✅ [SUPABASE] Seguridad Anti-Spam y Plantillas sincronizadas (Anti-Bucle: ${row.data.anti_loop_enabled !== false ? 'ACTIVO' : 'INACTIVO'}, Delay: ${row.data.bot_typing_delay_ms || 2500}ms, Pausa Humano: ${row.data.human_mode_sleep_minutes || 25}min).`);
-          } else if (row.id === 'ai_config' && row.data && typeof row.data === 'object') {
+            console.log(`✅ [SUPABASE] Plantillas y modo del bot sincronizados (${row.id}): Modo ${row.data.menu_mode || row.data.bot_mode || 'catalog'}, Delay: ${row.data.bot_typing_delay_ms || 2500}ms, Pausa Humano: ${row.data.human_mode_sleep_minutes || 25}min.`);
+          } else if (isAi && row.data && typeof row.data === 'object') {
             geminiBotService.saveConfig(row.data);
             console.log(`✅ [SUPABASE] Configuración de IA sincronizada (Modo: ${row.data.mode || 'cascade'}).`);
           }

@@ -70,9 +70,16 @@ Podés explorar nuestra carta digital y armar tu pedido acá:
  * @returns {{ store: Object, variables: Record<string, string> }}
  */
 export function loadBotConfig(storeIdentifier) {
+  const args = typeof process !== 'undefined' ? (process.argv || []) : [];
+  let cliSlug = null;
+  const sIdx = args.findIndex(a => a === '--store' || a === '-s' || a === '--slug');
+  if (sIdx !== -1 && args[sIdx + 1] && !args[sIdx + 1].startsWith('-')) {
+    cliSlug = args[sIdx + 1].trim();
+  }
+
   const storeSlug = storeIdentifier || 
-                     process.env.STORE_SLUG || 
-                     process.env.STORE_ID;
+                     cliSlug ||
+                     (typeof process !== 'undefined' ? (process.env.STORE_SLUG || process.env.STORE_ID) : null);
 
   let store = { ...DEFAULT_BOT_STORE };
 
