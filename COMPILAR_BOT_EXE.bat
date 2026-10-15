@@ -13,7 +13,7 @@ echo.
 echo Compilando server\whatsapp_bot.py en ejecutable unico (ComandaBot.exe)...
 echo.
 
-python -m PyInstaller --noconfirm --clean --onefile --console --name "ComandaBot" --add-data "server/tester.html;." --add-data "data/ai_config.json;data" server/whatsapp_bot.py
+python -m PyInstaller --noconfirm --clean --onefile --console --name "ComandaBot" server/whatsapp_bot.py
 
 if %errorlevel% neq 0 (
     color 0C
@@ -25,14 +25,17 @@ if %errorlevel% neq 0 (
 )
 
 copy /Y "dist\ComandaBot.exe" "ComandaBot.exe" > nul
+if exist "ComandaFast-Bot-Portatil" (
+    copy /Y "dist\ComandaBot.exe" "ComandaFast-Bot-Portatil\ComandaBot.exe" > nul
+)
 
 color 0A
 echo.
 echo =====================================================================
 echo    EJECUTABLE PORTABLE GENERADO CON EXITO!
-echo    Archivo: ComandaBot.exe (en la raiz del proyecto)
+echo    Archivo: ComandaBot.exe (en la raiz del proyecto y paquete portable)
 echo =====================================================================
-echo Podes copiar ComandaBot.exe a cualquier computadora o pendrive.
-echo Al ejecutarlo, le pedira al cliente ingresar el SLUG de su negocio.
+echo Podes ejecutar ComandaBot.exe directamente en cualquier computadora.
+echo Incluye generador de Codigo QR de WhatsApp y sincronizacion Supabase.
 echo.
 pause

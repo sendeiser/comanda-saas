@@ -54,3 +54,4 @@ __pycache__/
 *.pyc
 *.spec
 *comanda_bot_config.json
+node.exe

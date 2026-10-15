@@ -28,7 +28,15 @@ fs.mkdirSync(path.join(OUTPUT_DIR, 'data', 'baileys_auth'), { recursive: true })
 
 // 2. Copia de código fuente
 console.log('[2/7] Copiando archivos de servidor y lógica del bot...');
-const serverFiles = ['whatsappBotServer.js', 'geminiBotService.js', 'printerServer.js', 'botUpdateService.js'];
+const serverFiles = [
+  'whatsappBotServer.js',
+  'geminiBotService.js',
+  'printerServer.js',
+  'botUpdateService.js',
+  'botStoreConfig.js',
+  'tester.html',
+  'whatsapp_bot.py'
+];
 serverFiles.forEach(file => {
   const src = path.join(ROOT_DIR, 'server', file);
   if (fs.existsSync(src)) {
@@ -36,6 +44,13 @@ serverFiles.forEach(file => {
     console.log(`  -> server/${file} copiado.`);
   }
 });
+
+// Copiar ComandaBot.exe si ya está compilado
+const exeSrc = path.join(ROOT_DIR, 'ComandaBot.exe');
+if (fs.existsSync(exeSrc)) {
+  fs.copyFileSync(exeSrc, path.join(OUTPUT_DIR, 'ComandaBot.exe'));
+  console.log('  -> ComandaBot.exe copiado al paquete portable.');
+}
 
 // 3. Copia de variables de entorno y datos iniciales
 console.log('[3/7] Copiando configuraciones y base de datos inicial...');

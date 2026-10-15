@@ -304,6 +304,35 @@ async function syncAllFromSupabaseCloud() {
       }
     }
 
+    // Sincronizar datos del comercio por SLUG desde Supabase
+    try {
+      const { store: activeStore } = loadBotConfig();
+      const storeSlug = (process.env.STORE_SLUG || activeStore?.slug || 'demo').trim();
+      const resStore = await fetch(`${SUPABASE_URL}/rest/v1/stores?slug=eq.${encodeURIComponent(storeSlug)}&limit=1`, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+      if (resStore.ok) {
+        const storeRows = await resStore.json();
+        if (Array.isArray(storeRows) && storeRows.length > 0) {
+          const st = storeRows[0];
+          console.log(`✅ [SUPABASE] Comercio vinculado: ${st.name} (${st.slug})`);
+          const curVars = getBotVariablesMap();
+          if (st.name) curVars.nombre_local = st.name;
+          if (st.contact_info?.address) curVars.direccion = st.contact_info.address;
+          if (st.contact_info?.phone) curVars.telefono_contacto = st.contact_info.phone;
+          if (st.payment_settings?.transferAlias) curVars.alias_banco = st.payment_settings.transferAlias;
+          if (st.payment_settings?.transferBank) curVars.banco = st.payment_settings.transferBank;
+          if (st.payment_settings?.transferCbu) curVars.cbu = st.payment_settings.transferCbu;
+          if (st.name) curVars.titular = st.name;
+          const varArray = Object.entries(curVars).map(([key, value]) => ({ key, value }));
+          saveBotVariables(varArray);
+        }
+      }
+    } catch (_) {}
+
     // Descargar catálogo y fotos de productos
     await syncAllProductsFromCloud();
   } catch (err) {
@@ -2541,19 +2570,33 @@ class WhatsAppBotServer {
         if (qr) {
           try {
             this.qrCode = await QRCode.toDataURL(qr, { scale: 8, margin: 2 });
+            this.qrCodeRaw = qr;
             this.status = 'qr_ready';
             this.isStarting = false;
             
             console.log('\n=====================================================================');
             console.log('📲  [WHATSAPP BOT] ESCANEÁ ESTE CÓDIGO QR PARA VINCULAR TU WHATSAPP:');
             console.log('=====================================================================\n');
-            qrcodeTerminal.generate(qr, { small: true });
+            try {
+              qrcodeTerminal.generate(qr, { small: true });
+            } catch (_) {}
             console.log('\n=====================================================================');
             console.log('👉 1. Abrí WhatsApp en tu celular.');
             console.log('👉 2. Andá a Menú (tres puntitos) o Ajustes > Dispositivos vinculados.');
-            console.log('👉 3. Tocá "Vincular un dispositivo" y apuntá la cámara al código de arriba.');
-            console.log('👉 (También disponible en el panel web: http://localhost:5174/#dueno)');
+            console.log('👉 3. Tocá "Vincular un dispositivo" y apuntá la cámara al código QR.');
+            console.log(`👉 🖥️  O miralo en pantalla grande en tu navegador: http://localhost:${PORT}/qr`);
             console.log('=====================================================================\n');
+
+            // Abrir automáticamente el navegador con la pantalla QR limpia
+            if (!this.qrBrowserOpened) {
+              this.qrBrowserOpened = true;
+              try {
+                const cmd = process.platform === 'win32' ? 'start' : (process.platform === 'darwin' ? 'open' : 'xdg-open');
+                import('child_process').then(cp => {
+                  cp.exec(`${cmd} http://localhost:${PORT}/qr`);
+                }).catch(() => {});
+              } catch (_) {}
+            }
           } catch (err) {
             console.error('[WHATSAPP BOT] Error al generar código QR:', err);
           }
@@ -2583,6 +2626,8 @@ class WhatsAppBotServer {
         } else if (connection === 'open') {
           this.status = 'connected';
           this.qrCode = null;
+          this.qrCodeRaw = null;
+          this.qrBrowserOpened = false;
           this.isStarting = false;
           this.connectedUser = this.sock?.user || null;
           console.log('\n=====================================================================');
@@ -4686,6 +4731,365 @@ app.get('/status', (req, res) => {
     },
     timestamp: new Date().toISOString()
   });
+});
+
+// =========================================================
+// PANTALLA VISUAL OFICIAL PARA ESCANEAR CÓDIGO QR WHATSAPP
+// Permite vincular el celular cómodamente desde el navegador
+// =========================================================
+app.get(['/qr', '/conectar', '/whatsapp-qr'], (req, res) => {
+  const vars = getBusinessContext();
+  const { store } = loadBotConfig();
+  const storeName = vars.nombre_local || store?.name || 'ComandaFast Gastronomía';
+  const storeSlug = store?.slug || 'demo';
+
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vincular WhatsApp — ${storeName}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --card-bg: rgba(17, 24, 39, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.25);
+      --amber: #f59e0b;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px -10px var(--emerald-glow);
+      text-align: center;
+      animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .badge-store {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 9999px;
+      margin-bottom: 16px;
+    }
+    .badge-store::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fbbf24;
+      box-shadow: 0 0 8px #fbbf24;
+    }
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .qr-frame {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .qr-frame img {
+      width: 250px;
+      height: 250px;
+      display: block;
+      image-rendering: pixelated;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--emerald);
+      margin-bottom: 24px;
+    }
+    .status-pill .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--emerald);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+    .steps-card {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 18px;
+      text-align: left;
+      font-size: 13.5px;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .step-item:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px 20px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-top: 10px;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .connected-card {
+      display: none;
+      text-align: center;
+      padding: 20px 0;
+    }
+    .connected-icon {
+      width: 80px;
+      height: 80px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 2px solid var(--emerald);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      color: var(--emerald);
+      box-shadow: 0 0 30px var(--emerald-glow);
+      margin-bottom: 20px;
+      animation: bounce 0.6s ease-out;
+    }
+    @keyframes bounce { 0% { transform: scale(0.6); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    .loading-card {
+      display: none;
+      padding: 40px 0;
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--emerald);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge-store">Negocio: ${storeName} (${storeSlug})</div>
+
+    <!-- ESTADO 1: ESPERANDO ESCANEO QR -->
+    <div id="view-qr">
+      <h1>Vincular WhatsApp del Negocio</h1>
+      <p class="subtitle">Escaneá este código QR con el WhatsApp de tu comercio para comenzar a recibir y responder pedidos automáticamente.</p>
+
+      <div class="qr-frame">
+        <img id="qr-img" src="" alt="Código QR WhatsApp">
+      </div>
+
+      <div class="status-pill">
+        <span class="pulse-dot"></span>
+        <span id="qr-status-text">Esperando escaneo con tu celular...</span>
+      </div>
+
+      <div class="steps-card">
+        <div class="step-item">
+          <span class="step-num">1</span>
+          <span>Abrí <strong>WhatsApp</strong> en el teléfono de tu comercio.</span>
+        </div>
+        <div class="step-item">
+          <span class="step-num">2</span>
+          <span>Andá a <strong>Menú (tres puntos)</strong> en Android o <strong>Ajustes</strong> en iPhone.</span>
+        </div>
+        <div class="step-item">
+          <span class="step-num">3</span>
+          <span>Tocá <strong>Dispositivos vinculados</strong> y luego <strong>Vincular un dispositivo</strong>.</span>
+        </div>
+        <div class="step-item">
+          <span class="step-num">4</span>
+          <span>Apuntá la cámara de tu celular hacia este código QR.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESTADO 2: YA CONECTADO -->
+    <div id="view-connected" class="connected-card">
+      <div class="connected-icon">✓</div>
+      <h1 style="color: #34d399;">¡WhatsApp Conectado!</h1>
+      <p class="subtitle" id="connected-details">El bot está activo y procesando pedidos en tiempo real.</p>
+      
+      <div style="margin-top: 24px;">
+        <a href="/simulador" class="btn btn-primary">📱 Abrir Simulador de Pedidos</a>
+        <button onclick="logoutDevice()" class="btn btn-secondary">🔌 Desvincular para conectar otro celular</button>
+      </div>
+    </div>
+
+    <!-- ESTADO 3: CARGANDO / INICIALIZANDO -->
+    <div id="view-loading" class="loading-card">
+      <div class="spinner"></div>
+      <h1>Iniciando Conexión...</h1>
+      <p class="subtitle">Generando nuevo código QR seguro de WhatsApp. Aguarda unos segundos...</p>
+    </div>
+  </div>
+
+  <script>
+    let currentStatus = null;
+    let pollInterval = null;
+
+    async function checkStatus() {
+      try {
+        const res = await fetch('/status');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        if (data.status === 'connected') {
+          showConnected(data.user);
+        } else if (data.status === 'qr_ready' && data.qrCode) {
+          showQr(data.qrCode);
+        } else {
+          showLoading();
+        }
+      } catch (err) {
+        console.warn('Error polling /status:', err);
+      }
+    }
+
+    function showQr(qrBase64) {
+      document.getElementById('view-loading').style.display = 'none';
+      document.getElementById('view-connected').style.display = 'none';
+      document.getElementById('view-qr').style.display = 'block';
+      const img = document.getElementById('qr-img');
+      if (img.src !== qrBase64) {
+        img.src = qrBase64;
+      }
+    }
+
+    function showConnected(user) {
+      document.getElementById('view-loading').style.display = 'none';
+      document.getElementById('view-qr').style.display = 'none';
+      document.getElementById('view-connected').style.display = 'block';
+      const details = document.getElementById('connected-details');
+      const name = user?.name || 'ComandaFast Bot';
+      const phone = user?.id ? user.id.split(':')[0].split('@')[0] : '';
+      details.innerHTML = 'Dispositivo vinculado: <strong>' + name + '</strong> ' + (phone ? '(+' + phone + ')' : '') + '<br>Recibiendo mensajes y sincronizando comandas con el POS.';
+    }
+
+    function showLoading() {
+      document.getElementById('view-qr').style.display = 'none';
+      document.getElementById('view-connected').style.display = 'none';
+      document.getElementById('view-loading').style.display = 'block';
+    }
+
+    async function logoutDevice() {
+      if (!confirm('¿Estás seguro de desvincular este celular? Se generará un nuevo código QR.')) return;
+      showLoading();
+      try {
+        await fetch('/logout', { method: 'POST' });
+        setTimeout(() => {
+          fetch('/start', { method: 'POST' }).finally(() => {
+            checkStatus();
+          });
+        }, 1000);
+      } catch (e) {
+        alert('Error al desvincular: ' + e.message);
+      }
+    }
+
+    // Polling continuo cada 1200ms
+    checkStatus();
+    pollInterval = setInterval(checkStatus, 1200);
+  </script>
+</body>
+</html>`;
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // Endpoint para consultar chats en Modo Humano (pausados por operador)
