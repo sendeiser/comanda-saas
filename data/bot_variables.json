@@ -3,7 +3,7 @@
     "key": "nombre_local",
     "icon": "Store",
     "label": "Nombre del Local",
-    "value": "Burga's Chamical",
+    "value": "La Cocina de ANa",
     "category": "business",
     "description": "Nombre de la hamburguesería o marca gastronómica",
     "defaultValue": "ComandaFast Burgers"
@@ -12,7 +12,7 @@
     "key": "direccion",
     "icon": "MapPin",
     "label": "Dirección para Retiros",
-    "value": "Av. Perón 145 (frente al super x día)",
+    "value": "Av. Perón 145 ",
     "category": "business",
     "description": "Ubicación física del local para Take Away y cadetes",
     "defaultValue": "Av. Belgrano 1234, Centro"
