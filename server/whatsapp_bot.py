@@ -203,6 +203,133 @@ def call_groq_ai(user_message, store_name, products, customer_name="Cliente"):
     return None
 
 
+def extract_order_items_groq(user_message, products):
+    """Extrae productos y cantidades usando Groq Cloud en milisegundos con soporte para modismos y plurales."""
+    groq_key = os.getenv("GROQ_API_KEY", "")
+    if not groq_key:
+        try:
+            cfg_path = os.path.join(os.path.dirname(__file__), "..", "data", "ai_config.json")
+            if os.path.exists(cfg_path):
+                with open(cfg_path, "r", encoding="utf-8") as f:
+                    cfg = json.load(f)
+                    groq_key = cfg.get("groqApiKey") or ""
+        except Exception:
+            pass
+    if not groq_key or not products:
+        return None
+
+    prods_catalog = [
+        {"id": p.get("id"), "name": p.get("name"), "price": float(p.get("price", 0))}
+        for p in (products or [])
+    ]
+    prompt = (
+        "Eres un extractor de pedidos gastronómicos de WhatsApp de alta precisión.\n"
+        "Analiza el mensaje del cliente y extrae TODOS los productos que desea pedir con sus cantidades exactas y notas/aclaraciones.\n"
+        f"Productos disponibles en el local:\n{json.dumps(prods_catalog, ensure_ascii=False)}\n\n"
+        "Reglas estrictas:\n"
+        "1. Identifica sinónimos, modismos y abreviaciones (ej: 'burguer'/'hamburguesa' -> 'Burger', 'birra' -> 'Cerveza', 'papas cheddar' -> 'Papas Cheddar & Bacon').\n"
+        "2. Interpreta cantidades numéricas o en palabras ('dos' = 2, 'una' = 1, 'un' = 1, 'tres' = 3, etc.).\n"
+        "3. Responde ÚNICAMENTE un array JSON válido con formato: [{\"id\": \"prod-id\", \"name\": \"Nombre Exacto\", \"qty\": 1, \"modifiers\": []}].\n"
+        "4. Sin formato markdown, sin comillas invertidas, solo JSON puro.\n"
+        "5. Si el cliente NO está pidiendo productos, responde []."
+    )
+
+    models = ["qwen/qwen3.8-27b", "openai/gpt-oss-120b", "llama-3.3-70b-versatile"]
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    }
+    for m in models:
+        try:
+            req_data = json.dumps({
+                "model": m,
+                "messages": [
+                    {"role": "system", "content": prompt},
+                    {"role": "user", "content": f"Cliente: \"{user_message}\""}
+                ],
+                "temperature": 0.1,
+                "max_tokens": 350
+            }).encode("utf-8")
+            req = urllib.request.Request("https://api.groq.com/openai/v1/chat/completions", data=req_data, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=6) as res:
+                resp = json.loads(res.read().decode("utf-8"))
+                reply = resp.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+                if reply:
+                    clean_match = re.search(r"\[.*\]", reply, re.DOTALL)
+                    if clean_match:
+                        parsed = json.loads(clean_match.group(0))
+                        if isinstance(parsed, list) and len(parsed) > 0:
+                            return parsed
+        except Exception:
+            continue
+    return None
+
+
+def extract_order_items_local(text, products):
+    """Fallback local inteligente para reconocer múltiples productos con cantidades, modismos y plurales."""
+    if not text or not products:
+        return []
+
+    def norm(s):
+        s = (s or "").lower()
+        replacements = [
+            ("á", "a"), ("é", "e"), ("í", "i"), ("ó", "o"), ("ú", "u"),
+            ("burguer", "burger"), ("hamburguesa", "burger"), ("hamburguesas", "burger"),
+            ("birra", "cerveza"), ("birras", "cerveza"), ("cervezas", "cerveza"),
+            ("chedar", "cheddar"), ("fritas", ""), ("porción de ", ""), ("porcion de ", ""),
+            ("bastón", ""), ("baston", "")
+        ]
+        for a, b in replacements:
+            s = s.replace(a, b)
+        return s
+
+    clean_text = norm(text)
+
+    # Convertir números en palabras a dígitos
+    word_to_num = {
+        "un": 1, "una": 1, "uno": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6
+    }
+    for w, n in word_to_num.items():
+        clean_text = re.sub(rf"\b{w}\b", str(n), clean_text)
+
+    matched = []
+    seen_ids = set()
+    sorted_prods = sorted(products, key=lambda p: len(p.get("name", "")), reverse=True)
+
+    for p in sorted_prods:
+        p_id = p.get("id")
+        if p_id in seen_ids:
+            continue
+        p_name = p.get("name", "")
+        p_norm = norm(p_name)
+
+        stop_words = {"con", "las", "los", "del", "para", "sin", "473ml", "500ml", "1.5l", "2l", "bacon"}
+        kws = [w for w in re.split(r"[^\w]+", p_norm) if len(w) >= 3 and w not in stop_words]
+        if not kws:
+            continue
+
+        min_matches = 2 if len(kws) >= 2 else 1
+        matched_cnt = sum(1 for kw in kws if kw in clean_text)
+
+        if matched_cnt >= min_matches:
+            first_kw = kws[0]
+            qty_match = re.search(rf"(\d+)\s*(?:de\s+)?(?:\w+\s+){{0,2}}{re.escape(first_kw)}", clean_text)
+            qty = int(qty_match.group(1)) if qty_match else 1
+            if qty <= 0:
+                qty = 1
+
+            matched.append({
+                "id": p_id,
+                "name": p_name,
+                "qty": qty,
+                "price": float(p.get("price", 0))
+            })
+            seen_ids.add(p_id)
+
+    return matched
+
+
 # ---------------------------------------------------------------------------
 # MOTOR CONVERSACIONAL INTELIGENTE MULTI-MODAL
 # ---------------------------------------------------------------------------
@@ -550,24 +677,40 @@ class MultiTenantBotEngine:
             matched_items = []
             subtotal = 0
 
-            # Comparar contra los productos reales de la base de datos de Supabase
-            for p in self.products:
-                p_name_lower = p.get("name", "").lower()
-                clean_term = p_name_lower[:14].strip()
-                pattern = rf"(\d+)?\s*(?:de\s+)?{re.escape(clean_term)}"
-                match = re.search(pattern, text_lower)
-                if match or clean_term in text_lower:
-                    qty = int(match.group(1)) if match and match.group(1) else 1
-                    price = float(p.get("price", 0))
-                    item_total = price * qty
-                    subtotal += item_total
-                    matched_items.append({
-                        "id": p.get("id"),
-                        "name": p.get("name"),
-                        "qty": qty,
-                        "unitPrice": price,
-                        "notes": "Tomado automáticamente por Bot WhatsApp"
-                    })
+            # 5.1 Extracción inteligente multi-producto mediante Groq IA o Fallback Local
+            extracted_items = extract_order_items_groq(text, self.products)
+            if not extracted_items:
+                extracted_items = extract_order_items_local(text, self.products)
+
+            if extracted_items:
+                prod_by_id = {str(p.get("id")): p for p in self.products}
+                prod_by_name = {p.get("name", "").lower(): p for p in self.products}
+
+                for ext in extracted_items:
+                    matched_p = prod_by_id.get(str(ext.get("id")))
+                    if not matched_p:
+                        ext_name = (ext.get("name") or "").lower()
+                        matched_p = prod_by_name.get(ext_name)
+                        if not matched_p:
+                            for p in self.products:
+                                if ext_name in p.get("name", "").lower() or p.get("name", "").lower() in ext_name:
+                                    matched_p = p
+                                    break
+
+                    if matched_p:
+                        qty = int(ext.get("qty") or 1)
+                        if qty <= 0:
+                            qty = 1
+                        price = float(matched_p.get("price", 0))
+                        item_total = price * qty
+                        subtotal += item_total
+                        matched_items.append({
+                            "id": matched_p.get("id"),
+                            "name": matched_p.get("name"),
+                            "qty": qty,
+                            "unitPrice": price,
+                            "notes": "Tomado automáticamente por Bot WhatsApp"
+                        })
 
             if matched_items:
                 order_num = self.sb.get_next_order_number(store.get("id"))

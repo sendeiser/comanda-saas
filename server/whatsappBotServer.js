@@ -1207,6 +1207,62 @@ function cleanTokensWithDigits(txt) {
   return cleaned;
 }
 
+function extractOrderItemsLocal(text, prodsList) {
+  if (!text || !Array.isArray(prodsList) || prodsList.length === 0) return [];
+
+  function norm(s) {
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/burguers?/g, 'burger')
+      .replace(/hamburguesas?/g, 'burger')
+      .replace(/birras?/g, 'cerveza')
+      .replace(/cervezas/g, 'cerveza')
+      .replace(/chedar/g, 'cheddar')
+      .replace(/fritas/g, '')
+      .replace(/porci[oó]n\s+de\s+/g, '')
+      .trim();
+  }
+
+  let clean = norm(text);
+  const wordToNum = {
+    un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6
+  };
+  for (const [w, n] of Object.entries(wordToNum)) {
+    clean = clean.replace(new RegExp(`\\b${w}\\b`, 'gi'), n);
+  }
+
+  const matched = [];
+  const seenIds = new Set();
+  const sorted = [...prodsList].sort((a, b) => (b.name?.length || 0) - (a.name?.length || 0));
+
+  for (const p of sorted) {
+    if (seenIds.has(p.id)) continue;
+    const pNorm = norm(p.name);
+    const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l', 'bacon']);
+    const kws = pNorm.split(/[^\w]+/).filter(w => w.length >= 3 && !stopWords.has(w));
+    if (kws.length === 0) continue;
+
+    const minMatches = kws.length >= 2 ? 2 : 1;
+    const matchedCount = kws.filter(kw => clean.includes(kw)).length;
+
+    if (matchedCount >= minMatches) {
+      const firstKw = kws[0];
+      const qtyRegex = new RegExp(`(\\d+)\\s*(?:de\\s+)?(?:\\w+\\s+){0,2}${firstKw}`);
+      const qtyMatch = clean.match(qtyRegex);
+      const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+
+      matched.push({
+        prod: p,
+        qty: Math.max(1, qty),
+        modifiers: []
+      });
+      seenIds.add(p.id);
+    }
+  }
+
+  return matched;
+}
+
 function findProductByText(inputText, prodsList) {
   if (!inputText || !Array.isArray(prodsList) || prodsList.length === 0) return null;
   const rawNorm = normalizeSearchText(inputText);
@@ -3587,47 +3643,96 @@ class WhatsAppBotServer {
               continue;
             }
 
-            // 6. Selección y adición de productos por número o nombre (con soporte inteligente de cantidades)
-            let selectedProd = null;
-            let parsedQty = 1;
+            // 6. Selección y adición de productos por número o nombre (con soporte multi-producto inteligente)
+            let itemsToAdd = [];
 
-            // Detección por número: ej "1", "la 1", "sumar 1", "quiero el 2", "dame 1"
+            // 6.a Detección por número: ej "1", "la 1", "sumar 1", "quiero el 2", "dame 1"
             const numOnlyMatch = cleanNormSelecting.match(/^(?:quiero\s+|dame\s+|anotame\s+|sumar\s+|agregar\s+|pedir\s+|llevar\s+|trae\s+|traeme\s+)?(?:el\s+|la\s+|n[uú]mero\s+|numero\s+|nro\s+|#|opci[oó]n\s+|opcion\s+|otro\s+n[uú]mero\s+|otro\s+numero\s+)?(\d+)(?:\s+por\s+favor)?$/i);
             if (numOnlyMatch) {
               const numIdx = parseInt(numOnlyMatch[1], 10);
               if (numIdx >= 1 && numIdx <= prods.length) {
-                selectedProd = prods[numIdx - 1];
-                parsedQty = 1;
+                itemsToAdd.push({ prod: prods[numIdx - 1], qty: 1, modifiers: [] });
               }
             } else {
-              // Búsqueda por texto / nombre (ej: "2 clasicas", "quiero doña burga", "bajonera")
-              selectedProd = findProductByText(lower, prods);
-              if (selectedProd) {
-                parsedQty = parseCustomerQuantity(lower, selectedProd.name);
+              // 6.b Intentar extracción con Groq IA si es frase de pedido compuesto
+              const isMultiIntent = /\b(quiero|dame|anotame|pedir|mandame|traeme|sumar|agregar)\b/i.test(lower) ||
+                lower.includes(' y ') || lower.includes(',') || /\d+\s*(burger|burguer|papas|cerveza|birra|coca)/i.test(lower);
+
+              if (isMultiIntent) {
+                try {
+                  const aiExtracted = await geminiBotService.extractOrderItems(text, prods);
+                  if (Array.isArray(aiExtracted) && aiExtracted.length > 0) {
+                    for (const ext of aiExtracted) {
+                      const matchedP = prods.find(p => p.id === ext.id) || 
+                        prods.find(p => p.name.toLowerCase() === (ext.name || '').toLowerCase());
+                      if (matchedP) {
+                        itemsToAdd.push({
+                          prod: matchedP,
+                          qty: Number(ext.qty) || 1,
+                          modifiers: Array.isArray(ext.modifiers) ? ext.modifiers : []
+                        });
+                      }
+                    }
+                  }
+                } catch (_) {}
+              }
+
+              // 6.c Si la IA no extrajo ítems, usar el extractor local multi-producto
+              if (itemsToAdd.length === 0) {
+                const localExtracted = extractOrderItemsLocal(lower, prods);
+                if (localExtracted.length > 0) {
+                  itemsToAdd = localExtracted;
+                } else {
+                  // Fallback a producto único tradicional
+                  const singleProd = findProductByText(lower, prods);
+                  if (singleProd) {
+                    const parsedQty = parseCustomerQuantity(lower, singleProd.name);
+                    itemsToAdd.push({ prod: singleProd, qty: parsedQty, modifiers: [] });
+                  }
+                }
               }
             }
 
-            if (selectedProd) {
-              if (!isProductAvailable(selectedProd)) {
-                const outOfStockReply = `⚠️ *¡Lo sentimos mucho!* El producto *${selectedProd.name}* se encuentra *agotado por hoy (hasta agotar stock)* 😔🍔\n\n¿Te gustaría elegir otra de nuestras opciones disponibles? Enviá *MENU* para ver la carta.`;
-                await this.safeSendMessage(remoteJid, { text: outOfStockReply }, msg.key);
-                continue;
+            if (itemsToAdd.length > 0) {
+              const addedDescriptions = [];
+              let addedSubtotal = 0;
+
+              for (const item of itemsToAdd) {
+                const p = item.prod;
+                const pQty = item.qty || 1;
+
+                if (!isProductAvailable(p)) {
+                  continue;
+                }
+
+                const existingIdx = session.items.findIndex(it => it.id === p.id);
+                if (existingIdx !== -1) {
+                  session.items[existingIdx].qty = (session.items[existingIdx].qty || 1) + pQty;
+                  session.items[existingIdx].quantity = session.items[existingIdx].qty;
+                  if (item.modifiers?.length) {
+                    session.items[existingIdx].modifiers = [...(session.items[existingIdx].modifiers || []), ...item.modifiers];
+                  }
+                } else {
+                  session.items.push({
+                    id: p.id,
+                    name: p.name,
+                    price: Number(p.price) || 0,
+                    freeShipping: Boolean(p.freeShipping),
+                    qty: pQty,
+                    quantity: pQty,
+                    modifiers: item.modifiers || []
+                  });
+                }
+
+                const itemSum = (Number(p.price) || 0) * pQty;
+                addedSubtotal += itemSum;
+                addedDescriptions.push(`• ${p.name} (x${pQty}) [+$${itemSum.toLocaleString('es-AR')}]`);
               }
 
-              const existingIdx = session.items.findIndex(it => it.id === selectedProd.id);
-              if (existingIdx !== -1) {
-                session.items[existingIdx].qty = (session.items[existingIdx].qty || 1) + parsedQty;
-                session.items[existingIdx].quantity = session.items[existingIdx].qty;
-              } else {
-                session.items.push({
-                  id: selectedProd.id,
-                  name: selectedProd.name,
-                  price: Number(selectedProd.price) || 0,
-                  freeShipping: Boolean(selectedProd.freeShipping),
-                  qty: parsedQty,
-                  quantity: parsedQty,
-                  modifiers: []
-                });
+              if (addedDescriptions.length === 0) {
+                const outOfStockReply = `⚠️ *¡Lo sentimos mucho!* Uno o más productos solicitados están *agotados por hoy* 😔🍔\n\n¿Te gustaría elegir otra de nuestras opciones disponibles? Enviá *MENU* para ver la carta.`;
+                await this.safeSendMessage(remoteJid, { text: outOfStockReply }, msg.key);
+                continue;
               }
 
               session.subtotal = session.items.reduce((acc, it) => acc + ((Number(it.price) || 0) * (it.qty || 1)), 0);
@@ -3635,13 +3740,12 @@ class WhatsAppBotServer {
 
               const itemsList = session.items.map(it => `• ${it.name} (x${it.qty || 1}) - $${((Number(it.price) || 0) * (it.qty || 1)).toLocaleString('es-AR')}${it.modifiers?.length ? ' [' + it.modifiers.join(', ') + ']' : ''}`).join('\n');
 
-              const modsHint = selectedProd.modifiers && selectedProd.modifiers.length > 0 
-                ? `\n👉 *Modificadores disponibles:* ${selectedProd.modifiers.join(', ')}`
-                : `\n👉 *¿Modificaciones?* (Ej: Sin cebolla, Extra cheddar)`;
+              const addedText = addedDescriptions.length === 1 
+                ? `✅ *¡Sumaste ${itemsToAdd[0].prod.name}${itemsToAdd[0].qty > 1 ? ` (x${itemsToAdd[0].qty})` : ''}!* 🍔`
+                : `✅ *¡Sumamos ${addedDescriptions.length} productos a tu pedido!* 🍔\n${addedDescriptions.join('\n')}`;
 
-              const qtyStr = parsedQty > 1 ? ` (x${parsedQty})` : '';
               await this.safeSendMessage(remoteJid, {
-                text: `✅ *¡Sumaste ${selectedProd.name}${qtyStr}!* 🍔 (+$${((Number(selectedProd.price) || 0) * parsedQty).toLocaleString('es-AR')})\n\n🛒 *Tu pedido actual:*\n${itemsList}\n\n💵 *Subtotal:* $${session.total.toLocaleString('es-AR')}\n\n👉 *¿Querés sumar algo más?*\n• Podés pedir directamente por *nombre* (ej: *"1 Coca"*, *"papas"*) o por *número*.\n• Escribí *CARTA* (o *HAMBURGUESAS*, *BEBIDAS*, etc.) para ver la lista sin perder tu carrito.${modsHint}\n👉 O escribí *LISTO* para avanzar con la entrega y el pago.`
+                text: `${addedText}\n\n🛒 *Tu pedido actual:*\n${itemsList}\n\n💵 *Subtotal:* $${session.total.toLocaleString('es-AR')}\n\n👉 *¿Querés sumar algo más?*\n• Podés pedir directamente por *nombre* (ej: *"1 Coca"*, *"papas"*) o por *número*.\n• Escribí *CARTA* para ver la lista sin perder tu carrito.\n👉 O escribí *LISTO* para avanzar con la entrega y el pago.`
               }, msg.key);
               continue;
             }

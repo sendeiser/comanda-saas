@@ -64,44 +64,62 @@ export const whatsappParserService = {
     }
 
     // 3. Detectar Productos y Cantidades
-    availableProducts.forEach(prod => {
-      // Create flexible regex for product name (e.g. "doble cuarto", "papas cheddar")
-      const baseName = prod.name.toLowerCase()
-        .replace(/burger|hamburguesa|porci[oó]n|mega|combo|cl[aá]sica/gi, '')
-        .trim();
-      
-      const searchTerms = [prod.name.toLowerCase()];
-      if (baseName.length >= 4) searchTerms.push(baseName);
+    const norm = (s) => (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/burguers?/gi, 'burger')
+      .replace(/hamburguesas?/gi, 'burger')
+      .replace(/birras?/gi, 'cerveza')
+      .replace(/cervezas/gi, 'cerveza')
+      .replace(/chedar/gi, 'cheddar')
+      .replace(/fritas/gi, '')
+      .replace(/porci[oó]n\s+de\s+/gi, '')
+      .trim();
 
-      searchTerms.forEach(term => {
-        const regex = new RegExp(`(?:(\d+)\s*(?:x|de)?\s*)?${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
-        const match = raw.match(regex);
-        if (match) {
-          const qty = parseInt(match[1] || '1', 10);
-          
-          // Check for modifiers in the surrounding text or global message
-          let modifiers = [];
-          if (/sin\s*cebolla/i.test(raw)) modifiers.push('Sin cebolla');
-          if (/sin\s*tomate/i.test(raw)) modifiers.push('Sin tomate');
-          if (/extra\s*cheddar|con\s*mucho\s*cheddar/i.test(raw)) modifiers.push('Extra Cheddar (+$800)');
-          if (/extra\s*bacon|con\s*bacon/i.test(raw)) modifiers.push('Extra Bacon (+$900)');
-          if (/bien\s*cocida/i.test(raw)) modifiers.push('Bien cocida');
+    let cleanRaw = norm(raw);
+    const wordNumbers = { un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6 };
+    for (const [w, n] of Object.entries(wordNumbers)) {
+      cleanRaw = cleanRaw.replace(new RegExp(`\\b${w}\\b`, 'gi'), n);
+    }
 
-          // Avoid duplicate product additions
-          if (!detectedItems.some(i => i.productId === prod.id)) {
-            detectedItems.push({
-              productId: prod.id,
-              name: prod.name,
-              unitPrice: prod.price,
-              qty: Math.max(1, qty),
-              modifiers,
-              notes: '',
-              image: prod.image || '',
-              emoji: prod.emoji || '🍔'
-            });
-          }
+    const sortedProds = [...availableProducts].sort((a, b) => (b.name?.length || 0) - (a.name?.length || 0));
+
+    sortedProds.forEach(prod => {
+      const pNorm = norm(prod.name);
+      const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l', 'bacon']);
+      const kws = pNorm.split(/[^\w]+/).filter(w => w.length >= 3 && !stopWords.has(w));
+      if (kws.length === 0) return;
+
+      const minMatches = kws.length >= 2 ? 2 : 1;
+      const matchedCount = kws.filter(kw => cleanRaw.includes(kw)).length;
+
+      if (matchedCount >= minMatches) {
+        const firstKw = kws[0];
+        const qtyRegex = new RegExp(`(\\d+)\\s*(?:de\\s+)?(?:\\w+\\s+){0,2}${firstKw}`);
+        const qtyMatch = cleanRaw.match(qtyRegex);
+        const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+
+        // Check for modifiers in the surrounding text or global message
+        let modifiers = [];
+        if (/sin\s*cebolla/i.test(raw)) modifiers.push('Sin cebolla');
+        if (/sin\s*tomate/i.test(raw)) modifiers.push('Sin tomate');
+        if (/extra\s*cheddar|con\s*mucho\s*cheddar/i.test(raw)) modifiers.push('Extra Cheddar (+$800)');
+        if (/extra\s*bacon|con\s*bacon/i.test(raw)) modifiers.push('Extra Bacon (+$900)');
+        if (/bien\s*cocida/i.test(raw)) modifiers.push('Bien cocida');
+
+        // Avoid duplicate product additions
+        if (!detectedItems.some(i => i.productId === prod.id)) {
+          detectedItems.push({
+            productId: prod.id,
+            name: prod.name,
+            unitPrice: prod.price,
+            qty: Math.max(1, qty),
+            modifiers,
+            notes: '',
+            image: prod.image || '',
+            emoji: prod.emoji || '🍔'
+          });
         }
-      });
+      }
     });
 
     return {

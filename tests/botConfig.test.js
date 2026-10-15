@@ -52,3 +52,22 @@ test('geminiBotService initializes with Groq enabled and valid keys', async () =
   assert.ok(safeConfig.groqModel);
 });
 
+test('geminiBotService extractOrderItems recognizes natural language multi-item orders', async () => {
+  const { geminiBotService } = await import('../server/geminiBotService.js');
+  const prods = [
+    { id: 'prod-1', name: 'Burger Clásica', price: 6500 },
+    { id: 'prod-7', name: 'Papas Cheddar & Bacon', price: 4900 },
+    { id: 'prod-11', name: 'Cerveza IPA 473ml', price: 3200 }
+  ];
+  const items = await geminiBotService.extractOrderItems(
+    'quiero 2 burguer clasica una papas cheddar y una cerveza ipa',
+    prods
+  );
+  assert.ok(Array.isArray(items));
+  assert.ok(items.length >= 2, 'Debe haber extraído al menos 2 o los 3 productos');
+  const burger = items.find(i => i.id === 'prod-1' || (i.name && i.name.toLowerCase().includes('clasica')));
+  assert.ok(burger, 'Debe reconocer la Burger Clásica');
+  assert.equal(burger.qty, 2, 'La cantidad de Burger Clásica debe ser 2');
+});
+
+

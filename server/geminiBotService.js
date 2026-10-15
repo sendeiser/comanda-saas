@@ -20,6 +20,63 @@ if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
 
+export function extractOrderItemsLocal(text, prodsList) {
+  if (!text || !Array.isArray(prodsList) || prodsList.length === 0) return [];
+
+  function norm(s) {
+    return (s || '').toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/burguers?/g, 'burger')
+      .replace(/hamburguesas?/g, 'burger')
+      .replace(/birras?/g, 'cerveza')
+      .replace(/cervezas/g, 'cerveza')
+      .replace(/chedar/g, 'cheddar')
+      .replace(/fritas/g, '')
+      .replace(/porci[oó]n\s+de\s+/g, '')
+      .trim();
+  }
+
+  let clean = norm(text);
+  const wordToNum = {
+    un: 1, una: 1, uno: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6
+  };
+  for (const [w, n] of Object.entries(wordToNum)) {
+    clean = clean.replace(new RegExp(`\\b${w}\\b`, 'gi'), n);
+  }
+
+  const matched = [];
+  const seenIds = new Set();
+  const sorted = [...prodsList].sort((a, b) => (b.name?.length || 0) - (a.name?.length || 0));
+
+  for (const p of sorted) {
+    if (seenIds.has(p.id)) continue;
+    const pNorm = norm(p.name);
+    const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l', 'bacon']);
+    const kws = pNorm.split(/[^\w]+/).filter(w => w.length >= 3 && !stopWords.has(w));
+    if (kws.length === 0) continue;
+
+    const minMatches = kws.length >= 2 ? 2 : 1;
+    const matchedCount = kws.filter(kw => clean.includes(kw)).length;
+
+    if (matchedCount >= minMatches) {
+      const firstKw = kws[0];
+      const qtyRegex = new RegExp(`(\\d+)\\s*(?:de\\s+)?(?:\\w+\\s+){0,2}${firstKw}`);
+      const qtyMatch = clean.match(qtyRegex);
+      const qty = qtyMatch ? parseInt(qtyMatch[1], 10) : 1;
+
+      matched.push({
+        id: p.id,
+        name: p.name,
+        qty: Math.max(1, qty),
+        modifiers: []
+      });
+      seenIds.add(p.id);
+    }
+  }
+
+  return matched;
+}
+
 export class GeminiBotService {
   constructor() {
     this.activeProviderInUse = 'Groq';
@@ -112,7 +169,7 @@ export class GeminiBotService {
   // --- LLAMADAS A APIS EXTERNAS ---
 
   async callGroq(apiKey, model, systemPrompt, userMessage) {
-    const keysToTry = [apiKey, DEFAULT_GROQ_KEY_1, DEFAULT_GROQ_KEY_2].filter(Boolean);
+    const keysToTry = [apiKey, this.config?.groqApiKey, process.env.GROQ_API_KEY].filter(Boolean);
     const uniqueKeys = [...new Set(keysToTry)];
 
     const candidateModels = [
@@ -307,6 +364,75 @@ export class GeminiBotService {
       success: anyOk,
       message: summary.join(' | ')
     };
+  }
+
+  async extractOrderItems(userMessage, products = []) {
+    if (!userMessage || !Array.isArray(products) || products.length === 0) return [];
+
+    const groqKey = (this.config.groqApiKey || process.env.GROQ_API_KEY || '').trim();
+    const geminiKey = (this.config.geminiApiKey || this.config.apiKey || process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY_1).trim();
+
+    const prodsCatalog = products.map(p => ({
+      id: p.id,
+      name: p.name,
+      price: Number(p.price) || 0
+    }));
+
+    const systemPrompt = `Eres un extractor de pedidos gastronómicos de WhatsApp de alta precisión.
+Analiza el mensaje del cliente y extrae TODOS los productos que desea pedir con sus cantidades exactas y notas/aclaraciones.
+Productos disponibles en el local:
+${JSON.stringify(prodsCatalog)}
+
+Reglas estrictas:
+1. Compara modismos, variaciones fonéticas y abreviaciones (ej: 'burguer'/'hamburguesa' -> 'Burger', 'birra' -> 'Cerveza', 'papas cheddar' -> 'Papas Cheddar & Bacon').
+2. Interpreta números en palabras ('dos' = 2, 'una' = 1, 'un' = 1, 'tres' = 3, etc.).
+3. Responde ÚNICAMENTE un array JSON válido sin texto ni bloques markdown, formato: [{"id": "id-exacto", "name": "Nombre Exacto", "qty": 1, "modifiers": []}].
+4. Si el cliente NO está pidiendo productos, responde [].`;
+
+    // 1. Intentar con Groq (ultrarrápido ~200ms)
+    if (groqKey) {
+      try {
+        const rawGroq = await this.callGroq(
+          groqKey,
+          this.config.groqModel || 'qwen/qwen3.8-27b',
+          systemPrompt,
+          `Cliente: "${userMessage}"`
+        );
+        if (rawGroq) {
+          const jsonMatch = rawGroq.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Extract Items Groq Error]:', err?.message || err);
+      }
+    }
+
+    // 2. Fallback a Gemini si Groq no responde
+    if (geminiKey) {
+      try {
+        const rawGem = await this.callGemini(
+          geminiKey,
+          this.config.model || 'gemini-2.0-flash',
+          systemPrompt,
+          `Cliente: "${userMessage}"`
+        );
+        if (rawGem?.reply) {
+          const jsonMatch = rawGem.reply.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          }
+        }
+      } catch (err) {
+        console.warn('[AI Extract Items Gemini Error]:', err?.message || err);
+      }
+    }
+
+    // 3. Fallback determinista local sin conexión
+    return extractOrderItemsLocal(userMessage, products);
   }
 
   // --- GENERACIÓN PRINCIPAL DE RESPUESTA ---
