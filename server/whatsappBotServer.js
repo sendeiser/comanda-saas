@@ -1248,8 +1248,7 @@ function extractOrderItemsLocal(text, prodsList) {
       .replace(/birras?/g, 'cerveza')
       .replace(/cervezas/g, 'cerveza')
       .replace(/chedar/g, 'cheddar')
-      .replace(/fritas/g, '')
-      .replace(/porci[oó]n\s+de\s+/g, '')
+      .replace(/porci[oó]n(es)?(\s+de)?\s+/g, '')
       .trim();
   }
 
@@ -1261,21 +1260,29 @@ function extractOrderItemsLocal(text, prodsList) {
     clean = clean.replace(new RegExp(`\\b${w}\\b`, 'gi'), n);
   }
 
+  const isExplicitPromoInquiry = /\b(promo|promos|promocion|promociones|combo|combos|duo|pareja)\b/i.test(clean);
+
   const matched = [];
   const seenIds = new Set();
   const sorted = [...prodsList].sort((a, b) => (b.name?.length || 0) - (a.name?.length || 0));
 
   for (const p of sorted) {
     if (seenIds.has(p.id)) continue;
+    const isPromoItem = (p.category || '').toLowerCase().includes('promo') || p.name.toLowerCase().startsWith('promo');
+    if (isPromoItem && !isExplicitPromoInquiry) {
+      continue; // No matchear promociones si el cliente no pidió promo explícitamente
+    }
+
     const pNorm = norm(p.name);
-    const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l', 'bacon']);
+    const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l']);
     const kws = pNorm.split(/[^\w]+/).filter(w => w.length >= 3 && !stopWords.has(w));
     if (kws.length === 0) continue;
 
-    const minMatches = kws.length >= 2 ? 2 : 1;
+    const minMatches = kws.length >= 3 ? Math.min(kws.length, 2) : (kws.length >= 2 ? 2 : 1);
     const matchedCount = kws.filter(kw => clean.includes(kw)).length;
+    const ratio = matchedCount / kws.length;
 
-    if (matchedCount >= minMatches) {
+    if (matchedCount >= minMatches && (kws.length <= 2 || ratio >= 0.5)) {
       const firstKw = kws[0];
       const qtyRegex = new RegExp(`(\\d+)\\s*(?:de\\s+)?(?:\\w+\\s+){0,2}${firstKw}`);
       const qtyMatch = clean.match(qtyRegex);
@@ -1283,6 +1290,9 @@ function extractOrderItemsLocal(text, prodsList) {
 
       matched.push({
         prod: p,
+        id: p.id,
+        name: p.name,
+        price: Number(p.price) || 0,
         qty: Math.max(1, qty),
         modifiers: []
       });
@@ -3721,8 +3731,8 @@ class WhatsAppBotServer {
             }
 
             // 3. Finalizar armado de carrito y avanzar al checkout (entrega y pago)
-            const isCheckoutTrigger = /^(listo|pedir|comprar|terminar|seguir|avanzar|pagar|ya\s+esta|ya\s+está|nada\s+mas|nada\s+más|eso\s+es\s+todo|eso\s+solo|fin|delivery|envio|envío|retiro|take\s*away|para\s+llevar)$/i.test(cleanNormSelecting) ||
-              (/\b(para\s+llevar|para\s+retirar|es\s+para\s+delivery|mandamelo|traemelo)\b/i.test(cleanNormSelecting) && session.items.length > 0);
+            const isCheckoutTrigger = /^(listo|pedir|comprar|terminar|seguir|avanzar|pagar|ya\s+esta|ya\s+está|nada\s+m[aá]s|eso\s+es\s+todo|eso\s+solo|eso\s+no?\s*m[aá]s|fin|delivery|envio|envío|retiro|take\s*away|para\s+llevar)$/i.test(cleanNormSelecting) ||
+              (/\b(para\s+llevar|para\s+retirar|es\s+para\s+delivery|por\s+delivery|para\s+delivery|hacer\s+delivery|mandamelo|traemelo|eso\s+no?\s*m[aá]s|eso\s+solo|nada\s+m[aá]s)\b/i.test(cleanNormSelecting) && session.items.length > 0);
             if (isCheckoutTrigger) {
               if (session.items.length === 0) {
                 await this.safeSendMessage(remoteJid, {
@@ -4291,72 +4301,126 @@ class WhatsAppBotServer {
           }
 
           // -------------------------------------------------------------
-          // SELECCIÓN DIRECTA DE HAMBURGUESAS O PROMOS EN CUALQUIER MOMENTO (NÚMERO O NOMBRE)
+          // SELECCIÓN DIRECTA DE HAMBURGUESAS O PRODUCTOS EN CUALQUIER MOMENTO (NÚMERO, NOMBRE O MULTI-PRODUCTO)
           // -------------------------------------------------------------
-          const initialNum = parseInt(lower.replace(/\D/g, ''), 10);
-          let matchedProd = null;
-          let parsedDirectQty = 1;
+          let directItemsToAdd = [];
 
+          const initialNum = parseInt(lower.replace(/\D/g, ''), 10);
           if (!isNaN(initialNum) && initialNum >= 1 && initialNum <= prods.length && !lower.includes('hamburguesa') && !lower.includes('burger') && /^(pedir|comprar|la|el|nro|numero)?\s*\d+$/i.test(lower)) {
-            matchedProd = prods[initialNum - 1];
-            parsedDirectQty = 1;
+            directItemsToAdd.push({ prod: prods[initialNum - 1], qty: 1, modifiers: [] });
           } else {
-            matchedProd = directProdCheck || findProductByText(lower, prods);
-            if (matchedProd) {
-              parsedDirectQty = parseCustomerQuantity(lower, matchedProd.name);
+            // Detección multi-producto inteligente (ej: "quier dos porciones papas cheddar y bacon y dos porciones de papas fritas clasicas")
+            const isMultiIntent = /\b(quiero|quier|dame|anotame|pedir|mandame|traeme|sumar|agregar|porciones?|porción)\b/i.test(lower) ||
+              lower.includes(' y ') || lower.includes(',') || /\d+\s*(burger|burguer|papas|cerveza|birra|coca)/i.test(lower);
+
+            if (isMultiIntent) {
+              try {
+                const aiExtracted = await geminiBotService.extractOrderItems(text, prods);
+                if (Array.isArray(aiExtracted) && aiExtracted.length > 0) {
+                  for (const ext of aiExtracted) {
+                    const matchedP = prods.find(p => p.id === ext.id) || 
+                      prods.find(p => p.name.toLowerCase() === (ext.name || '').toLowerCase());
+                    if (matchedP) {
+                      directItemsToAdd.push({
+                        prod: matchedP,
+                        qty: Number(ext.qty) || 1,
+                        modifiers: Array.isArray(ext.modifiers) ? ext.modifiers : []
+                      });
+                    }
+                  }
+                }
+              } catch (_) {}
+            }
+
+            // Si la IA no extrajo ítems, usar el extractor local multi-producto
+            if (directItemsToAdd.length === 0) {
+              const localExtracted = extractOrderItemsLocal(lower, prods);
+              if (localExtracted.length > 0) {
+                for (const lex of localExtracted) {
+                  const targetP = lex.prod || prods.find(p => p.id === lex.id);
+                  if (targetP) {
+                    directItemsToAdd.push({
+                      prod: targetP,
+                      qty: Number(lex.qty) || 1,
+                      modifiers: []
+                    });
+                  }
+                }
+              }
+            }
+
+            // Fallback a producto único tradicional
+            if (directItemsToAdd.length === 0) {
+              const singleProd = directProdCheck || findProductByText(lower, prods);
+              if (singleProd) {
+                const parsedQty = parseCustomerQuantity(lower, singleProd.name);
+                directItemsToAdd.push({ prod: singleProd, qty: parsedQty, modifiers: [] });
+              }
             }
           }
 
-          if (matchedProd) {
-            // Comprobar si el producto está pausado o sin stock
-            if (!isProductAvailable(matchedProd)) {
-              const outOfStockReply = `⚠️ *¡Lo sentimos mucho!* El producto *${matchedProd.name}* se encuentra *agotado por hoy (hasta agotar stock)* 😔🍔\n\n¿Te gustaría elegir otra de nuestras opciones disponibles? Enviá *MENU* para ver la carta.`;
-              await this.safeSendMessage(remoteJid, { text: outOfStockReply }, msg.key);
-              continue;
-            }
-
+          if (directItemsToAdd.length > 0) {
             const tplsDirect = getBotTemplates();
             const menuModeDirect = tplsDirect.menu_mode || 'templates';
             if (menuModeDirect === 'catalog' || menuModeDirect === 'catalog_direct') {
-              // MODO CATÁLOGO ONLINE: no se permite pedir por texto ni plantillas
               const biz = getBusinessContext();
               const catalogUrl = biz.catalogo_url;
-              const reply = `🍔 *¡Para pedir ${matchedProd.name}, ingresá a nuestra Carta Digital con fotos!* 📸\n\n👉 ${catalogUrl}\n\nDesde allí podés ver fotos reales, elegir los ingredientes o combos y enviar tu pedido directo a la cocina con un click.`;
+              const reply = `🍔 *¡Para realizar tu pedido, ingresá a nuestra Carta Digital con fotos!* 📸\n\n👉 ${catalogUrl}\n\nAllí podés ver fotos reales, elegir adicionales y enviar tu pedido directo a la cocina con un click.`;
               await this.safeSendMessage(remoteJid, { text: reply }, msg.key);
               continue;
             }
 
             session.step = 'SELECTING';
             if (!Array.isArray(session.items)) session.items = [];
-            
-            const existingIdx = session.items.findIndex(it => it.id === matchedProd.id);
-            if (existingIdx !== -1) {
-              session.items[existingIdx].qty = (session.items[existingIdx].qty || 1) + parsedDirectQty;
-              session.items[existingIdx].quantity = session.items[existingIdx].qty;
-            } else {
-              session.items.push({
-                id: matchedProd.id,
-                name: matchedProd.name,
-                price: Number(matchedProd.price) || 0,
-                freeShipping: Boolean(matchedProd.freeShipping),
-                qty: parsedDirectQty,
-                quantity: parsedDirectQty,
-                modifiers: []
-              });
+
+            const addedDescriptions = [];
+            for (const item of directItemsToAdd) {
+              const p = item.prod;
+              const pQty = item.qty || 1;
+
+              if (!isProductAvailable(p)) {
+                continue;
+              }
+
+              const existingIdx = session.items.findIndex(it => it.id === p.id);
+              if (existingIdx !== -1) {
+                session.items[existingIdx].qty = (session.items[existingIdx].qty || 1) + pQty;
+                session.items[existingIdx].quantity = session.items[existingIdx].qty;
+                if (item.modifiers?.length) {
+                  session.items[existingIdx].modifiers = [...(session.items[existingIdx].modifiers || []), ...item.modifiers];
+                }
+              } else {
+                session.items.push({
+                  id: p.id,
+                  name: p.name,
+                  price: Number(p.price) || 0,
+                  freeShipping: Boolean(p.freeShipping),
+                  qty: pQty,
+                  quantity: pQty,
+                  modifiers: item.modifiers || []
+                });
+              }
+
+              const itemSum = (Number(p.price) || 0) * pQty;
+              addedDescriptions.push(`• *${p.name}* (x${pQty}) [+$${itemSum.toLocaleString('es-AR')}]`);
+            }
+
+            if (addedDescriptions.length === 0) {
+              const outOfStockReply = `⚠️ *¡Lo sentimos mucho!* Uno o más productos seleccionados están *agotados por hoy* 😔🍔\n\n¿Te gustaría elegir otra opción? Enviá *MENU* para ver la carta.`;
+              await this.safeSendMessage(remoteJid, { text: outOfStockReply }, msg.key);
+              continue;
             }
 
             session.subtotal = session.items.reduce((acc, it) => acc + ((Number(it.price) || 0) * (it.qty || 1)), 0);
             session.total = session.subtotal;
 
-            const itemsList = session.items.map(it => `• ${it.name} (x${it.qty || 1}) - $${((Number(it.price) || 0) * (it.qty || 1)).toLocaleString('es-AR')}${it.modifiers?.length ? ' [' + it.modifiers.join(', ') + ']' : ''}`).join('\n');
+            const addedText = directItemsToAdd.length === 1 
+              ? `✅ *Sumaste ${directItemsToAdd[0].prod.name}${directItemsToAdd[0].qty > 1 ? ` (x${directItemsToAdd[0].qty})` : ''}* 🍔`
+              : `✅ *Sumamos ${addedDescriptions.length} productos:* \n${addedDescriptions.join('\n')}`;
 
-            const modsHint = matchedProd.modifiers && matchedProd.modifiers.length > 0 
-              ? `\n👉 *Modificadores disponibles:* ${matchedProd.modifiers.join(', ')}`
-              : `\n👉 *¿Algún cambio?* (Ej: Sin cebolla, Extra cheddar)`;
-
-            const qtyStr = parsedDirectQty > 1 ? ` (x${parsedDirectQty})` : '';
-            const reply = `✅ *¡Excelente elección! Sumaste ${matchedProd.name}${qtyStr}* 🍔 (+$${((Number(matchedProd.price) || 0) * parsedDirectQty).toLocaleString('es-AR')})\n\n🛒 *Tu pedido actual:*\n${itemsList}\n\n💵 *Subtotal:* $${session.total.toLocaleString('es-AR')}\n\n👉 *¿Querés sumar algo más?*\n• Podés pedir directamente por *nombre* (ej: *"1 Coca"*, *"papas"*) o por *número*.\n• Escribí *CARTA* (o *HAMBURGUESAS*, *BEBIDAS*, etc.) para ver la lista sin perder tu carrito.${modsHint}\n👉 O respondé *LISTO* para elegir forma de entrega.`;
-            await this.safeSendMessage(remoteJid, { text: reply }, msg.key);
+            await this.safeSendMessage(remoteJid, {
+              text: `${addedText}\n\n🛒 *Pedido:* ${session.items.map(it => `${it.name} (x${it.qty || 1})`).join(', ')}\n💵 *Subtotal:* $${session.total.toLocaleString('es-AR')}\n\n_Escribí otro producto para sumar, o respondé *LISTO* para pedir._`
+            }, msg.key);
             continue;
           }
 

@@ -31,8 +31,7 @@ export function extractOrderItemsLocal(text, prodsList) {
       .replace(/birras?/g, 'cerveza')
       .replace(/cervezas/g, 'cerveza')
       .replace(/chedar/g, 'cheddar')
-      .replace(/fritas/g, '')
-      .replace(/porci[oó]n\s+de\s+/g, '')
+      .replace(/porci[oó]n(es)?(\s+de)?\s+/g, '')
       .trim();
   }
 
@@ -44,21 +43,29 @@ export function extractOrderItemsLocal(text, prodsList) {
     clean = clean.replace(new RegExp(`\\b${w}\\b`, 'gi'), n);
   }
 
+  const isExplicitPromoInquiry = /\b(promo|promos|promocion|promociones|combo|combos|duo|pareja)\b/i.test(clean);
+
   const matched = [];
   const seenIds = new Set();
   const sorted = [...prodsList].sort((a, b) => (b.name?.length || 0) - (a.name?.length || 0));
 
   for (const p of sorted) {
     if (seenIds.has(p.id)) continue;
+    const isPromoItem = (p.category || '').toLowerCase().includes('promo') || p.name.toLowerCase().startsWith('promo');
+    if (isPromoItem && !isExplicitPromoInquiry) {
+      continue; // No matchear promociones si el cliente no pidió promo explícitamente
+    }
+
     const pNorm = norm(p.name);
-    const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l', 'bacon']);
+    const stopWords = new Set(['con', 'las', 'los', 'del', 'para', 'sin', '473ml', '500ml', '1.5l', '2l']);
     const kws = pNorm.split(/[^\w]+/).filter(w => w.length >= 3 && !stopWords.has(w));
     if (kws.length === 0) continue;
 
-    const minMatches = kws.length >= 2 ? 2 : 1;
+    const minMatches = kws.length >= 3 ? Math.min(kws.length, 2) : (kws.length >= 2 ? 2 : 1);
     const matchedCount = kws.filter(kw => clean.includes(kw)).length;
+    const ratio = matchedCount / kws.length;
 
-    if (matchedCount >= minMatches) {
+    if (matchedCount >= minMatches && (kws.length <= 2 || ratio >= 0.5)) {
       const firstKw = kws[0];
       const qtyRegex = new RegExp(`(\\d+)\\s*(?:de\\s+)?(?:\\w+\\s+){0,2}${firstKw}`);
       const qtyMatch = clean.match(qtyRegex);
@@ -67,6 +74,7 @@ export function extractOrderItemsLocal(text, prodsList) {
       matched.push({
         id: p.id,
         name: p.name,
+        price: Number(p.price) || 0,
         qty: Math.max(1, qty),
         modifiers: []
       });
@@ -550,13 +558,15 @@ ${context.menuMode === 'catalog' || context.menuMode === 'catalog_direct' ? `1. 
 4. Si pregunta por ingredientes, celíacos o vegetarianos, sé honesto y empático mencionando lo que tenemos.
 5. Si el cliente quiere hacer un pedido o ver fotos, envíale el enlace a la Carta Digital (${directCatalogUrl}).
 6. Respuestas concisas y atractivas (máximo 2 a 3 párrafos cortos). No des discursos largos ni menús numerados en texto.
-7. TERMINOLOGÍA OBLIGATORIA: Usa SIEMPRE la palabra "pedido" o "pedidos". Está TERMINANTEMENTE PROHIBIDO usar la palabra "comanda" con el cliente. Habla siempre de "tu pedido", "armar tu pedido", "confirmar tu pedido".` : `1. Si el cliente saluda (hola, buenas noches, etc.), dale la bienvenida cordial en nombre de "${storeName}" y recuérdale que puede escribir *MENU* para ver la carta o *COMPRAR* para pedir.
+7. TERMINOLOGÍA OBLIGATORIA: Usa SIEMPRE la palabra "pedido" o "pedidos". Está TERMINANTEMENTE PROHIBIDO usar la palabra "comanda" con el cliente. Habla siempre de "tu pedido", "armar tu pedido", "confirmar tu pedido".
+8. REGLA ESTRICTA DE CARRITO: NUNCA digas "Te armamos el pedido" ni inventes totales de compra por tu cuenta si el carrito del cliente está vacío. El sistema del bot es el encargado de registrar los productos oficialmente.` : `1. Si el cliente saluda (hola, buenas noches, etc.), dale la bienvenida cordial en nombre de "${storeName}" y recuérdale que puede escribir *MENU* para ver la carta o *COMPRAR* para pedir.
 2. Si el cliente pregunta por promociones, ofertas o qué promos hay, si hay activas detállalas con entusiasmo. Si están agotadas, aclara que se agotaron (hasta agotar stock) y ofrécele las 3 alternativas.
 3. Si el cliente pregunta qué comer, qué le recomendás o qué opciones hay, recomendale 2 o 3 opciones tentadoras con su precio y descripción real.
 4. Si pregunta por ingredientes, celíacos o vegetarianos, sé honesto y empático mencionando lo que tenemos.
 5. Si el cliente quiere hacer un pedido o ver fotos, recordale que puede escribir "COMPRAR", "MENU", "PROMOS" o "FOTO [número]".
 6. Respuestas concisas y atractivas (máximo 2 a 4 párrafos cortos). No des discursos largos.
-7. TERMINOLOGÍA OBLIGATORIA: Usa SIEMPRE la palabra "pedido" o "pedidos". Está TERMINANTEMENTE PROHIBIDO usar la palabra "comanda" con el cliente. Habla siempre de "tu pedido", "armar tu pedido", "confirmar tu pedido".`}
+7. TERMINOLOGÍA OBLIGATORIA: Usa SIEMPRE la palabra "pedido" o "pedidos". Está TERMINANTEMENTE PROHIBIDO usar la palabra "comanda" con el cliente. Habla siempre de "tu pedido", "armar tu pedido", "confirmar tu pedido".
+8. REGLA ESTRICTA DE CARRITO: NUNCA digas "Te armamos el pedido" ni calcules totales ficticios de compra por tu cuenta si el carrito del cliente está vacío. El sistema del bot es el único encargado de registrar los productos oficialmente.`}
 
 Cliente: ${context.customerName || 'Cliente'}
     `.trim();

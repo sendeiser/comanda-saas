@@ -1,182 +1,82 @@
 [
   {
     "key": "nombre_local",
-    "icon": "Store",
-    "label": "Nombre del Local",
-    "value": "La Cocina de ANa",
-    "category": "business",
-    "description": "Nombre de la hamburguesería o marca gastronómica",
-    "defaultValue": "ComandaFast Burgers"
+    "value": "Comanda Demo Gastronómica"
   },
   {
     "key": "direccion",
-    "icon": "MapPin",
-    "label": "Dirección para Retiros",
-    "value": "Av. Perón 145 ",
-    "category": "business",
-    "description": "Ubicación física del local para Take Away y cadetes",
-    "defaultValue": "Av. Belgrano 1234, Centro"
+    "value": "Av. Perón 145 "
   },
   {
     "key": "horarios",
-    "icon": "Clock",
-    "label": "Días y Horarios de Atención",
-    "value": "Martes a Domingos de 19:30 a 00:30 hs",
-    "category": "business",
-    "description": "Turnos en los que la cocina se encuentra abierta y despachando",
-    "defaultValue": "Miércoles a Domingos de 19:30 a 00:30 hs"
+    "value": "Martes a Domingos de 19:30 a 00:30 hs"
   },
   {
     "key": "telefono_contacto",
-    "icon": "Phone",
-    "label": "Teléfono / WhatsApp de Atención",
-    "value": "3826 430159",
-    "category": "business",
-    "description": "Número de línea directa para consultas o derivación a humano",
-    "defaultValue": "+54 9 3826 40-1234"
+    "value": "3826 430159"
   },
   {
     "key": "catalogo_url",
-    "icon": "Globe",
-    "label": "Enlace a la Carta Web",
-    "value": "https://burgasystem.netlify.app/#catalog",
-    "category": "business",
-    "description": "URL de la carta digital para que los clientes vean fotos y promociones",
-    "defaultValue": "https://comandafast.online"
+    "value": "https://burgasystem.netlify.app/#catalog"
   },
   {
     "key": "zona_envio",
-    "icon": "Compass",
-    "label": "Zona de Cobertura de Envíos",
-    "value": "Casco céntrico y barrios aledaños (hasta 5 km)",
-    "category": "business",
-    "description": "Área geográfica de despacho del servicio de delivery",
-    "defaultValue": "Casco céntrico y barrios aledaños (hasta 5 km)"
+    "value": "Casco céntrico y barrios aledaños (hasta 5 km)"
   },
   {
     "key": "alias_banco",
-    "icon": "CreditCard",
-    "label": "Alias Bancario / Mercado Pago",
-    "value": "Burgachamical.nx",
-    "category": "payments",
-    "description": "Alias corto para transferencias bancarias o virtuales",
-    "defaultValue": "comandafast.mp"
+    "value": "Burgachamical.nx"
   },
   {
     "key": "banco",
-    "icon": "Building",
-    "label": "Entidad Bancaria o Billetera",
-    "value": "Naranja X",
-    "category": "payments",
-    "description": "Nombre del banco emisor o app financiera",
-    "defaultValue": "Mercado Pago / Banco Galicia"
+    "value": "Naranja X"
   },
   {
     "key": "titular",
-    "icon": "UserCheck",
-    "label": "Titular de la Cuenta",
-    "value": "Braian Carlos Zarate San Felipe",
-    "category": "payments",
-    "description": "Nombre de la persona o razón social a la que se transfiere",
-    "defaultValue": "ComandaFast Burgers S.R.L."
+    "value": "Comanda Demo Gastronómica"
   },
   {
     "key": "cbu",
-    "icon": "Hash",
-    "label": "CBU / CVU (22 dígitos)",
-    "value": "",
-    "category": "payments",
-    "description": "Clave Bancaria Uniforme completa para transferencias tradicionales",
-    "defaultValue": "0000003100092138928374"
+    "value": ""
   },
   {
     "key": "cuit",
-    "icon": "FileText",
-    "label": "CUIT / CUIL",
-    "value": "",
-    "category": "payments",
-    "description": "Identificación tributaria del negocio",
-    "defaultValue": "30-71829384-9"
+    "value": ""
   },
   {
     "key": "descuento_efectivo",
-    "icon": "Percent",
-    "label": "Beneficio Pago en Efectivo",
-    "value": "",
-    "category": "payments",
-    "description": "Promoción o porcentaje especial al pagar en efectivo en mano",
-    "defaultValue": "10% de descuento"
+    "value": ""
   },
   {
     "key": "demora",
-    "icon": "Hourglass",
-    "label": "Tiempo Promedio de Espera",
-    "value": "30 a 45 minutos",
-    "category": "delivery",
-    "description": "Frase que se le comunica al cliente para estimar la cocción y viaje",
-    "defaultValue": "30 a 45 minutos"
+    "value": "30 a 45 minutos"
   },
   {
     "key": "demora_min",
-    "icon": "Timer",
-    "label": "Demora Mínima (Minutos)",
-    "value": "30",
-    "category": "delivery",
-    "description": "Tiempo mínimo en minutos en días habituales",
-    "defaultValue": "30"
+    "value": "30"
   },
   {
     "key": "demora_max",
-    "icon": "Timer",
-    "label": "Demora Máxima (Minutos)",
-    "value": "45",
-    "category": "delivery",
-    "description": "Tiempo máximo de entrega en picos de demanda",
-    "defaultValue": "45"
+    "value": "45"
   },
   {
     "key": "costo_envio",
-    "icon": "Bike",
-    "label": "Costo Base de Delivery",
-    "value": " $2,000",
-    "category": "delivery",
-    "description": "Tarifa del cadete para envíos a domicilio",
-    "defaultValue": "$1.500"
+    "value": " $2,000"
   },
   {
     "key": "envio_gratis_desde",
-    "icon": "Gift",
-    "label": "Envío Gratis a partir de",
-    "value": "$18.000",
-    "category": "delivery",
-    "description": "Monto de compra mínima donde el costo de envío es bonificado",
-    "defaultValue": "$18.000"
+    "value": "$18.000"
   },
   {
     "key": "mensaje_bienvenida",
-    "icon": "MessageSquare",
-    "label": "Mensaje de Saludo y Bienvenida",
-    "value": "¡Hola {cliente}! Bienvenido a Burga's Chamical 🔥 Las mejores hamburguesas smashadas a la plancha.",
-    "category": "messages",
-    "description": "Saludo inicial automático cuando el cliente contacta por primera vez",
-    "defaultValue": "¡Hola {cliente}! Bienvenido a ComandaFast Burgers 🔥 Las mejores hamburguesas smashadas a la plancha."
+    "value": "¡Hola {cliente}! Bienvenido a Burga's Chamical 🔥 Las mejores hamburguesas smashadas a la plancha."
   },
   {
     "key": "mensaje_demora",
-    "icon": "AlertTriangle",
-    "label": "Aviso de Cocina con Demora Alta",
-    "value": "⚠️ ¡Estamos a pleno fuego en la cocina! La demora actual es de 50 a 65 min. ¡Gracias por la paciencia!",
-    "category": "messages",
-    "description": "Mensaje opcional para activar en días de alta demanda o lluvia",
-    "defaultValue": "⚠️ ¡Estamos a pleno fuego en la cocina! La demora actual es de 50 a 65 min. ¡Gracias por la paciencia!"
+    "value": "⚠️ ¡Estamos a pleno fuego en la cocina! La demora actual es de 50 a 65 min. ¡Gracias por la paciencia!"
   },
   {
     "key": "mensaje_fuera_horario",
-    "icon": "Moon",
-    "label": "Respuesta Fuera de Horario",
-    "value": "🌙 En este momento nuestro local está cerrado. Abrimos de {horarios}. ¡Te esperamos luego!",
-    "category": "messages",
-    "description": "Mensaje de guardia cuando ingresan mensajes fuera de turno",
-    "defaultValue": "🌙 En este momento nuestro local está cerrado. Abrimos de {horarios}. ¡Te esperamos luego!"
+    "value": "🌙 En este momento nuestro local está cerrado. Abrimos de {horarios}. ¡Te esperamos luego!"
   }
 ]
