@@ -202,9 +202,19 @@ function mapCashierToDB(c) {
 export const supabaseSync = {
   getCredentials() {
     const settings = storageService.getSettings();
+    let url = settings?.supabaseUrl;
+    let anonKey = settings?.supabaseAnonKey;
+
+    if (!url || url.includes('yqynuvjpipmvurualgtg')) {
+      url = DEFAULT_SUPABASE_URL;
+    }
+    if (!anonKey || anonKey.includes('yqynuvjpipmvurualgtg')) {
+      anonKey = DEFAULT_SUPABASE_ANON_KEY;
+    }
+
     return {
-      url: settings?.supabaseUrl || DEFAULT_SUPABASE_URL,
-      anonKey: settings?.supabaseAnonKey || DEFAULT_SUPABASE_ANON_KEY
+      url,
+      anonKey
     };
   },
 

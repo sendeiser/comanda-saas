@@ -28,15 +28,17 @@ export default function CashierLogin({ onLoginSuccess, onOpenOwner, onOpenKitche
 
   // Load cashiers list from cache and cloud
   const refreshCashiers = async () => {
-    const local = authService.getCashiers();
+    let local = authService.getCashiers();
+    local = (local || []).filter(c => c && c.name !== 'Cande' && c.name !== 'Martin Gonzalez');
     setCashiersList(local);
 
     if (supabaseSync.isConfigured()) {
       try {
         const cloud = await supabaseSync.fetchCashiers();
-        if (Array.isArray(cloud) && cloud.length > 0) {
-          authService.syncCashiersFromCloud(cloud);
-          setCashiersList(cloud);
+        if (Array.isArray(cloud)) {
+          const cleanCloud = cloud.filter(c => c && c.name !== 'Cande' && c.name !== 'Martin Gonzalez');
+          authService.syncCashiersFromCloud(cleanCloud);
+          setCashiersList(cleanCloud);
         }
       } catch (_) {}
     }

@@ -5,7 +5,14 @@ import { printerService } from '../../services/printerService';
 import { supabaseSync } from '../../services/supabaseClient';
 
 export default function SettingsModal({ settings, onSaveSettings, onOpenCatalogQR, onClose }) {
-  const [form, setForm] = useState(settings);
+  const [form, setForm] = useState(() => {
+    const creds = supabaseSync.getCredentials();
+    return {
+      ...settings,
+      supabaseUrl: settings?.supabaseUrl && !settings.supabaseUrl.includes('yqynuvjpipmvurualgtg') ? settings.supabaseUrl : creds.url,
+      supabaseAnonKey: settings?.supabaseAnonKey && !settings.supabaseAnonKey.includes('yqynuvjpipmvurualgtg') ? settings.supabaseAnonKey : creds.anonKey
+    };
+  });
   const [testingSupabase, setTestingSupabase] = useState(false);
   const [supabaseStatus, setSupabaseStatus] = useState(null);
 

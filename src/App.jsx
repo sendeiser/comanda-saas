@@ -332,7 +332,7 @@ export default function App() {
         setSettings(cloudSettings);
       }
 
-      if (Array.isArray(cloudCashiers) && cloudCashiers.length > 0) {
+      if (Array.isArray(cloudCashiers)) {
         authService.syncCashiersFromCloud(cloudCashiers);
       }
 

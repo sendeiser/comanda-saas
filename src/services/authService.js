@@ -112,7 +112,7 @@ export const authService = {
   },
 
   syncCashiersFromCloud(cloudCashiers) {
-    if (Array.isArray(cloudCashiers) && cloudCashiers.length > 0) {
+    if (Array.isArray(cloudCashiers)) {
       storageService.saveCashiers(cloudCashiers);
     }
   },

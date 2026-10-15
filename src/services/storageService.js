@@ -192,11 +192,11 @@ const DEFAULT_PRODUCTS = [
 ];
 
 const DEFAULT_SETTINGS = {
-  businessName: 'BURGER & CO. CHAMICAL',
-  slogan: 'Hamburguesas Artesanales & Delivery Rápido',
-  address: 'Av. Rivadavia 450, Chamical, La Rioja',
-  phone: '+54 9 3826 45-6789',
-  alias: 'BURGER.CHAMICAL.MP',
+  businessName: 'ComandaFast Demo',
+  slogan: 'Hamburguesas & Fast Food de Alta Velocidad',
+  address: 'Av. Gastronómica 123',
+  phone: '+54 9 11 2233-4455',
+  alias: 'COMANDA.FAST',
   cbu: '0000003100045678901234',
   ticketWidth: '58mm', // '58mm' | '80mm'
   ticketTheme: 'classic', // 'classic' | 'modern' | 'minimal' | 'street'
@@ -209,7 +209,9 @@ const DEFAULT_SETTINGS = {
   autoPrintOnConfirm: true,
   soundAlerts: true,
   deliveryDefaultFee: 1000,
-  printerServerUrl: 'http://localhost:3001/print'
+  printerServerUrl: 'http://localhost:3001/print',
+  supabaseUrl: 'https://vmnhystuwcbdbukoxdtz.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZtbmh5c3R1d2NiZGJ1a294ZHR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDkzNTMsImV4cCI6MjEwNzU4NTM1M30._P68WCxLZLdElXkXuDuitvtSXxsyEU0IdK-S73-NDpg'
 };
 
 const KEYS = {
@@ -277,14 +279,18 @@ export const storageService = {
   getProducts() {
     const raw = localStorage.getItem(KEYS.PRODUCTS);
     if (!raw) {
-      return [];
+      return DEFAULT_PRODUCTS;
     }
     try {
+      if (raw.includes('BAJONERA') || raw.includes('DOÑA BURGA') || raw.includes('PANCHO GUACAMOLE')) {
+        localStorage.removeItem(KEYS.PRODUCTS);
+        return DEFAULT_PRODUCTS;
+      }
       const prods = JSON.parse(raw);
-      if (!Array.isArray(prods)) return [];
+      if (!Array.isArray(prods) || prods.length === 0) return DEFAULT_PRODUCTS;
       return prods;
     } catch (_) {
-      return [];
+      return DEFAULT_PRODUCTS;
     }
   },
 
@@ -983,11 +989,25 @@ export const storageService = {
       localStorage.setItem(KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
       return DEFAULT_SETTINGS;
     }
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed.supabaseUrl && parsed.supabaseUrl.includes('yqynuvjpipmvurualgtg')) {
+        delete parsed.supabaseUrl;
+        delete parsed.supabaseAnonKey;
+      }
+      return { ...DEFAULT_SETTINGS, ...parsed };
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
   },
 
   saveSettings(settings) {
-    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(settings));
+    const updated = { ...settings };
+    if (updated.supabaseUrl && updated.supabaseUrl.includes('yqynuvjpipmvurualgtg')) {
+      updated.supabaseUrl = DEFAULT_SETTINGS.supabaseUrl;
+      updated.supabaseAnonKey = DEFAULT_SETTINGS.supabaseAnonKey;
+    }
+    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(updated));
   },
 
   exportBackup() {
@@ -1132,7 +1152,14 @@ export const storageService = {
     try {
       const data = localStorage.getItem(KEYS.CASHIERS);
       if (!data) return [];
-      return JSON.parse(data);
+      const list = JSON.parse(data);
+      if (!Array.isArray(list)) return [];
+      // Filtrar de raíz cualquier cajero residual de la base de datos anterior
+      const clean = list.filter(c => c && c.name !== 'Cande' && c.name !== 'Martin Gonzalez');
+      if (clean.length !== list.length) {
+        localStorage.setItem(KEYS.CASHIERS, JSON.stringify(clean));
+      }
+      return clean;
     } catch {
       return [];
     }
