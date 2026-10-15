@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Guía Oficial — ComandaBot Portable (.exe)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0b0f17;
+      color: #e2e8f0;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      padding: 16mm 18mm;
+      position: relative;
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 40%),
+                  radial-gradient(circle at bottom left, rgba(56, 189, 248, 0.05), transparent 40%),
+                  #0b0f17;
+    }
+
+    /* Page Header & Footer */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 8.5pt;
+      color: #64748b;
+      font-weight: 500;
+    }
+    .page-header .brand {
+      color: #10b981;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .page-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 8pt;
+      color: #64748b;
+    }
+    .page-footer .page-number {
+      font-family: 'Fira Code', monospace;
+      color: #94a3b8;
+    }
+
+    /* Content Area */
+    .content {
+      flex: 1;
+      padding: 12px 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #ffffff;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    h1 { font-size: 26pt; line-height: 1.15; }
+    h2 { font-size: 16pt; margin-bottom: 10px; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+    h3 { font-size: 11.5pt; margin-bottom: 6px; color: #38bdf8; }
+    p { font-size: 9.5pt; color: #94a3b8; margin-bottom: 8px; line-height: 1.5; }
+    strong { color: #f1f5f9; }
+
+    /* Cards & Containers */
+    .card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      backdrop-filter: blur(10px);
+    }
+    .card-emerald {
+      border-color: rgba(16, 185, 129, 0.3);
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.06), rgba(255, 255, 255, 0.02));
+    }
+    .card-cyan {
+      border-color: rgba(56, 189, 248, 0.3);
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.06), rgba(255, 255, 255, 0.02));
+    }
+
+    /* Grid layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 7.5pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+    /* Code & Terminal Styling */
+    .terminal-box {
+      background: #05080f;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: 'Fira Code', monospace;
+      font-size: 8pt;
+      color: #38bdf8;
+      line-height: 1.45;
+      overflow: hidden;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .term-header {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .term-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+    .term-title {
+      font-size: 7pt;
+      color: #64748b;
+      margin-left: 6px;
+      font-weight: 600;
+    }
+
+    /* WhatsApp Phone Mockup */
+    .phone-container {
+      background: #090e11;
+      border: 2px solid #2a3942;
+      border-radius: 20px;
+      padding: 10px;
+      width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .phone-header {
+      background: #1f2c34;
+      padding: 8px 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .phone-avatar {
+      width: 28px;
+      height: 28px;
+      background: #10b981;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .chat-bubble {
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 7.5pt;
+      line-height: 1.35;
+      margin-bottom: 6px;
+      max-width: 88%;
+    }
+    .bubble-bot {
+      background: #202c33;
+      color: #e9edef;
+      border-top-left-radius: 2px;
+      align-self: flex-start;
+    }
+    .bubble-user {
+      background: #005c4b;
+      color: #e9edef;
+      border-top-right-radius: 2px;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+
+    /* Diagram Nodes & SVGs */
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8pt;
+      margin-bottom: 8px;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+      font-weight: 600;
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    td {
+      padding: 6px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #cbd5e1;
+    }
+
+    /* Icons */
+    .icon {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================ -->
+  <!-- PÁGINA 1: PORTADA EJECUTIVA                                  -->
+  <!-- ============================================================ -->
+  <div class="page" style="justify-content: center; text-align: center; padding: 24mm 20mm;">
+    <div style="margin-bottom: 30px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; background: linear-gradient(135deg, #10b981, #0284c7); border-radius: 20px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); margin-bottom: 20px;">
+        <span style="font-size: 38px;">🍔</span>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 14px;">
+        <span class="badge badge-green">v2.5 Standalone</span>
+        <span class="badge badge-blue">Windows x64 (.EXE)</span>
+        <span class="badge badge-purple">Supabase Cloud</span>
+      </div>
+      <h1 style="font-size: 32pt; margin-bottom: 12px; background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        COMANDA FAST
+      </h1>
+      <h2 style="font-size: 16pt; color: #10b981; justify-content: center; font-weight: 600; margin-bottom: 16px;">
+        Manual Oficial del Bot de WhatsApp Portable
+      </h2>
+      <p style="font-size: 11pt; color: #94a3b8; max-width: 520px; margin: 0 auto 30px auto; line-height: 1.6;">
+        Guía integral de arquitectura, puesta en marcha y operación comercial del bot ejecutable autónomo con sincronización multi-negocio por <strong>SLUG</strong>.
+      </p>
+    </div>
+
+    <!-- Highlights Grid -->
+    <div class="grid-3" style="text-align: left; margin-bottom: 35px;">
+      <div class="card card-emerald">
+        <div style="font-size: 20px; margin-bottom: 6px;">⚡</div>
+        <h3 style="color: #34d399; font-size: 10pt;">Zero Dependencies</h3>
+        <p style="font-size: 8pt; margin: 0; color: #94a3b8;">Ejecutable único (.exe de 6 MB). No requiere instalar Python, Node.js ni librerías en la PC.</p>
+      </div>
+      <div class="card card-cyan">
+        <div style="font-size: 20px; margin-bottom: 6px;">☁️</div>
+        <h3 style="color: #38bdf8; font-size: 10pt;">Multi-Tenant por SLUG</h3>
+        <p style="font-size: 8pt; margin: 0; color: #94a3b8;">El cliente escribe el SLUG de su local y se descargan menú, precios, promociones y reglas en tiempo real.</p>
+      </div>
+      <div class="card" style="border-color: rgba(168, 85, 247, 0.3);">
+        <div style="font-size: 20px; margin-bottom: 6px;">📱</div>
+        <h3 style="color: #c084fc; font-size: 10pt;">Simulador Web & Wi-Fi</h3>
+        <p style="font-size: 8pt; margin: 0; color: #94a3b8;">Consola interactiva visual y acceso inalámbrico desde cualquier celular en el local.</p>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 20px; font-size: 8.5pt; color: #64748b;">
+      <p style="margin: 0;"><strong>Comanda SaaS Platform</strong> • Arquitectura Multi-Comercio y Automatización Gastronómica</p>
+      <p style="margin: 4px 0 0 0; font-family: 'Fira Code', monospace; color: #475569;">Documento Técnico y Manual de Usuario • Versión 2.5 • Octubre 2026</p>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- PÁGINA 2: ARQUITECTURA GENERAL Y CONCEPTOS CLAVE            -->
+  <!-- ============================================================ -->
+  <div class="page">
+    <div class="page-header">
+      <span class="brand">🍔 COMANDA FAST</span>
+      <span>CAPÍTULO 1 • ARQUITECTURA Y PORTABILIDAD</span>
+    </div>
+
+    <div class="content">
+      <h2>1. ¿Qué es el Bot Portable y Cómo Funciona?</h2>
+      <p>
+        <strong>ComandaBot.exe</strong> es un servicio autónomo que digitaliza y automatiza la toma de pedidos vía WhatsApp para comercios gastronómicos (hamburgueserías, pizzerías, rotiserías y restaurantes).
+      </p>
+
+      <!-- Comparativa Visual -->
+      <div class="grid-2" style="margin-bottom: 12px;">
+        <div class="card" style="background: rgba(239, 68, 68, 0.04); border-color: rgba(239, 68, 68, 0.2);">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            <span style="color: #ef4444; font-size: 14px;">❌</span>
+            <strong style="color: #fca5a5; font-size: 9.5pt;">Bots Tradicionales</strong>
+          </div>
+          <ul style="font-size: 8pt; color: #94a3b8; padding-left: 14px; line-height: 1.5;">
+            <li>Requieren instalar Node.js, Python, npm y compiladores C++.</li>
+            <li>Archivos pesados (+500 MB en node_modules).</li>
+            <li>Si el cliente cambia de máquina, se rompen las dependencias.</li>
+            <li>Configuraciones manuales complejas y fragilidad en caja.</li>
+          </ul>
+        </div>
+        <div class="card card-emerald">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+            <span style="color: #10b981; font-size: 14px;">✅</span>
+            <strong style="color: #6ee7b7; font-size: 9.5pt;">ComandaBot Portable (.exe)</strong>
+          </div>
+          <ul style="font-size: 8pt; color: #cbd5e1; padding-left: 14px; line-height: 1.5;">
+            <li><strong>1 solo archivo .exe de 6 MB</strong>: listo para Pendrive o PC de mostrador.</li>
+            <li><strong>Cero dependencias</strong>: hace doble clic y arranca de inmediato.</li>
+            <li><strong>Sincronización en la Nube</strong>: descarga datos por SLUG desde Supabase.</li>
+            <li><strong>Memoria automática</strong>: recuerda el local configurado al reabrir.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2>2. Diagrama de Arquitectura del Ecosistema</h2>
+      <p>El bot actúa como puente en tiempo real entre el cliente de WhatsApp y la cocina del local:</p>
+
+      <!-- SVG Architecture Diagram -->
+      <div class="diagram-container">
+        <svg viewBox="0 0 700 230" style="width: 100%; height: auto;">
+          <!-- Defs -->
+          <defs>
+            <linearGradient id="gradEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#10b981"/>
+              <stop offset="100%" stop-color="#059669"/>
+            </linearGradient>
+            <linearGradient id="gradCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#38bdf8"/>
+              <stop offset="100%" stop-color="#0284c7"/>
+            </linearGradient>
+            <linearGradient id="gradPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#a855f7"/>
+              <stop offset="100%" stop-color="#7e22ce"/>
+            </linearGradient>
+            <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b"/>
+            </marker>
+          </defs>
+
+          <!-- Node 1: WhatsApp Client -->
+          <rect x="20" y="75" width="130" height="80" rx="8" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+          <text x="85" y="105" text-anchor="middle" fill="#34d399" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="11">📱 Cliente WhatsApp</text>
+          <text x="85" y="125" text-anchor="middle" fill="#94a3b8" font-size="8.5">Mensaje de Texto / Audio</text>
+          <text x="85" y="140" text-anchor="middle" fill="#64748b" font-size="7.5">Consulta de Menú y Pedido</text>
+
+          <!-- Arrow 1 -> 2 -->
+          <line x1="150" y1="115" x2="205" y2="115" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Node 2: ComandaBot.exe (Center) -->
+          <rect x="215" y="45" width="170" height="140" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+          <rect x="215" y="45" width="170" height="28" rx="8" fill="rgba(56, 189, 248, 0.15)"/>
+          <text x="300" y="64" text-anchor="middle" fill="#ffffff" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="11">⚙️ ComandaBot.exe</text>
+          <text x="300" y="92" text-anchor="middle" fill="#38bdf8" font-weight="600" font-size="9">Motor Portable Local</text>
+          <text x="300" y="110" text-anchor="middle" fill="#cbd5e1" font-size="8">• Validador de SLUG</text>
+          <text x="300" y="126" text-anchor="middle" fill="#cbd5e1" font-size="8">• Servidor Web (3002)</text>
+          <text x="300" y="142" text-anchor="middle" fill="#cbd5e1" font-size="8">• Extractor IA Groq</text>
+          <text x="300" y="165" text-anchor="middle" fill="#10b981" font-weight="600" font-size="8.5">Memoria: config.json</text>
+
+          <!-- Arrow 2 -> 3 (Supabase) -->
+          <line x1="385" y1="85" x2="445" y2="65" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Node 3: Supabase Cloud -->
+          <rect x="455" y="25" width="150" height="80" rx="8" fill="#111827" stroke="#10b981" stroke-width="1.5"/>
+          <text x="530" y="52" text-anchor="middle" fill="#34d399" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="11">☁️ Supabase Cloud</text>
+          <text x="530" y="70" text-anchor="middle" fill="#cbd5e1" font-size="8">Catálogo, Precios, Stores</text>
+          <text x="530" y="85" text-anchor="middle" fill="#cbd5e1" font-size="8">Plantillas y Modos de Bot</text>
+          <text x="530" y="98" text-anchor="middle" fill="#fbbf24" font-size="7.5">Órdenes Correlativas</text>
+
+          <!-- Arrow 2 -> 4 (KDS / Cocina) -->
+          <line x1="385" y1="145" x2="445" y2="165" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <!-- Node 4: KDS & POS -->
+          <rect x="455" y="125" width="150" height="80" rx="8" fill="#111827" stroke="#a855f7" stroke-width="1.5"/>
+          <text x="530" y="152" text-anchor="middle" fill="#c084fc" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="11">🍳 KDS & Mostrador</text>
+          <text x="530" y="170" text-anchor="middle" fill="#cbd5e1" font-size="8">Pantalla de Cocina en Vivo</text>
+          <text x="530" y="185" text-anchor="middle" fill="#cbd5e1" font-size="8">Ticketera Comandera</text>
+          <text x="530" y="198" text-anchor="middle" fill="#94a3b8" font-size="7.5">Actualización Instantánea</text>
+        </svg>
+      </div>
+
+      <!-- Explicación de los Flujos -->
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-size: 9pt;">1. Consulta y Validación</h3>
+          <p style="font-size: 7.5pt; margin: 0;">El bot consulta Supabase con el SLUG del local y obtiene menú, promociones y alias de pago sin necesidad de base de datos local pesada.</p>
+        </div>
+        <div class="card">
+          <h3 style="font-size: 9pt;">2. Emisión Automática</h3>
+          <p style="font-size: 7.5pt; margin: 0;">Cuando el cliente confirma el pedido, el bot inserta la comanda en Supabase con número consecutivo (#101, #102...) y aparece en la pantalla de cocina al instante.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Comanda SaaS • Guía Técnica del Bot Portable</span>
+      <span class="page-number">02 / 06</span>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- PÁGINA 3: PASO A PASO — SLUG Y PUESTA EN MARCHA              -->
+  <!-- ============================================================ -->
+  <div class="page">
+    <div class="page-header">
+      <span class="brand">🍔 COMANDA FAST</span>
+      <span>CAPÍTULO 2 • PUESTA EN MARCHA Y VALIDACIÓN DEL SLUG</span>
+    </div>
+
+    <div class="content">
+      <h2>1. El Identificador Único: ¿Qué es el SLUG?</h2>
+      <p>
+        Cada comercio registrado en <strong>Comanda SaaS</strong> tiene un identificador web alfanumérico único denominado <strong>SLUG</strong> (ej: <code>fastburga-centro</code>, <code>pizzeria-napoli</code>, <code>demo</code>). Este SLUG garantiza que cada bot cargue exclusivamente la carta, precios y reglas de ese local específico.
+      </p>
+
+      <!-- Terminal Mockup 1: Solicitud interactiva -->
+      <div class="terminal-box">
+        <div class="term-header">
+          <div class="term-dot dot-red"></div>
+          <div class="term-dot dot-yellow"></div>
+          <div class="term-dot dot-green"></div>
+          <span class="term-title">ComandaBot.exe — Terminal de Inicio</span>
+        </div>
+        <div style="color: #cbd5e1;">
+          <span style="color: #10b981;">======================================================================</span><br>
+          <span style="color: #f1f5f9; font-weight: bold;">🍔 COMANDA FAST — ASISTENTE WHATSAPP AUTOMÁTICO (PORTABLE)</span><br>
+          <span style="color: #64748b;">📡 Conectado a la nube Comanda Cloud (Supabase)</span><br>
+          <span style="color: #10b981;">======================================================================</span><br><br>
+          <span style="color: #94a3b8;">------------------------------------------------------------</span><br>
+          <span style="color: #fbbf24; font-weight: bold;">✍️  Por favor, escribí el SLUG de tu negocio (ej: fastburga-centro):</span><br>
+          <span style="color: #64748b;">    [Tip: escribí '?' o 'lista' para ver todos los comercios activos]</span><br>
+          <span style="color: #94a3b8;">------------------------------------------------------------</span><br>
+          <span style="color: #38bdf8;">SLUG de tu negocio &gt;</span> <span style="color: #ffffff; font-weight: bold;">fastburga-centro</span>
+        </div>
+      </div>
+
+      <h2>2. Los 3 Escenarios de Inicio Inteligente</h2>
+      <div class="grid-3" style="margin-bottom: 12px;">
+        <div class="card card-emerald">
+          <h3 style="color: #34d399; font-size: 9pt;">A. Primera Vez</h3>
+          <p style="font-size: 7.5pt; margin: 0; color: #cbd5e1;">
+            El usuario escribe el slug de su local. El bot valida en Supabase, descarga los productos y guarda la selección en <code>comanda_bot_config.json</code>.
+          </p>
+        </div>
+        <div class="card card-cyan">
+          <h3 style="color: #38bdf8; font-size: 9pt;">B. Inicios Posteriores</h3>
+          <p style="font-size: 7.5pt; margin: 0; color: #cbd5e1;">
+            Al día siguiente, el bot muestra: <em>"Último negocio: fastburga-centro"</em>. Con solo presionar <strong>ENTER</strong> arranca en 1 segundo.
+          </p>
+        </div>
+        <div class="card" style="border-color: rgba(245, 158, 11, 0.3);">
+          <h3 style="color: #fbbf24; font-size: 9pt;">C. Corrección de Errores</h3>
+          <p style="font-size: 7.5pt; margin: 0; color: #cbd5e1;">
+            Si el usuario comete un error tipográfico o tipea <code>?</code>, el bot lista los comercios disponibles de la nube para elegir por número <code>[1..N]</code>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Terminal Mockup 2: Conexión Exitosa -->
+      <div class="terminal-box">
+        <div class="term-header">
+          <div class="term-dot dot-red"></div>
+          <div class="term-dot dot-yellow"></div>
+          <div class="term-dot dot-green"></div>
+          <span class="term-title">Resumen de Conexión y Apertura de Servidor</span>
+        </div>
+        <div style="color: #cbd5e1;">
+          <span style="color: #34d399;">Buscando comercio con slug 'fastburga-centro'...</span><br>
+          <span style="color: #10b981;">=================================================================</span><br>
+          <span style="color: #34d399; font-weight: bold;">✅ COMERCIO CONECTADO CON ÉXITO:</span><br>
+          &nbsp;&nbsp;• <strong>Nombre:</strong>    FastBurga Centro<br>
+          &nbsp;&nbsp;• <strong>Slug:</strong>      fastburga-centro<br>
+          &nbsp;&nbsp;• <strong>ID:</strong>        f5ece6d9-a2df-4f88-8842-bfb932863568<br>
+          &nbsp;&nbsp;• <strong>Modo Bot:</strong>  TEMPLATES (Menú Interactivo)<br>
+          &nbsp;&nbsp;• <strong>Productos:</strong> 10 cargados desde Supabase<br>
+          &nbsp;&nbsp;• <strong>Enlace Web:</strong> https://comandasaas.app/#catalog?store=fastburga-centro<br>
+          <span style="color: #10b981;">=================================================================</span><br>
+          <span style="color: #38bdf8;">🚀 Servidor Webhook &amp; Simulador en vivo:</span><br>
+          &nbsp;&nbsp;👉 En esta PC:            <strong>http://localhost:3002/simulador</strong><br>
+          &nbsp;&nbsp;👉 En tu Celular (Wi-Fi): <strong>http://192.168.1.45:3002/simulador</strong><br>
+        </div>
+      </div>
+
+      <div class="card" style="background: rgba(16, 185, 129, 0.05); border-color: rgba(16, 185, 129, 0.2);">
+        <p style="font-size: 8pt; margin: 0; color: #a7f3d0;">
+          💡 <strong>Apertura Automática del Navegador:</strong> Apenas se conecta el comercio, el bot abre automáticamente el simulador en el navegador predeterminado para que el operador no tenga que copiar ni pegar ninguna dirección URL.
+        </p>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Comanda SaaS • Guía Técnica del Bot Portable</span>
+      <span class="page-number">03 / 06</span>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- PÁGINA 4: LA EXPERIENCIA DEL CLIENTE — MODOS DEL BOT        -->
+  <!-- ============================================================ -->
+  <div class="page">
+    <div class="page-header">
+      <span class="brand">🍔 COMANDA FAST</span>
+      <span>CAPÍTULO 3 • EXPERIENCIA DE ATENCIÓN Y MODOS OPERATIVOS</span>
+    </div>
+
+    <div class="content">
+      <h2>1. Interacción Real en WhatsApp</h2>
+      <p>
+        El bot atiende a los clientes como un mozo digital entrenado: responde al instante, muestra precios actualizados, toma personalizaciones (<em>"sin cebolla"</em>) y brinda los datos de transferencia.
+      </p>
+
+      <div class="grid-2" style="margin-bottom: 12px; align-items: start;">
+        <!-- Phone Mockup -->
+        <div class="phone-container">
+          <div class="phone-header">
+            <div class="phone-avatar">🍔</div>
+            <div>
+              <div style="font-weight: bold; font-size: 8pt; color: #e9edef;">FastBurga Centro</div>
+              <div style="font-size: 6.5pt; color: #25d366;">en línea • Cuenta de Empresa</div>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column;">
+            <div class="chat-bubble bubble-user">Hola buenas noches, qué tienen?</div>
+            <div class="chat-bubble bubble-bot">
+              🍔 <strong>¡Hola! Bienvenido a FastBurga Centro</strong> 🔥<br><br>
+              1️⃣ <strong>Burger Clásica</strong> — $6.500<br>
+              2️⃣ <strong>Doble Cuarto Cheddar</strong> — $8.200<br>
+              3️⃣ <strong>Papas Cheddar &amp; Bacon</strong> — $4.900<br>
+              4️⃣ <strong>Promo Dúo Smash + Papas</strong> — $15.500<br><br>
+              👉 Respondé con el <strong>NÚMERO</strong> o lo que quieras pedir.
+            </div>
+            <div class="chat-bubble bubble-user">Quiero 2 dobles cheddar y unas papas cheddar</div>
+            <div class="chat-bubble bubble-bot">
+              🛒 <strong>Resumen de tu pedido:</strong><br>
+              • 2x Doble Cuarto Cheddar ($16.400)<br>
+              • 1x Papas Cheddar &amp; Bacon ($4.900)<br>
+              💰 <strong>Total a pagar: $21.300</strong><br><br>
+              💳 Alias de Transferencia: <code>fastburga.mp</code><br>
+              ¿Retirás en el local o es con Envío a Domicilio?
+            </div>
+            <div class="chat-bubble bubble-user">Para enviar a San Martín 450</div>
+            <div class="chat-bubble bubble-bot">
+              🔥 <strong>¡Comanda #104 confirmada!</strong> En 35 min te lo llevamos a San Martín 450. Gracias por tu compra!
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Bot Modes -->
+        <div>
+          <h3 style="margin-top: 0;">2. Los 4 Modos Operativos</h3>
+          <p style="font-size: 7.5pt; margin-bottom: 8px;">Configurables desde el panel web de Comanda SaaS:</p>
+
+          <div class="card" style="padding: 8px 10px; margin-bottom: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="font-size: 8.5pt; color: #38bdf8;">1. Catálogo Web</strong>
+              <span class="badge badge-blue">catalog_link</span>
+            </div>
+            <p style="font-size: 7pt; margin: 0; color: #94a3b8;">
+              Envía la bienvenida con el link interactivo a la carta digital. Ideal para negocios con menú extenso o fotos de alta definición.
+            </p>
+          </div>
+
+          <div class="card card-emerald" style="padding: 8px 10px; margin-bottom: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="font-size: 8.5pt; color: #34d399;">2. Menú Interactivo</strong>
+              <span class="badge badge-green">templates</span>
+            </div>
+            <p style="font-size: 7pt; margin: 0; color: #cbd5e1;">
+              Lista productos numerados. El cliente escribe <code>1</code>, <code>2</code> o combos y el bot procesa el pedido paso a paso de forma rápida.
+            </p>
+          </div>
+
+          <div class="card" style="padding: 8px 10px; margin-bottom: 6px; border-color: rgba(245, 158, 11, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="font-size: 8.5pt; color: #fbbf24;">3. Flujos Dinámicos</strong>
+              <span class="badge badge-amber">flows</span>
+            </div>
+            <p style="font-size: 7pt; margin: 0; color: #94a3b8;">
+              Árbol de decisiones guiado (Ej: <em>1. Pedir comida, 2. Reservar mesa, 3. Hablar con un mozo</em>).
+            </p>
+          </div>
+
+          <div class="card" style="padding: 8px 10px; border-color: rgba(168, 85, 247, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <strong style="font-size: 8.5pt; color: #c084fc;">4. Inteligencia Artificial</strong>
+              <span class="badge badge-purple">Groq / Llama 3.3</span>
+            </div>
+            <p style="font-size: 7pt; margin: 0; color: #cbd5e1;">
+              Entiende lenguaje natural y modismos: <em>"mandame dos birras y una burguer sin tomate"</em>. Extrae cantidades y detalles automáticamente.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Comanda SaaS • Guía Técnica del Bot Portable</span>
+      <span class="page-number">04 / 06</span>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- PÁGINA 5: SIMULADOR WEB Y RED WI-FI LOCAL                   -->
+  <!-- ============================================================ -->
+  <div class="page">
+    <div class="page-header">
+      <span class="brand">🍔 COMANDA FAST</span>
+      <span>CAPÍTULO 4 • SIMULADOR WEB Y PRUEBAS EN RED LOCAL</span>
+    </div>
+
+    <div class="content">
+      <h2>1. El Simulador Web Embebido</h2>
+      <p>
+        <strong>ComandaBot.exe</strong> incluye un servidor HTTP ligero interno que sirve una consola de simulación completa (<code>tester.html</code>). Esto permite probar el bot en vivo, capacitar a los empleados del mostrador y auditar pedidos sin depender de enviar mensajes reales por WhatsApp.
+      </p>
+
+      <!-- Diagrama Wi-Fi Local con Flexbox -->
+      <div class="card" style="padding: 14px 16px; margin-bottom: 12px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 14px;">
+          
+          <!-- Box 1: PC Mostrador -->
+          <div style="flex: 1; background: #090e17; border: 1.5px solid #38bdf8; border-radius: 10px; padding: 10px 12px; text-align: center;">
+            <div style="font-size: 20px; margin-bottom: 2px;">💻</div>
+            <strong style="color: #38bdf8; font-size: 9pt; display: block; margin-bottom: 3px;">PC de Caja / Mostrador</strong>
+            <span style="font-size: 7.5pt; color: #cbd5e1; display: block;">Ejecuta: <strong>ComandaBot.exe</strong></span>
+            <span style="font-size: 7pt; color: #94a3b8; display: block; margin-top: 1px;">IP Local: <code>192.168.1.45</code></span>
+            <div style="margin-top: 5px; padding: 4px 6px; background: rgba(56, 189, 248, 0.12); border-radius: 6px;">
+              <span style="color: #38bdf8; font-size: 7pt; font-family: 'Fira Code', monospace; font-weight: 600;">http://localhost:3002/simulador</span>
+            </div>
+          </div>
+
+          <!-- Middle: Wi-Fi Router -->
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100px; text-align: center;">
+            <div style="font-size: 24px;">📡</div>
+            <span style="color: #ffffff; font-weight: 700; font-size: 7.5pt; margin-top: 2px;">Red Wi-Fi Local</span>
+            <span style="color: #64748b; font-size: 6.5pt;">(Sin cables ni túneles)</span>
+            <div style="display: flex; gap: 6px; margin-top: 4px; font-size: 11px;">
+              <span style="color: #10b981;">◀───</span>
+              <span style="color: #38bdf8;">───▶</span>
+            </div>
+          </div>
+
+          <!-- Box 2: Smartphone -->
+          <div style="flex: 1; background: #090e17; border: 1.5px solid #10b981; border-radius: 10px; padding: 10px 12px; text-align: center;">
+            <div style="font-size: 20px; margin-bottom: 2px;">📱</div>
+            <strong style="color: #34d399; font-size: 9pt; display: block; margin-bottom: 3px;">Celulares del Local</strong>
+            <span style="font-size: 7.5pt; color: #cbd5e1; display: block;">Mozo / Encargado / Dueño</span>
+            <span style="font-size: 7pt; color: #94a3b8; display: block; margin-top: 1px;">Navegador móvil (Chrome / Safari)</span>
+            <div style="margin-top: 5px; padding: 4px 6px; background: rgba(16, 185, 129, 0.12); border-radius: 6px;">
+              <span style="color: #34d399; font-size: 7pt; font-family: 'Fira Code', monospace; font-weight: 600;">http://192.168.1.45:3002/simulador</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <h2>2. Capacidades del Simulador</h2>
+      <div class="grid-3" style="margin-bottom: 12px;">
+        <div class="card card-emerald">
+          <h3 style="font-size: 9pt; color: #34d399;">Chat Móvil en Pantalla</h3>
+          <p style="font-size: 7.5pt; margin: 0; color: #cbd5e1;">
+            Emula la interfaz nativa de WhatsApp con teclado, burbujas de audio, respuestas rápidas y cálculo de subtotales.
+          </p>
+        </div>
+        <div class="card card-cyan">
+          <h3 style="font-size: 9pt; color: #38bdf8;">Consola de Depuración</h3>
+          <p style="font-size: 7.5pt; margin: 0; color: #cbd5e1;">
+            Muestra los eventos JSON recibidos en tiempo real, latencias de Groq IA y el estado de la sesión en memoria.
+          </p>
+        </div>
+        <div class="card" style="border-color: rgba(168, 85, 247, 0.3);">
+          <h3 style="font-size: 9pt; color: #c084fc;">Pruebas Sin Costo</h3>
+          <p style="font-size: 7.5pt; margin: 0; color: #cbd5e1;">
+            Permite entrenar al personal y probar nuevos combos del menú sin consumir saldo de la API oficial de Meta.
+          </p>
+        </div>
+      </div>
+
+      <h2>3. Endpoints Disponibles en el Servidor</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Endpoint</th>
+            <th>Método</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>/simulador</code></td>
+            <td><span class="badge badge-green">GET</span></td>
+            <td>Carga la interfaz gráfica del simulador de chat y consola para PC y celulares.</td>
+          </tr>
+          <tr>
+            <td><code>/health</code></td>
+            <td><span class="badge badge-blue">GET</span></td>
+            <td>Monitoreo de estado JSON (tienda activa, slug, modo del bot, productos cargados).</td>
+          </tr>
+          <tr>
+            <td><code>/api/webhook/whatsapp</code></td>
+            <td><span class="badge badge-amber">POST</span></td>
+            <td>Recepción de mensajes en formato estándar Meta WhatsApp Cloud API.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="page-footer">
+      <span>Comanda SaaS • Guía Técnica del Bot Portable</span>
+      <span class="page-number">05 / 06</span>
+    </div>
+  </div>
+
+
+  <!-- ============================================================ -->
+  <!-- PÁGINA 6: COMANDOS CLI, COMPILACIÓN Y FAQ                   -->
+  <!-- ============================================================ -->
+  <div class="page">
+    <div class="page-header">
+      <span class="brand">🍔 COMANDA FAST</span>
+      <span>CAPÍTULO 5 • MANTENIMIENTO, COMANDOS Y PREGUNTAS FRECUENTES</span>
+    </div>
+
+    <div class="content">
+      <h2>1. Parámetros CLI para Accesos Directos</h2>
+      <p>Podés crear accesos directos en el escritorio de Windows con parámetros personalizados:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Comando / Parámetro</th>
+            <th>Ejemplo</th>
+            <th>Utilidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>--slug &lt;nombre&gt;</code></td>
+            <td><code>ComandaBot.exe --slug fastburga-centro</code></td>
+            <td>Inicia directamente vinculado al local sin solicitarlo en consola.</td>
+          </tr>
+          <tr>
+            <td><code>--port &lt;puerto&gt;</code></td>
+            <td><code>ComandaBot.exe --port 5005</code></td>
+            <td>Asigna un puerto HTTP específico si el 3002 está en uso.</td>
+          </tr>
+          <tr>
+            <td><code>--list</code></td>
+            <td><code>ComandaBot.exe --list</code></td>
+            <td>Lista todos los comercios registrados en Supabase y sale.</td>
+          </tr>
+          <tr>
+            <td><code>-m &quot;mensaje&quot;</code></td>
+            <td><code>ComandaBot.exe -s demo -m &quot;hola&quot;</code></td>
+            <td>Prueba una respuesta directa en la terminal sin levantar servidor.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. ¿Cómo Volver a Compilar el Ejecutable?</h2>
+      <div class="card card-emerald">
+        <p style="font-size: 8pt; margin: 0; color: #cbd5e1;">
+          Si en el futuro modificás el archivo <code>server/whatsapp_bot.py</code> (agregando nuevas respuestas, integraciones o medios de pago):<br>
+          1. Hacé doble clic en <strong><code>COMPILAR_BOT_EXE.bat</code></strong>.<br>
+          2. PyInstaller volverá a generar el archivo <strong><code>ComandaBot.exe</code></strong> en la raíz del proyecto en menos de 10 segundos, listo para distribuir.
+        </p>
+      </div>
+
+      <h2>3. Preguntas Frecuentes (FAQ)</h2>
+      <div class="card" style="margin-bottom: 6px;">
+        <strong style="color: #38bdf8; font-size: 8.5pt;">¿Qué pasa si se corta Internet en el local?</strong>
+        <p style="font-size: 7.5pt; margin: 2px 0 0 0; color: #94a3b8;">
+          El bot intentará reconectarse automáticamente a Supabase Cloud con reintentos exponenciales. Los pedidos pendientes no se pierden ya que quedan respaldados en la nube.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom: 6px;">
+        <strong style="color: #38bdf8; font-size: 8.5pt;">¿Puedo tener más de un bot abierto en la misma PC?</strong>
+        <p style="font-size: 7.5pt; margin: 2px 0 0 0; color: #94a3b8;">
+          Sí. Podés abrir una terminal con <code>ComandaBot.exe --slug local1 --port 3002</code> y otra con <code>ComandaBot.exe --slug local2 --port 3003</code>.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom: 6px;">
+        <strong style="color: #38bdf8; font-size: 8.5pt;">¿Cómo cambio el alias bancario o los precios?</strong>
+        <p style="font-size: 7.5pt; margin: 2px 0 0 0; color: #94a3b8;">
+          Se actualizan directamente desde el panel web de Comanda SaaS. El bot los refleja en el siguiente mensaje sin necesidad de reiniciar el ejecutable.
+        </p>
+      </div>
+
+      <!-- Conclusión y Soporte -->
+      <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 10px; text-align: center; margin-top: auto;">
+        <p style="font-size: 8.5pt; color: #e2e8f0; margin: 0; font-weight: 600;">
+          🚀 ¡El Bot Portable de ComandaFast está listo para trabajar en tu local!
+        </p>
+        <p style="font-size: 7.5pt; color: #64748b; margin: 2px 0 0 0;">
+          Para soporte técnico o nuevas funciones, consulta la plataforma oficial en <strong>comandasaas.app</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <span>Comanda SaaS • Guía Técnica del Bot Portable</span>
+      <span class="page-number">06 / 06</span>
+    </div>
+  </div>
+
+</body>
+</html>
