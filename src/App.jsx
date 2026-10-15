@@ -160,6 +160,12 @@ export default function App() {
   // Catalog route: accessible via #catalog, ?mesa=X, #catalog?mesa=X, etc.
   const [isCatalogRoute, setIsCatalogRoute] = useState(() => checkIsCatalogRoute());
   const [isAppRoute, setIsAppRoute] = useState(() => checkIsAppRoute());
+  const [isSimulatorRoute, setIsSimulatorRoute] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hash = (window.location.hash || '').toLowerCase();
+    const search = (window.location.search || '').toLowerCase();
+    return hash === '#simulador' || hash === '#tester' || search.includes('portal=simulador') || search.includes('portal=tester');
+  });
 
   // Secret URL listener and secret keyboard shortcut (Ctrl + Shift + D)
   useEffect(() => {
@@ -172,6 +178,8 @@ export default function App() {
       setIsSaasPortalRoute(isSaas);
       setIsCatalogRoute(checkIsCatalogRoute());
       setIsAppRoute(checkIsAppRoute());
+      const isSim = hash === '#simulador' || hash === '#tester' || search.includes('portal=simulador') || search.includes('portal=tester');
+      setIsSimulatorRoute(isSim);
     };
     handleHash();
     window.addEventListener('hashchange', handleHash);
@@ -1045,6 +1053,77 @@ export default function App() {
       <CatalogPage
         initialCashShift={cashShift}
       />
+    );
+  }
+
+  // SIMULADOR WEB DE CONSOLA Y WHATSAPP (Apto para celulares y desktop)
+  if (isSimulatorRoute) {
+    const simulatorUrl = typeof window !== 'undefined'
+      ? `http://${window.location.hostname}:3002/simulador`
+      : 'http://localhost:3002/simulador';
+
+    return (
+      <div style={{ position: 'fixed', inset: 0, width: '100vw', height: '100dvh', zIndex: 99999, background: '#0b141a', display: 'flex', flexDirection: 'column' }}>
+        <div style={{
+          height: '48px',
+          background: '#202c33',
+          borderBottom: '1px solid #2a3942',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 1rem',
+          color: '#e9edef',
+          flexShrink: 0
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700, fontSize: '0.9rem' }}>
+            <span>🧪</span>
+            <span>Simulador Bot Móvil & Consola</span>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <a
+              href={simulatorUrl}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                fontSize: '0.75rem',
+                color: '#38bdf8',
+                background: 'rgba(56, 189, 248, 0.15)',
+                border: '1px solid rgba(56, 189, 248, 0.3)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                textDecoration: 'none',
+                fontWeight: 600
+              }}
+            >
+              Pestaña Aparte ↗
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.hash = '#pos';
+                setIsSimulatorRoute(false);
+              }}
+              style={{
+                fontSize: '0.75rem',
+                color: '#f87171',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              ✕ Cerrar
+            </button>
+          </div>
+        </div>
+        <iframe
+          src={simulatorUrl}
+          title="Simulador de WhatsApp Bot"
+          style={{ width: '100%', height: 'calc(100% - 48px)', border: 'none', display: 'block' }}
+        />
+      </div>
     );
   }
 

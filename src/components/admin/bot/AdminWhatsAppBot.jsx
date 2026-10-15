@@ -32,6 +32,9 @@ const isSecureHttps = typeof window !== 'undefined' && window.location.protocol 
 const BOT_SERVER_URL = (!isSecureHttps && isLocalNetwork)
   ? `http://${window.location.hostname}:3002`
   : null;
+const SIMULATOR_URL = typeof window !== 'undefined'
+  ? `http://${window.location.hostname}:3002/simulador`
+  : 'http://localhost:3002/simulador';
 
 export default function AdminWhatsAppBot({ initialTab }) {
   const [activeTab, setActiveTab] = useState(initialTab || 'connection'); // 'connection' | 'flows' | 'variables' | 'ai' | 'templates' | 'security'
@@ -1185,7 +1188,7 @@ pause
 
         {/* Botón Laboratorio en Link Aparte */}
         <a
-          href="http://localhost:3002/tester"
+          href={SIMULATOR_URL}
           target="_blank"
           rel="noopener noreferrer"
           style={{
@@ -3630,7 +3633,7 @@ pause
                 ) : (
                   <>
                     <a
-                      href="http://localhost:3002/tester"
+                      href={SIMULATOR_URL}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="cat-pill-btn active"
@@ -4345,7 +4348,7 @@ pause
                   </a>
                   <span>•</span>
                   <a
-                    href="http://localhost:3002/tester"
+                    href={SIMULATOR_URL}
                     target="_blank"
                     rel="noreferrer"
                     style={{ color: 'var(--accent-emerald)', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none', fontWeight: 700 }}
@@ -4388,7 +4391,7 @@ pause
 
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <a
-                  href="http://localhost:3002/tester"
+                  href={SIMULATOR_URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cat-pill-btn active"
@@ -4420,8 +4423,8 @@ pause
               <div style={{ background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '0.85rem' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Enlace Directo Aparte</div>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-blue)', marginTop: '2px' }}>
-                  <a href="http://localhost:3002/tester" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
-                    http://localhost:3002/tester ↗
+                  <a href={SIMULATOR_URL} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                    {SIMULATOR_URL} ↗
                   </a>
                 </div>
               </div>
@@ -4451,7 +4454,7 @@ pause
               background: '#0c1317'
             }}>
               <iframe
-                src="http://localhost:3002/tester"
+                src={SIMULATOR_URL}
                 title="Laboratorio de Pruebas WhatsApp"
                 style={{
                   width: '100%',

@@ -20,11 +20,42 @@ import sys
 import json
 import re
 import time
+import socket
+import threading
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import argparse
+
+def get_local_ip():
+    """Detecta la IP local de la máquina en la red Wi-Fi / Ethernet."""
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception:
+        return "127.0.0.1"
+
+# Estado en memoria para el Simulador Web y Consola
+TESTER_HTML_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tester.html")
+sim_chat_messages = []
+sim_session = {
+    "step": "IDLE",
+    "items": [],
+    "subtotal": 0,
+    "total": 0,
+    "shippingMethod": "local",
+    "shippingAddress": "",
+    "customerName": "Cliente Móvil",
+    "paymentMethod": "efectivo"
+}
+sim_terminal_logs = [
+    f"[{datetime.now().strftime('%H:%M:%S')}] 🟢 Simulador de Consola ComandaFast inicializado.",
+    f"[{datetime.now().strftime('%H:%M:%S')}] 📱 Servidor web y API activos para acceso desde celular."
+]
 
 # Configurar encoding UTF-8 en consolas Windows
 if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
@@ -911,6 +942,16 @@ class BotHttpHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8"))
 
+    def _send_html(self, status_code, html_content):
+        self.send_response(status_code)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+        if isinstance(html_content, str):
+            self.wfile.write(html_content.encode("utf-8"))
+        else:
+            self.wfile.write(html_content)
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -922,6 +963,20 @@ class BotHttpHandler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         store = active_engine.current_store if active_engine else {}
 
+        # 0. Servir el Simulador Web / Consola para Celular y PC
+        accept_hdr = self.headers.get("Accept", "")
+        if path in ["/simulador", "/tester", "/simulador-consola"] or (path == "/" and "text/html" in accept_hdr):
+            if os.path.exists(TESTER_HTML_PATH):
+                try:
+                    with open(TESTER_HTML_PATH, "r", encoding="utf-8") as f:
+                        content = f.read()
+                    self._send_html(200, content)
+                    return
+                except Exception as e:
+                    self._send_html(500, f"<h1>Error al cargar simulador</h1><p>{e}</p>")
+                    return
+
+        # 1. Endpoints de Estado y Health
         if path in ["/", "/health"]:
             self._send_json(200, {
                 "status": "online",
@@ -932,8 +987,16 @@ class BotHttpHandler(BaseHTTPRequestHandler):
                 "store_id": store.get("id"),
                 "bot_mode": active_engine.get_mode() if active_engine else "auto_order",
                 "products_count": len(active_engine.products) if active_engine else 0,
+                "local_ip": get_local_ip(),
+                "simulador_url": f"http://{get_local_ip()}:3002/simulador",
                 "supabase_target": DEFAULT_SUPABASE_URL,
                 "timestamp": datetime.now(timezone.utc).isoformat()
+            })
+        elif path == "/api/network-ip":
+            self._send_json(200, {
+                "ip": get_local_ip(),
+                "port": 3002,
+                "simuladorUrl": f"http://{get_local_ip()}:3002/simulador"
             })
         elif path == "/api/status":
             self._send_json(200, {
@@ -943,6 +1006,29 @@ class BotHttpHandler(BaseHTTPRequestHandler):
                 "slug": store.get("slug", "demo"),
                 "qr": None,
                 "uptime": time.time()
+            })
+        elif path.startswith("/api/bot/tester/state"):
+            vars_dict = active_engine.variables if active_engine else {}
+            prods = active_engine.products if active_engine else []
+            self._send_json(200, {
+                "success": True,
+                "botStatus": "connected",
+                "botUser": f"Python Groq Bot ({active_engine.get_mode().upper() if active_engine else 'AUTO'})",
+                "jid": "sim_cliente@s.whatsapp.net",
+                "isPaused": False,
+                "remainingPauseMinutes": 0,
+                "pauseReason": None,
+                "messages": sim_chat_messages,
+                "session": sim_session,
+                "terminalLogs": sim_terminal_logs[-60:],
+                "businessInfo": {
+                    "nombre_local": store.get("name", "Demo"),
+                    "direccion": store.get("contact_info", {}).get("address", "") if isinstance(store.get("contact_info"), dict) else "",
+                    "horarios": "Miércoles a Domingos 19:30 a 00:30 hs",
+                    "demora": "30 a 45 min",
+                    "alias_banco": vars_dict.get("alias_banco") or "Burgachamical.nx",
+                    "productsCount": len(prods)
+                }
             })
         elif path.startswith("/api/stores/"):
             parts = path.strip("/").split("/")
@@ -966,16 +1052,84 @@ class BotHttpHandler(BaseHTTPRequestHandler):
         except Exception:
             payload = {}
 
-        # 1. Simulador de Chat desde Web o consola
-        if path == "/api/simulate-chat":
-            msg = payload.get("message", "")
-            phone = payload.get("phone", "5491122334455")
+        # 1. Simulador de Chat desde Web, Móvil o Consola
+        if path in ["/api/bot/tester/message", "/api/simulate-chat"]:
+            msg = payload.get("text") or payload.get("message", "")
+            phone = payload.get("jid") or payload.get("phone", "sim_cliente@s.whatsapp.net")
+            clean_phone = re.sub(r"\D", "", phone) or "5491122334455"
+            cust_name = payload.get("name") or "Cliente Móvil"
             store_id = payload.get("store_id")
 
-            result = active_engine.process_message(phone, msg, store_id)
-            self._send_json(200, result)
+            now_ts = int(time.time() * 1000)
+            time_str = datetime.now().strftime("%H:%M:%S")
 
-        # 2. Webhook WhatsApp Oficial (Meta Cloud API / Baileys / Evolution API)
+            # Registrar mensaje del cliente
+            sim_chat_messages.append({
+                "from": "customer",
+                "text": msg,
+                "timestamp": now_ts,
+                "name": cust_name
+            })
+            sim_terminal_logs.append(f"[{time_str}] 👤 CLIENTE: {msg}")
+            print(f"\n[{time_str}] 📱 [SIMULADOR WEB - {cust_name}]: {msg}")
+
+            # Procesar con el motor
+            result = active_engine.process_message(clean_phone, msg, store_id)
+            reply = result.get("reply", "")
+            bot_ts = int(time.time() * 1000)
+
+            # Registrar respuesta del bot
+            sim_chat_messages.append({
+                "from": "bot",
+                "text": reply,
+                "timestamp": bot_ts
+            })
+            sim_terminal_logs.append(f"[{time_str}] 🤖 BOT ({result.get('mode', 'auto')}):\n{reply}")
+            print(f"[{time_str}] 🤖 Bot respondió ({result.get('mode', 'auto')}):\n{reply}\n")
+
+            # Actualizar estado de sesión en memoria
+            if result.get("order_created"):
+                ord_c = result["order_created"]
+                order_id = ord_c.get("id") or ord_c.get("order_number", "N/A")
+                total_val = ord_c.get("total", 0)
+                sim_terminal_logs.append(f"[{time_str}] 🔥 [SUPABASE] ¡Comanda #{order_id} creada en Cocina y POS! Total: ${total_val}")
+                print(f"[{time_str}] 🔥 [SUPABASE] Comanda #{order_id} creada exitosamente!")
+
+                sim_session["step"] = "CONFIRMED"
+                sim_session["items"] = ord_c.get("items", [])
+                sim_session["total"] = total_val
+                sim_session["customerName"] = cust_name
+                sim_session["paymentMethod"] = ord_c.get("payment_method", "efectivo")
+            elif any(w in reply.lower() for w in ["anotadísimo", "anotadisimo", "agregué al pedido", "agregue al pedido"]):
+                sim_session["step"] = "SELECTING"
+
+            self._send_json(200, {
+                "success": True,
+                "jid": phone,
+                "reply": reply,
+                "messages": sim_chat_messages,
+                "session": sim_session,
+                "terminalLogs": sim_terminal_logs[-60:],
+                "order_created": result.get("order_created")
+            })
+
+        # 2. Reset de sesión del simulador
+        elif path == "/api/bot/tester/reset":
+            sim_chat_messages.clear()
+            sim_session["step"] = "IDLE"
+            sim_session["items"] = []
+            sim_session["total"] = 0
+            sim_session["subtotal"] = 0
+            time_str = datetime.now().strftime("%H:%M:%S")
+            sim_terminal_logs.append(f"[{time_str}] 🧹 [RESET] Memoria y carrito vaciados.")
+            print(f"[{time_str}] 🧹 Sesión del simulador reiniciada.")
+            self._send_json(200, {
+                "success": True,
+                "message": "Sesión reiniciada con éxito",
+                "terminalLogs": sim_terminal_logs[-60:]
+            })
+
+        # 3. Webhook WhatsApp Oficial (Meta Cloud API / Baileys / Evolution API)
         elif path == "/api/webhook/whatsapp":
             msg = ""
             phone = ""
@@ -996,7 +1150,7 @@ class BotHttpHandler(BaseHTTPRequestHandler):
             result = active_engine.process_message(phone, msg, store_id)
             self._send_json(200, result)
 
-        # 3. Cambio de negocio en caliente
+        # 4. Cambio de negocio en caliente
         elif path == "/api/switch-store":
             slug = payload.get("slug") or payload.get("store_id")
             if slug:
@@ -1133,18 +1287,49 @@ def main():
             print(f"\n[🔥 COMANDA GENERADA EN SUPABASE -> ID: {res['order_created'].get('id')} | TOTAL: ${res['order_created'].get('total')}]")
         return
 
-    # Si se solicitó modo interactivo
+    local_ip = get_local_ip()
+
+    # Si se solicitó modo interactivo (consola CLI)
     if args.interactive:
+        # Iniciar servidor web en segundo plano para que el celular funcione al mismo tiempo
+        try:
+            httpd = HTTPServer(("", args.port), BotHttpHandler)
+            srv_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+            srv_thread.start()
+            print("\n" + "=" * 65)
+            print("🚀 SIMULADOR WEB Y CONSOLA EN VIVO INICIADO")
+            print(f"   👉 En tu Celular (Wi-Fi): http://{local_ip}:{args.port}/simulador")
+            print(f"   👉 En esta PC:            http://localhost:{args.port}/simulador")
+            print("=" * 65)
+        except Exception as srv_err:
+            try:
+                httpd = HTTPServer(("", 5005), BotHttpHandler)
+                srv_thread = threading.Thread(target=httpd.serve_forever, daemon=True)
+                srv_thread.start()
+                print("\n" + "=" * 65)
+                print("🚀 SIMULADOR WEB Y CONSOLA EN VIVO INICIADO (Puerto 5005)")
+                print(f"   👉 En tu Celular (Wi-Fi): http://{local_ip}:5005/simulador")
+                print(f"   👉 En esta PC:            http://localhost:5005/simulador")
+                print("=" * 65)
+            except Exception:
+                print(f"⚠️ Aviso: No se pudo enlazar el simulador web en segundo plano: {srv_err}")
+
         run_interactive_chat(active_engine)
         return
 
-    # Si no, iniciar servidor HTTP daemon
-    server_address = ("", args.port)
-    httpd = HTTPServer(server_address, BotHttpHandler)
-    print(f"\n🚀 Servidor Webhook & API escuchando en http://localhost:{args.port}")
-    print(f"   • Endpoint Health:     http://localhost:{args.port}/health")
-    print(f"   • Endpoint Webhook:    http://localhost:{args.port}/api/webhook/whatsapp")
-    print(f"   • Endpoint Simulador:  http://localhost:{args.port}/api/simulate-chat")
+    # Si no, iniciar servidor HTTP daemon en primer plano
+    try:
+        httpd = HTTPServer(("", args.port), BotHttpHandler)
+    except OSError:
+        print(f"⚠️ Puerto {args.port} en uso. Iniciando servidor en puerto 5005...")
+        httpd = HTTPServer(("", 5005), BotHttpHandler)
+        args.port = 5005
+
+    print(f"\n🚀 Servidor Webhook & Simulador escuchando:")
+    print(f"   • En tu Celular (Wi-Fi): http://{local_ip}:{args.port}/simulador")
+    print(f"   • En esta PC:            http://localhost:{args.port}/simulador")
+    print(f"   • Endpoint Health:       http://localhost:{args.port}/health")
+    print(f"   • Endpoint Webhook:      http://localhost:{args.port}/api/webhook/whatsapp")
     print(f"\nPresiona Ctrl + C para detener el bot.\n")
 
     try:

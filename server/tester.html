@@ -2,11 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Laboratorio de Pruebas WhatsApp - ComandaFast</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Simulador WhatsApp & Consola Bot — ComandaFast</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg-main: #0c1317;
@@ -24,8 +24,12 @@
       --accent-amber: #f59e0b;
       --accent-blue: #38bdf8;
       --accent-purple: #a855f7;
+      --accent-rose: #f43f5e;
       --border-color: #222d34;
       --border-subtle: rgba(255, 255, 255, 0.08);
+      --term-bg: #090d10;
+      --term-border: #1e293b;
+      --term-text: #38bdf8;
     }
 
     * {
@@ -35,7 +39,6 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* VIEWPORT LOCK: NUNCA PERMITIR QUE EL BODY O HTML SE DESPLACE */
     html, body {
       width: 100%;
       height: 100%;
@@ -64,55 +67,57 @@
 
     /* TOP NAVBAR */
     .top-navbar {
-      height: 56px;
+      height: 54px;
       flex-shrink: 0;
       background-color: var(--bg-panel-header);
       border-bottom: 1px solid var(--border-color);
-      padding: 0 16px;
+      padding: 0 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       z-index: 30;
     }
 
     .brand-section {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .brand-icon {
-      font-size: 22px;
+      font-size: 20px;
       background: rgba(37, 211, 102, 0.15);
       border: 1px solid rgba(37, 211, 102, 0.3);
-      border-radius: 9px;
-      width: 36px;
-      height: 36px;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .brand-title {
-      font-size: 0.98rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--text-primary);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .badge-live {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       background: rgba(16, 185, 129, 0.18);
       color: #34d399;
       border: 1px solid rgba(16, 185, 129, 0.35);
-      padding: 2px 7px;
+      padding: 2px 6px;
       border-radius: 9999px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
     }
 
     .badge-live::before {
@@ -130,10 +135,54 @@
       50% { opacity: 0.4; transform: scale(0.8); }
     }
 
+    /* VIEW SWITCHER TABS */
+    .view-switcher-bar {
+      display: flex;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .view-switch-btn {
+      background: transparent;
+      color: var(--text-secondary);
+      border: none;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .view-switch-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .view-switch-btn.active {
+      background: var(--bg-input);
+      color: #34d399;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+
+    .view-switch-btn.terminal-active {
+      background: #0f172a;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .btn-nav {
@@ -141,13 +190,13 @@
       color: var(--text-primary);
       border: 1px solid var(--border-subtle);
       border-radius: 7px;
-      padding: 6px 11px;
-      font-size: 0.78rem;
+      padding: 5px 9px;
+      font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.15s ease;
       text-decoration: none;
       white-space: nowrap;
@@ -164,11 +213,14 @@
       border: none;
       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     }
-    .btn-nav.accent:hover {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+
+    .btn-nav.mobile-btn {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
     }
 
-    /* MAIN CONTAINER: 2 COLUMNAS FLEXIBLES CON MIN-HEIGHT: 0 */
+    /* MAIN CONTAINER */
     .app-main {
       flex: 1 1 0px;
       min-height: 0;
@@ -178,7 +230,7 @@
       position: relative;
     }
 
-    /* COLUMNA CHAT (ZONA PRINCIPAL) */
+    /* CHAT PANEL */
     .chat-panel {
       flex: 1 1 0px;
       min-width: 0;
@@ -191,12 +243,11 @@
       overflow: hidden;
     }
 
-    /* HEADER DEL CHAT */
     .chat-header {
-      height: 56px;
+      height: 50px;
       flex-shrink: 0;
       background: var(--bg-panel-header);
-      padding: 0 16px;
+      padding: 0 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -207,42 +258,36 @@
     .chat-avatar-info {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .chat-avatar {
-      width: 38px;
-      height: 38px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       background: #2a3942;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
+      font-size: 18px;
       border: 2px solid var(--accent-emerald);
       flex-shrink: 0;
     }
 
     .chat-user-details h3 {
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 700;
       color: var(--text-primary);
       line-height: 1.2;
     }
 
     .chat-user-details p {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: #34d399;
       display: flex;
       align-items: center;
       gap: 4px;
-      margin-top: 2px;
-    }
-
-    .chat-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin-top: 1px;
     }
 
     .customer-pill {
@@ -253,200 +298,148 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-secondary);
     }
 
-    .customer-pill input {
+    .customer-input-name {
       background: transparent;
       border: none;
-      color: #fff;
-      font-size: 0.78rem;
+      color: var(--text-primary);
+      font-size: 0.72rem;
       font-weight: 600;
-      width: 110px;
       outline: none;
+      width: 100px;
     }
 
-    /* CUERPO DE MENSAJES (ÚNICO LUGAR CON SCROLL VERTICAL) */
-    .chat-messages {
+    /* MESSAGES CONTAINER */
+    .chat-messages-container {
       flex: 1 1 0px;
       min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 16px 20px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      background-color: #0b141a;
+      gap: 10px;
       background-image: 
-        radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-      background-size: 22px 22px;
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.015) 1px, transparent 1px),
+        radial-gradient(circle at 0% 0%, rgba(37,211,102,0.03) 0%, transparent 60%);
+      background-size: 24px 24px, 100% 100%;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+
+    .chat-bubble {
+      max-width: 85%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      line-height: 1.45;
       position: relative;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      animation: bubble-appear 0.18s ease-out;
     }
 
-    .chat-messages::-webkit-scrollbar {
-      width: 6px;
-    }
-    .chat-messages::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 3px;
-    }
-    .chat-messages::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.25);
-    }
-
-    /* BURBUJAS DE MENSAJE */
-    .msg-wrapper {
-      display: flex;
-      width: 100%;
-      margin-bottom: 2px;
-      animation: fadeInMsg 0.15s ease-out;
-    }
-
-    @keyframes fadeInMsg {
-      from { opacity: 0; transform: translateY(4px); }
+    @keyframes bubble-appear {
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .msg-wrapper.in {
-      justify-content: flex-start;
+    .chat-bubble.customer {
+      align-self: flex-end;
+      background-color: var(--bubble-out);
+      color: var(--text-primary);
+      border-bottom-right-radius: 2px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
 
-    .msg-wrapper.out {
-      justify-content: flex-end;
-    }
-
-    .msg-bubble {
-      max-width: 76%;
-      min-width: 90px;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-size: 0.86rem;
-      line-height: 1.45;
-      position: relative;
-      word-break: break-word;
-      white-space: pre-wrap;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-    }
-
-    .msg-wrapper.in .msg-bubble {
+    .chat-bubble.bot {
+      align-self: flex-start;
       background-color: var(--bubble-in);
       color: var(--text-primary);
-      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.04);
     }
 
-    .msg-wrapper.out .msg-bubble {
-      background-color: var(--bubble-out);
-      color: #ffffff;
-      border-top-right-radius: 2px;
+    .chat-bubble code {
+      font-family: 'Fira Code', monospace;
+      background: rgba(0,0,0,0.3);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.84rem;
+      color: #fde047;
     }
 
-    .msg-time {
-      font-size: 0.66rem;
-      color: rgba(255, 255, 255, 0.55);
-      float: right;
-      margin-left: 8px;
-      margin-top: 4px;
+    .bubble-meta {
       display: flex;
       align-items: center;
-      gap: 3px;
+      justify-content: flex-end;
+      gap: 4px;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 3px;
       user-select: none;
     }
 
-    .msg-bubble strong {
+    .chat-bubble.customer .bubble-meta {
+      color: rgba(255,255,255,0.7);
+    }
+
+    .ticks-read {
+      color: #53bdeb;
       font-weight: 700;
-      color: #ffffff;
     }
 
-    .msg-bubble em {
-      font-style: italic;
-      color: rgba(255, 255, 255, 0.85);
-    }
-
-    .msg-bubble code {
-      background: rgba(0, 0, 0, 0.35);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      color: #38bdf8;
-      font-size: 0.83rem;
-    }
-
-    /* TYPING INDICATOR DENTRO DEL CONTENEDOR DE MENSAJES */
-    .typing-row {
+    /* TYPING INDICATOR */
+    .typing-indicator {
+      align-self: flex-start;
+      background-color: var(--bubble-in);
+      padding: 8px 14px;
+      border-radius: 8px;
+      border-bottom-left-radius: 2px;
       display: none;
       align-items: center;
-      gap: 6px;
-      background: var(--bubble-in);
-      padding: 8px 14px;
-      border-radius: 10px;
-      border-top-left-radius: 2px;
-      width: fit-content;
-      margin-top: 4px;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      gap: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
     }
 
     .typing-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--text-secondary);
+      width: 6px;
+      height: 6px;
+      background-color: var(--text-secondary);
       border-radius: 50%;
-      animation: typingBounce 1.4s infinite ease-in-out both;
+      animation: typingBounce 1.3s infinite ease-in-out;
     }
-
-    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
     @keyframes typingBounce {
-      0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
-      40% { transform: scale(1); opacity: 1; }
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-5px); opacity: 1; }
     }
 
-    /* BOTÓN FLOTANTE: IR AL FINAL (SCROLL TO BOTTOM) */
-    .btn-scroll-bottom {
-      position: absolute;
-      bottom: 120px;
-      right: 20px;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: var(--bg-panel-header);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 25;
-      transition: all 0.2s ease;
-    }
-
-    .btn-scroll-bottom:hover {
-      background: #2a3942;
-      transform: translateY(-2px);
-    }
-
-    /* FOOTER FIJO DEL CHAT: CONTIENE CHIPS Y BARRA DE ENTRADA */
+    /* CHAT FOOTER & INPUT */
     .chat-footer {
       flex-shrink: 0;
-      background: var(--bg-panel-header);
+      background: var(--bg-panel);
       border-top: 1px solid var(--border-color);
       display: flex;
       flex-direction: column;
       z-index: 20;
     }
 
-    /* BARRA DE CHIPS DE ACCIONES RÁPIDAS (SCROLL HORIZONTAL ÚNICAMENTE) */
     .quick-chips-bar {
-      background: #111b21;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 7px 14px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
       gap: 6px;
       overflow-x: auto;
-      white-space: nowrap;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid var(--border-subtle);
       scrollbar-width: none;
       -webkit-overflow-scrolling: touch;
     }
@@ -457,62 +450,50 @@
       color: var(--text-primary);
       border: 1px solid var(--border-subtle);
       border-radius: 14px;
-      padding: 4px 11px;
-      font-size: 0.75rem;
+      padding: 4px 10px;
+      font-size: 0.72rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s ease;
       display: inline-flex;
       align-items: center;
       gap: 4px;
       flex-shrink: 0;
       user-select: none;
+      transition: all 0.15s ease;
     }
 
-    .chip-btn:hover {
+    .chip-btn:hover, .chip-btn:active {
       background: #37464f;
       border-color: var(--accent-emerald);
       color: #34d399;
-      transform: translateY(-1px);
-    }
-    .chip-btn:active {
-      transform: translateY(0);
     }
 
-    .chip-btn.emerald {
-      border-color: rgba(16, 185, 129, 0.35);
-      color: #34d399;
-    }
-    .chip-btn.amber {
-      border-color: rgba(245, 158, 11, 0.35);
-      color: #fbbf24;
-    }
-    .chip-btn.rose {
-      border-color: rgba(239, 68, 68, 0.35);
-      color: #f87171;
-    }
+    .chip-btn.emerald { border-color: rgba(16, 185, 129, 0.35); color: #34d399; }
+    .chip-btn.amber { border-color: rgba(245, 158, 11, 0.35); color: #fbbf24; }
+    .chip-btn.purple { border-color: rgba(168, 85, 247, 0.35); color: #c084fc; }
+    .chip-btn.blue { border-color: rgba(56, 189, 248, 0.35); color: #38bdf8; }
+    .chip-btn.rose { border-color: rgba(239, 68, 68, 0.35); color: #f87171; }
 
-    /* BARRA DE INPUT FIJA */
     .chat-input-bar {
-      height: 58px;
+      height: 54px;
       background: var(--bg-panel-header);
-      padding: 0 14px;
+      padding: 0 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .chat-input-field {
       flex: 1;
-      height: 40px;
+      height: 38px;
       background: var(--bg-input);
       border: 1px solid transparent;
       color: var(--text-primary);
-      font-size: 0.9rem;
-      padding: 0 14px;
+      font-size: 0.88rem;
+      padding: 0 12px;
       border-radius: 8px;
       outline: none;
-      transition: border-color 0.2s, background-color 0.2s;
+      transition: border-color 0.2s;
     }
 
     .chat-input-field:focus {
@@ -525,35 +506,157 @@
       color: white;
       border: none;
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 38px;
+      height: 38px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.15s, background-color 0.2s;
       box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
       flex-shrink: 0;
     }
 
-    .btn-send:hover {
-      background: #059669;
-      transform: scale(1.05);
+    /* TERMINAL CONSOLE PANEL */
+    .terminal-panel {
+      flex: 1 1 0px;
+      min-width: 0;
+      min-height: 0;
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      background-color: var(--term-bg);
+      position: relative;
+      overflow: hidden;
+      font-family: 'Fira Code', monospace;
     }
 
-    .btn-send:active {
-      transform: scale(0.95);
+    .terminal-header {
+      height: 42px;
+      flex-shrink: 0;
+      background: #0f172a;
+      border-bottom: 1px solid var(--term-border);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .btn-send:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
+    .terminal-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    /* SIDEBAR INSPECTOR (COLUMNA DERECHA CON SCROLL PROPIO) */
+    .term-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .term-dot.red { background: #ef4444; }
+    .term-dot.yellow { background: #f59e0b; }
+    .term-dot.green { background: #10b981; }
+
+    .terminal-title {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .terminal-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-term-action {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.68rem;
+      font-family: 'Fira Code', monospace;
+      cursor: pointer;
+    }
+
+    .btn-term-action:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+    }
+
+    .terminal-body {
+      flex: 1 1 0px;
+      min-height: 0;
+      padding: 12px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: #cbd5e1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .term-line {
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .term-line.client { color: #34d399; }
+    .term-line.bot { color: #e2e8f0; }
+    .term-line.ai { color: #fbbf24; }
+    .term-line.transfer { color: #c084fc; }
+    .term-line.receipt { color: #38bdf8; }
+    .term-line.order { color: #f87171; font-weight: 700; background: rgba(239, 68, 68, 0.1); padding: 4px 8px; border-radius: 4px; border-left: 3px solid #ef4444; }
+    .term-line.system { color: #94a3b8; }
+
+    .terminal-input-bar {
+      height: 48px;
+      flex-shrink: 0;
+      background: #0f172a;
+      border-top: 1px solid var(--term-border);
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-prompt {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      color: #38bdf8;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .terminal-input {
+      flex: 1;
+      height: 32px;
+      background: transparent;
+      border: none;
+      color: #f8fafc;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .terminal-btn-send {
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* SIDEBAR INSPECTOR */
     .sidebar-inspector {
-      width: 350px;
+      width: 320px;
       flex-shrink: 0;
       height: 100%;
       min-height: 0;
@@ -566,16 +669,8 @@
       z-index: 10;
     }
 
-    .sidebar-inspector::-webkit-scrollbar {
-      width: 5px;
-    }
-    .sidebar-inspector::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 3px;
-    }
-
     .inspector-header {
-      padding: 14px 16px;
+      padding: 12px 14px;
       background: var(--bg-panel-header);
       border-bottom: 1px solid var(--border-color);
       display: flex;
@@ -587,7 +682,7 @@
     }
 
     .inspector-header h2 {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: var(--text-primary);
       display: flex;
@@ -596,119 +691,175 @@
     }
 
     .inspector-section {
-      padding: 14px 16px;
+      padding: 12px 14px;
       border-bottom: 1px solid var(--border-color);
     }
 
     .section-title {
       font-size: 0.7rem;
       text-transform: uppercase;
-      font-weight: 700;
       letter-spacing: 0.05em;
-      color: var(--text-secondary);
+      color: var(--text-muted);
+      font-weight: 700;
       margin-bottom: 8px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
     }
 
     .step-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 7px;
-      font-size: 0.78rem;
-      font-weight: 800;
-      width: 100%;
-      justify-content: center;
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
     }
-    .step-badge.idle { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
-    .step-badge.selecting { background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-    .step-badge.ask_shipping_method, .step-badge.ask_shipping { background: rgba(245, 158, 11, 0.18); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .step-badge.ask_payment, .step-badge.confirming { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .step-badge.confirmed {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
 
     .cart-box {
-      background: #182229;
+      background: var(--bg-chat);
       border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-
-    .cart-empty {
+      border-radius: 6px;
+      padding: 8px;
+      min-height: 50px;
+      max-height: 160px;
+      overflow-y: auto;
       font-size: 0.78rem;
-      color: var(--text-muted);
-      text-align: center;
-      padding: 10px 0;
     }
 
     .cart-item {
       display: flex;
       justify-content: space-between;
-      font-size: 0.8rem;
-      padding: 5px 0;
-      border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(255,255,255,0.06);
     }
-    .cart-item:last-child { border-bottom: none; }
 
     .cart-total-line {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.15);
-      font-size: 0.88rem;
+      padding-top: 6px;
       font-weight: 800;
       color: #34d399;
+      font-size: 0.85rem;
     }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      font-size: 0.78rem;
-    }
     .info-row {
       display: flex;
       justify-content: space-between;
+      font-size: 0.75rem;
+      padding: 3px 0;
       color: var(--text-secondary);
     }
     .info-row span:last-child {
       color: var(--text-primary);
       font-weight: 600;
-      text-align: right;
     }
 
-    /* KDS NOTICE CARD */
-    .kds-card {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.05) 100%);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+    /* SCROLL TO BOTTOM BUTTON */
+    .btn-scroll-bottom {
+      position: absolute;
+      bottom: 120px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 15;
+    }
+
+    /* MODAL CELULAR QR */
+    .mobile-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 1rem;
+    }
+
+    .mobile-modal-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      max-width: 400px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 14px;
+    }
+
+    .qr-img-box {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-img-box img {
+      width: 190px;
+      height: 190px;
+      display: block;
+    }
+
+    .link-copy-box {
+      background: var(--bg-main);
+      border: 1px solid var(--border-subtle);
       border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.76rem;
-      line-height: 1.45;
-      color: #d1fae5;
+      padding: 8px 12px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
 
-    .kds-card a {
-      color: #34d399;
-      font-weight: 700;
-      text-decoration: underline;
+    .link-copy-box input {
+      background: transparent;
+      border: none;
+      color: #38bdf8;
+      font-size: 0.8rem;
+      font-family: 'Fira Code', monospace;
+      outline: none;
+      width: 100%;
     }
 
-    /* RESPONSIVE TOGGLE SIDEBAR */
-    @media (max-width: 900px) {
+    @media (max-width: 800px) {
       .sidebar-inspector {
         position: absolute;
         top: 0;
         right: 0;
         bottom: 0;
-        width: 320px;
-        box-shadow: -4px 0 20px rgba(0,0,0,0.5);
+        width: 100%;
         display: none;
       }
       .sidebar-inspector.show {
         display: flex;
+      }
+      .brand-title span.badge-live {
+        display: none;
       }
     }
   </style>
@@ -717,102 +868,111 @@
 
   <div class="tester-layout">
     
-    <!-- TOP NAVBAR (SIEMPRE FIJA ARRIBA) -->
+    <!-- TOP NAVBAR -->
     <header class="top-navbar">
       <div class="brand-section">
         <div class="brand-icon">🍔</div>
-        <div>
-          <div class="brand-title">
-            ComandaFast Bot Tester
-            <span class="badge-live" id="botStatusBadge">En Vivo (3002)</span>
-          </div>
+        <div class="brand-title">
+          <span>ComandaFast Bot</span>
+          <span class="badge-live" id="botStatusBadge">En Vivo (3002)</span>
         </div>
       </div>
 
+      <!-- VIEW MODE SWITCHER TABS -->
+      <div class="view-switcher-bar">
+        <button type="button" class="view-switch-btn active" id="btnTabChat" title="Vista interactiva estilo WhatsApp">
+          💬 WhatsApp
+        </button>
+        <button type="button" class="view-switch-btn" id="btnTabTerminal" title="Vista Consola de comandos y terminal en vivo">
+          💻 Consola CLI
+        </button>
+        <button type="button" class="view-switch-btn" id="btnTabInspector" title="Ver carrito y variables de la tienda">
+          🔍 Carrito
+        </button>
+      </div>
+
+      <!-- ACTIONS -->
       <div class="nav-actions">
+        <button type="button" class="btn-nav mobile-btn" id="btnOpenMobileModal" title="Probar desde mi teléfono móvil vía WiFi">
+          📱 Celular
+        </button>
+        <button type="button" class="btn-nav" id="btnResetSession" title="Reiniciar memoria y carrito">
+          🔄 Reset
+        </button>
         <button type="button" class="btn-nav" id="btnToggleSound" title="Silenciar / Activar sonido">
           <span id="soundIcon">🔊</span>
         </button>
-        <button type="button" class="btn-nav" id="btnResetSession" title="Reiniciar memoria y carrito del cliente">
-          🔄 Reiniciar Sesión
-        </button>
-        <button type="button" class="btn-nav" id="btnClearChat" title="Limpiar pantalla de mensajes">
-          🧹 Limpiar
-        </button>
-        <button type="button" class="btn-nav" id="btnToggleSidebar" title="Mostrar / Ocultar Inspector lateral">
-          🔍 Inspector
-        </button>
-        <a href="http://localhost:5173" target="_blank" class="btn-nav accent" title="Abrir sistema POS / Cocina">
-          📋 Abrir POS / KDS ↗
-        </a>
       </div>
     </header>
 
     <!-- MAIN CONTAINER -->
     <div class="app-main">
       
-      <!-- CHAT PANEL -->
-      <section class="chat-panel">
-        
-        <!-- Chat Header Fijo -->
+      <!-- 1. CHAT PANEL (WHATSAPP VIEW) -->
+      <section class="chat-panel" id="chatPanel">
         <div class="chat-header">
           <div class="chat-avatar-info">
             <div class="chat-avatar">🤖</div>
             <div class="chat-user-details">
               <h3 id="storeNameLabel">Burga's Chamical Bot</h3>
-              <p><span style="display:inline-block;width:7px;height:7px;background:#10b981;border-radius:50%"></span> En línea • Multi-Device Baileys</p>
+              <p><span>●</span> en línea (IA Groq + Auto-Order)</p>
             </div>
           </div>
 
-          <div class="chat-controls">
-            <div class="customer-pill" title="Nombre del cliente simulado">
-              <span>👤 Cliente:</span>
-              <input type="text" id="inputCustomerName" value="Martín Gómez" placeholder="Tu Nombre" />
-            </div>
+          <div class="customer-pill" title="Nombre del cliente para el pedido">
+            <span>👤</span>
+            <input type="text" class="customer-input-name" id="inputCustomerName" value="Cliente Móvil" placeholder="Tu nombre" />
           </div>
         </div>
 
-        <!-- Mensajes (Área con scroll vertical exclusivo) -->
-        <div class="chat-messages" id="chatMessagesContainer">
-          <!-- Dynamic messages -->
-          <div class="typing-row" id="typingIndicator">
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
-            <span class="typing-dot"></span>
+        <!-- Scrollable Messages -->
+        <div class="chat-messages-container" id="chatMessagesContainer">
+          <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
           </div>
         </div>
 
-        <!-- Botón flotante para volver abajo -->
-        <button type="button" class="btn-scroll-bottom" id="btnScrollBottom" title="Bajar al último mensaje">
-          ↓
-        </button>
+        <button type="button" class="btn-scroll-bottom" id="btnScrollBottom">↓</button>
 
-        <!-- FOOTER FIJO: ACCIONES RÁPIDAS + ENTRADA DE TEXTO -->
+        <!-- Footer -->
         <footer class="chat-footer">
-          
-          <!-- Quick Action Chips -->
+          <!-- QUICK TEST CHIPS -->
           <div class="quick-chips-bar">
-            <button type="button" class="chip-btn emerald" onclick="sendQuickText('Hola')">👋 HOLA</button>
-            <button type="button" class="chip-btn emerald" onclick="sendQuickText('MENU')">🍔 MENÚ</button>
-            <button type="button" class="chip-btn" onclick="sendQuickText('1')">1️⃣ CHEESE</button>
-            <button type="button" class="chip-btn" onclick="sendQuickText('2')">2️⃣ BAJONERA</button>
-            <button type="button" class="chip-btn" onclick="sendQuickText('CARTA')">📋 CARTA COMPLETA</button>
-            <button type="button" class="chip-btn amber" onclick="sendQuickText('LISTO')">🛒 LISTO (Avanzar)</button>
-            <button type="button" class="chip-btn" onclick="sendQuickText('1')">🛍️ 1 (Retiro Local)</button>
-            <button type="button" class="chip-btn" onclick="sendQuickText('2')">🛵 2 (Delivery)</button>
-            <button type="button" class="chip-btn emerald" onclick="sendQuickText('1')">💵 1 (Efectivo)</button>
-            <button type="button" class="chip-btn emerald" onclick="sendQuickText('2')">💳 2 (Transferencia)</button>
-            <button type="button" class="chip-btn emerald" onclick="sendQuickText('SI')">✅ SI (Confirmar)</button>
-            <button type="button" class="chip-btn rose" onclick="sendQuickText('CANCELAR')">❌ CANCELAR</button>
+            <button type="button" class="chip-btn emerald" onclick="sendQuickText('quiero 2 burguer clasica una papas cheddar y una cerveza ipa')">
+              🍔 2 Clásica + Cheddar + Birra
+            </button>
+            <button type="button" class="chip-btn emerald" onclick="sendQuickText('quiero unas papas cheddar')">
+              🍟 Papas Cheddar
+            </button>
+            <button type="button" class="chip-btn purple" onclick="sendQuickText('pasame los datos para transferir')">
+              💳 Datos Transferencia
+            </button>
+            <button type="button" class="chip-btn blue" onclick="sendQuickText('ya transferí, acá te mando el comprobante')">
+              📸 Enviar Comprobante
+            </button>
+            <button type="button" class="chip-btn amber" onclick="sendQuickText('pago en efectivo al recibir')">
+              💵 Pago Efectivo
+            </button>
+            <button type="button" class="chip-btn" onclick="sendQuickText('mi direccion es Belgrano 450')">
+              📍 Dirección Delivery
+            </button>
+            <button type="button" class="chip-btn emerald" onclick="sendQuickText('SI')">
+              ✅ SI (Confirmar)
+            </button>
+            <button type="button" class="chip-btn rose" onclick="sendQuickText('CANCELAR')">
+              ❌ CANCELAR
+            </button>
           </div>
 
-          <!-- Input Bar (Fijo abajo, nunca se mueve) -->
+          <!-- Input Bar -->
           <form class="chat-input-bar" id="chatInputForm">
             <input 
               type="text" 
               class="chat-input-field" 
               id="chatInputField" 
-              placeholder="Escribí un mensaje al bot... (Ej: Hola, 1, Quiero una burger)" 
+              placeholder="Escribí un mensaje al bot... o tocá un botón arriba" 
               autocomplete="off" 
             />
             <button type="submit" class="btn-send" id="btnSendMsg" title="Enviar mensaje">
@@ -822,12 +982,42 @@
               </svg>
             </button>
           </form>
-
         </footer>
-
       </section>
 
-      <!-- SIDEBAR INSPECTOR (COLUMNA DERECHA) -->
+      <!-- 2. TERMINAL PANEL (CONSOLA CLI VIEW) -->
+      <section class="terminal-panel" id="terminalPanel">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="term-dot red"></span>
+            <span class="term-dot yellow"></span>
+            <span class="term-dot green"></span>
+          </div>
+          <div class="terminal-title">bash — comandafast-bot-simulator (Consola CLI)</div>
+          <div class="terminal-actions">
+            <button type="button" class="btn-term-action" id="btnClearTerminal">🧹 Limpiar</button>
+            <button type="button" class="btn-term-action" id="btnCopyTerminal">📋 Copiar</button>
+          </div>
+        </div>
+
+        <div class="terminal-body" id="terminalLogBody">
+          <div class="term-line system">[00:00:00] 🟢 Consola interactiva inicializada. Listo para procesar mensajes.</div>
+        </div>
+
+        <form class="terminal-input-bar" id="terminalInputForm">
+          <span class="terminal-prompt">cliente@bot:~$</span>
+          <input 
+            type="text" 
+            class="terminal-input" 
+            id="terminalInput" 
+            placeholder="Escribí un mensaje o comando al bot (Ej: 2 burguer clasica y papas cheddar)..." 
+            autocomplete="off"
+          />
+          <button type="submit" class="terminal-btn-send">ENTER</button>
+        </form>
+      </section>
+
+      <!-- 3. SIDEBAR INSPECTOR -->
       <aside class="sidebar-inspector" id="sidebarInspector">
         <div class="inspector-header">
           <h2>🔍 Inspector de Sesión</h2>
@@ -837,7 +1027,7 @@
         <!-- Paso Conversacional -->
         <div class="inspector-section">
           <div class="section-title">Paso Conversacional</div>
-          <div class="step-badge idle" id="sessionStepBadge">IDLE (Inactivo)</div>
+          <div class="step-badge" id="sessionStepBadge">IDLE (Inactivo)</div>
         </div>
 
         <!-- Carrito -->
@@ -847,58 +1037,72 @@
             <span id="cartCountBadge" style="color:#38bdf8;font-weight:700">0 items</span>
           </div>
           <div class="cart-box" id="cartItemsBox">
-            <div class="cart-empty">El carrito está vacío.</div>
+            <div class="cart-empty" style="color:var(--text-muted);font-size:0.75rem;">El carrito está vacío.</div>
           </div>
         </div>
 
         <!-- Variables del Negocio -->
         <div class="inspector-section">
-          <div class="section-title">Variables Activas del Local</div>
+          <div class="section-title">Variables del Local</div>
           <div class="info-grid">
             <div class="info-row">
               <span>Local:</span>
               <span id="infoStoreName">Burga's Chamical</span>
             </div>
             <div class="info-row">
+              <span>Alias Banco:</span>
+              <span id="infoAlias" style="color:#c084fc;">Burgachamical.nx</span>
+            </div>
+            <div class="info-row">
               <span>Demora:</span>
               <span id="infoDelay">30 a 45 min</span>
             </div>
             <div class="info-row">
-              <span>Horarios:</span>
-              <span id="infoHours">Martes a Domingos 19:30 hs</span>
-            </div>
-            <div class="info-row">
               <span>Productos:</span>
-              <span id="infoProductsCount">32 sincronizados</span>
+              <span id="infoProductsCount">Sincronizados</span>
             </div>
           </div>
         </div>
 
-        <!-- Simulación Pedido Web -->
+        <!-- Inyección Rápida -->
         <div class="inspector-section">
-          <div class="section-title">Test Rápido Catálogo Web</div>
+          <div class="section-title">Pruebas Rápidas</div>
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <button type="button" class="btn-nav" id="btnSimulateWebOrder" style="width:100%;justify-content:center;font-size:0.75rem;padding:7px 10px;" title="Simular pedido entrante desde la carta web en Efectivo">
-              💵 Inyectar Pedido (Efectivo)
+            <button type="button" class="btn-nav" id="btnSimulateWebOrder" style="width:100%;justify-content:center;font-size:0.75rem;">
+              💵 Pedido Web (Efectivo)
             </button>
-            <button type="button" class="btn-nav" id="btnSimulateWebOrderTransfer" style="width:100%;justify-content:center;font-size:0.75rem;padding:7px 10px;background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);" title="Simular pedido entrante desde la carta web con Transferencia">
-              💳 Inyectar Pedido (Transferencia)
+            <button type="button" class="btn-nav" id="btnSimulateWebOrderTransfer" style="width:100%;justify-content:center;font-size:0.75rem;background:rgba(99,102,241,0.15);color:#818cf8;border:1px solid rgba(99,102,241,0.3);">
+              💳 Pedido Web (Transferencia)
             </button>
-          </div>
-        </div>
-
-        <!-- Integración Cocina -->
-        <div class="inspector-section">
-          <div class="section-title">Circuito de Cocina KDS</div>
-          <div class="kds-card">
-            🔥 <strong>Sincronización en Vivo:</strong><br>
-            Al confirmar con <strong>"SI"</strong>, el bot crea la orden en 
-            <a href="http://localhost:5173" target="_blank">ComandaFast POS</a>.
-            Cuando un cocinero presione <strong>¡Listo!</strong> o <strong>Despachar</strong> en el KDS, verás llegar el aviso automático aquí en segundos.
           </div>
         </div>
       </aside>
 
+    </div>
+
+    <!-- MODAL CELULAR QR -->
+    <div class="mobile-modal-overlay" id="mobileModalOverlay">
+      <div class="mobile-modal-card">
+        <h3 style="font-size:1.1rem;color:var(--text-primary);">📱 Probar desde tu Celular</h3>
+        <p style="font-size:0.8rem;color:var(--text-secondary);line-height:1.4;">
+          Conectá tu celular al <strong>mismo Wi-Fi</strong> y escaneá este código QR con la cámara o abrí el enlace:
+        </p>
+        
+        <div class="qr-img-box">
+          <img id="qrCodeImage" src="" alt="Código QR para celular" />
+        </div>
+
+        <div class="link-copy-box">
+          <input type="text" id="mobileUrlInput" readonly />
+          <button type="button" class="btn-nav" id="btnCopyMobileUrl" style="flex-shrink:0;">
+            Copiar
+          </button>
+        </div>
+
+        <button type="button" class="btn-nav" id="btnCloseMobileModal" style="width:100%;justify-content:center;margin-top:4px;">
+          Entendido, cerrar
+        </button>
+      </div>
     </div>
 
   </div>
@@ -918,13 +1122,24 @@
     const btnScrollBottom = document.getElementById('btnScrollBottom');
     const btnSendMsg = document.getElementById('btnSendMsg');
     const sidebarInspector = document.getElementById('sidebarInspector');
+    const chatPanel = document.getElementById('chatPanel');
+    const terminalPanel = document.getElementById('terminalPanel');
+    const terminalLogBody = document.getElementById('terminalLogBody');
+    const terminalInputForm = document.getElementById('terminalInputForm');
+    const terminalInput = document.getElementById('terminalInput');
+
+    const btnTabChat = document.getElementById('btnTabChat');
+    const btnTabTerminal = document.getElementById('btnTabTerminal');
+    const btnTabInspector = document.getElementById('btnTabInspector');
 
     let currentMessages = [];
     let isSending = false;
     let soundEnabled = localStorage.getItem('cf_bot_tester_sound') !== 'false';
     let userHasScrolledUp = false;
+    let activeViewMode = 'chat'; // 'chat' | 'terminal' | 'inspector'
+    let detectedMobileUrl = window.location.href;
 
-    // Actualizar icono de sonido
+    // ACTUALIZAR SONIDO
     function updateSoundIcon() {
       document.getElementById('soundIcon').textContent = soundEnabled ? '🔊' : '🔇';
     }
@@ -936,15 +1151,39 @@
       updateSoundIcon();
     });
 
-    document.getElementById('btnToggleSidebar').addEventListener('click', () => {
-      if (window.innerWidth <= 900) {
+    // CAMBIAR PESTAÑAS DE VISTA
+    function setViewMode(mode) {
+      activeViewMode = mode;
+      btnTabChat.classList.toggle('active', mode === 'chat');
+      btnTabTerminal.classList.toggle('terminal-active', mode === 'terminal');
+      btnTabInspector.classList.toggle('active', mode === 'inspector');
+
+      if (mode === 'chat') {
+        chatPanel.style.display = 'flex';
+        terminalPanel.style.display = 'none';
+        if (window.innerWidth <= 800) sidebarInspector.classList.remove('show');
+        scrollToBottom(true);
+      } else if (mode === 'terminal') {
+        chatPanel.style.display = 'none';
+        terminalPanel.style.display = 'flex';
+        if (window.innerWidth <= 800) sidebarInspector.classList.remove('show');
+        scrollTerminalToBottom();
+      } else if (mode === 'inspector') {
+        sidebarInspector.classList.add('show');
+      }
+    }
+
+    btnTabChat.addEventListener('click', () => setViewMode('chat'));
+    btnTabTerminal.addEventListener('click', () => setViewMode('terminal'));
+    btnTabInspector.addEventListener('click', () => {
+      if (window.innerWidth <= 800) {
         sidebarInspector.classList.toggle('show');
       } else {
         sidebarInspector.style.display = (sidebarInspector.style.display === 'none') ? 'flex' : 'none';
       }
     });
 
-    // Sonido suave de mensaje usando Web Audio API
+    // SONIDO WEB AUDIO API
     function playChime() {
       if (!soundEnabled) return;
       try {
@@ -952,8 +1191,8 @@
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
-        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); // A5
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
         osc.connect(gain);
@@ -963,7 +1202,7 @@
       } catch (_) {}
     }
 
-    // Scroll inteligente exclusivo del contenedor de mensajes
+    // SCROLL CHAT
     function scrollToBottom(force = false) {
       if (!messagesContainer) return;
       if (force || !userHasScrolledUp) {
@@ -971,7 +1210,6 @@
       }
     }
 
-    // Detectar si el usuario scrolleó hacia arriba para no robarle la vista
     messagesContainer.addEventListener('scroll', () => {
       const threshold = 80;
       const atBottom = (messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight) <= threshold;
@@ -985,14 +1223,39 @@
       btnScrollBottom.style.display = 'none';
     });
 
+    // SCROLL TERMINAL
+    function scrollTerminalToBottom() {
+      if (terminalLogBody) {
+        terminalLogBody.scrollTop = terminalLogBody.scrollHeight;
+      }
+    }
+
+    // AGREGAR LOG A LA CONSOLA TERMINAL
+    function appendTerminalLog(line, type = 'system') {
+      if (!terminalLogBody) return;
+      const el = document.createElement('div');
+      el.className = `term-line ${type}`;
+      el.textContent = line;
+      terminalLogBody.appendChild(el);
+      scrollTerminalToBottom();
+    }
+
+    document.getElementById('btnClearTerminal').addEventListener('click', () => {
+      terminalLogBody.innerHTML = '<div class="term-line system">[Consola limpiada por el usuario]</div>';
+    });
+
+    document.getElementById('btnCopyTerminal').addEventListener('click', () => {
+      const txt = Array.from(terminalLogBody.querySelectorAll('.term-line')).map(l => l.textContent).join('\n');
+      navigator.clipboard.writeText(txt).then(() => alert('¡Logs de la consola copiados al portapapeles!'));
+    });
+
+    // FORMAT TEXT (MARKDOWN)
     function formatText(txt) {
       if (!txt) return '';
       let escaped = txt
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-
-      // WhatsApp Markdown
       escaped = escaped.replace(/\*(.*?)\*/g, '<strong>$1</strong>');
       escaped = escaped.replace(/_(.*?)_/g, '<em>$1</em>');
       escaped = escaped.replace(/`(.*?)`/g, '<code>$1</code>');
@@ -1004,7 +1267,6 @@
       const hadNewMessages = msgs.length > currentMessages.length;
       currentMessages = msgs;
 
-      // Preservar typingIndicator
       const typingEl = typingIndicator;
       messagesContainer.innerHTML = '';
 
@@ -1012,9 +1274,9 @@
         const welcome = document.createElement('div');
         welcome.style.cssText = 'text-align:center;color:var(--text-muted);font-size:0.82rem;margin:auto 0;padding:20px;line-height:1.6;';
         welcome.innerHTML = `
-          👋 <strong>¡Bienvenido al Laboratorio en Vivo de ComandaFast!</strong><br><br>
-          Este chat interactúa con el servidor de WhatsApp encendido en tu PC.<br>
-          Probá enviar <code>HOLA</code> o hacé click en los botones de abajo.
+          👋 <strong>¡Bienvenido al Simulador WhatsApp & Consola!</strong><br><br>
+          Probá pedir: <code>quiero 2 burguer clasica y unas papas cheddar</code><br>
+          o tocá los botones rápidos para probar transferencia y comprobante.
         `;
         messagesContainer.appendChild(welcome);
         messagesContainer.appendChild(typingEl);
@@ -1022,35 +1284,28 @@
       }
 
       msgs.forEach(m => {
-        const isOut = m.from === 'customer';
-        const wrapper = document.createElement('div');
-        wrapper.className = `msg-wrapper ${isOut ? 'out' : 'in'}`;
+        const bubble = document.createElement('div');
+        const isCustomer = m.from === 'customer';
+        bubble.className = `chat-bubble ${isCustomer ? 'customer' : 'bot'}`;
 
-        const timeStr = m.timestamp 
-          ? new Date(m.timestamp).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) 
-          : new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+        const textDiv = document.createElement('div');
+        textDiv.innerHTML = formatText(m.text || '');
+        bubble.appendChild(textDiv);
 
-        let imageHtml = '';
-        if (m.imageUrl) {
-          imageHtml = `<img src="${m.imageUrl}" style="max-width:100%;border-radius:6px;margin-bottom:6px;display:block;" />`;
-        }
+        const meta = document.createElement('div');
+        meta.className = 'bubble-meta';
+        const d = m.timestamp ? new Date(m.timestamp) : new Date();
+        const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        wrapper.innerHTML = `
-          <div class="msg-bubble">
-            ${imageHtml}
-            <div>${formatText(m.text || '')}</div>
-            <div class="msg-time">
-              ${timeStr}
-              ${isOut ? '<span style="color:#53bdeb;margin-left:2px;">✓✓</span>' : ''}
-            </div>
-          </div>
+        meta.innerHTML = `
+          <span>${timeStr}</span>
+          ${isCustomer ? '<span class="ticks-read">✓✓</span>' : ''}
         `;
-        messagesContainer.appendChild(wrapper);
+        bubble.appendChild(meta);
+        messagesContainer.appendChild(bubble);
       });
 
-      // Asegurar que el typingIndicator esté siempre al final
       messagesContainer.appendChild(typingEl);
-
       scrollToBottom(false);
 
       if (hadNewMessages) {
@@ -1058,52 +1313,41 @@
       }
     }
 
-    function updateSessionInspector(session, biz, isPaused, remainingPauseMinutes, pauseReason) {
+    function updateSessionInspector(session, biz) {
       if (biz) {
         if (biz.nombre_local) {
           storeNameLabel.textContent = biz.nombre_local + ' Bot';
           document.getElementById('infoStoreName').textContent = biz.nombre_local;
         }
+        if (biz.alias_banco) document.getElementById('infoAlias').textContent = biz.alias_banco;
         if (biz.demora) document.getElementById('infoDelay').textContent = biz.demora;
-        if (biz.horarios) document.getElementById('infoHours').textContent = biz.horarios;
         if (biz.productsCount) document.getElementById('infoProductsCount').textContent = biz.productsCount + ' sincronizados';
       }
 
-      if (isPaused) {
+      if (!session) {
         sessionStepBadge.className = 'step-badge';
-        sessionStepBadge.style.background = 'rgba(239, 68, 68, 0.2)';
-        sessionStepBadge.style.color = '#f87171';
-        sessionStepBadge.style.border = '1px solid rgba(239, 68, 68, 0.4)';
-        sessionStepBadge.textContent = `⏸️ PAUSADO (${remainingPauseMinutes}m) - Cajera`;
-      } else if (!session) {
-        sessionStepBadge.className = 'step-badge idle';
-        sessionStepBadge.style.background = '';
-        sessionStepBadge.style.color = '';
-        sessionStepBadge.style.border = '';
         sessionStepBadge.textContent = 'IDLE (Inactivo)';
         cartCountBadge.textContent = '0 items';
-        cartItemsBox.innerHTML = '<div class="cart-empty">El carrito está vacío.</div>';
+        cartItemsBox.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem;">El carrito está vacío.</div>';
         return;
-      } else {
-        const step = (session.step || 'IDLE').toUpperCase();
-        sessionStepBadge.textContent = step;
-        sessionStepBadge.className = `step-badge ${step.toLowerCase()}`;
-        sessionStepBadge.style.background = '';
-        sessionStepBadge.style.color = '';
-        sessionStepBadge.style.border = '';
       }
+
+      const step = (session.step || 'IDLE').toUpperCase();
+      sessionStepBadge.textContent = step;
+      sessionStepBadge.className = `step-badge ${step === 'CONFIRMED' ? 'confirmed' : ''}`;
 
       const items = session.items || [];
       cartCountBadge.textContent = `${items.length} ${items.length === 1 ? 'item' : 'items'}`;
 
       if (items.length === 0) {
-        cartItemsBox.innerHTML = '<div class="cart-empty">El carrito está vacío.</div>';
+        cartItemsBox.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem;">El carrito está vacío.</div>';
       } else {
         let html = '';
         let total = 0;
         items.forEach(it => {
           const qty = it.qty || it.quantity || 1;
-          const sub = (it.price || 0) * qty;
+          const price = it.price || it.unitPrice || 0;
+          const sub = price * qty;
           total += sub;
           html += `
             <div class="cart-item">
@@ -1122,6 +1366,7 @@
       }
     }
 
+    // FETCH STATE
     async function fetchState() {
       try {
         const res = await fetch(`/api/bot/tester/state?jid=${encodeURIComponent(TEST_JID)}`);
@@ -1131,16 +1376,31 @@
           if (data.messages && data.messages.length !== currentMessages.length) {
             renderMessages(data.messages);
           }
-          updateSessionInspector(data.session, data.businessInfo, data.isPaused, data.remainingPauseMinutes, data.pauseReason);
+          updateSessionInspector(data.session, data.businessInfo);
+          if (data.terminalLogs && Array.isArray(data.terminalLogs)) {
+            // Render terminal logs if empty or updated
+            if (terminalLogBody.children.length <= 1) {
+              terminalLogBody.innerHTML = '';
+              data.terminalLogs.forEach(l => {
+                let type = 'system';
+                if (l.includes('CLIENTE:')) type = 'client';
+                else if (l.includes('BOT')) type = 'bot';
+                else if (l.includes('IA GROQ')) type = 'ai';
+                else if (l.includes('TRANSFERENCIA')) type = 'transfer';
+                else if (l.includes('COMPROBANTE')) type = 'receipt';
+                else if (l.includes('SUPABASE')) type = 'order';
+                appendTerminalLog(l, type);
+              });
+            }
+          }
           if (data.botStatus === 'connected') {
             botStatusBadge.textContent = 'En Vivo (3002)';
-            botStatusBadge.style.background = 'rgba(16, 185, 129, 0.18)';
-            botStatusBadge.style.color = '#34d399';
           }
         }
       } catch (_) {}
     }
 
+    // ENVIAR MENSAJE
     async function sendMessage(text) {
       if (!text || isSending) return;
       isSending = true;
@@ -1148,7 +1408,10 @@
       typingIndicator.style.display = 'flex';
       scrollToBottom(true);
 
-      // Optimistic message
+      const clientName = (inputCustomerName.value || '').trim() || 'Cliente Móvil';
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      // Optimistic message en chat
       const optimisticMsg = {
         from: 'customer',
         text,
@@ -1157,6 +1420,9 @@
       renderMessages([...currentMessages, optimisticMsg]);
       scrollToBottom(true);
 
+      // Log en terminal
+      appendTerminalLog(`[${timeStr}] 👤 CLIENTE: ${text}`, 'client');
+
       try {
         const res = await fetch('/api/bot/tester/message', {
           method: 'POST',
@@ -1164,7 +1430,7 @@
           body: JSON.stringify({
             text,
             jid: TEST_JID,
-            name: (inputCustomerName.value || '').trim() || 'Martín Gómez'
+            name: clientName
           })
         });
 
@@ -1173,14 +1439,23 @@
           renderMessages(data.messages);
           updateSessionInspector(data.session);
           scrollToBottom(true);
+
+          const botTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          if (data.reply) {
+            appendTerminalLog(`[${botTime}] 🤖 BOT:\n${data.reply}`, 'bot');
+          }
+          if (data.order_created) {
+            const ord = data.order_created;
+            appendTerminalLog(`[${botTime}] 🔥 [SUPABASE] Comanda #${ord.id || ord.order_number} creada en Cocina y POS! Total: $${ord.total}`, 'order');
+          }
         }
       } catch (err) {
         console.error('Error enviando mensaje al tester:', err);
+        appendTerminalLog(`[ERROR] No se pudo conectar con el bot: ${err.message}`, 'rose');
       } finally {
         isSending = false;
         btnSendMsg.disabled = false;
         typingIndicator.style.display = 'none';
-        // FOCUS PREVINIENDO SCROLL GLOBAL
         inputField.focus({ preventScroll: true });
       }
     }
@@ -1190,7 +1465,7 @@
       inputField.value = '';
     }
 
-    // SUBMIT FORMULARIO
+    // SUBMITS
     inputForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const val = inputField.value.trim();
@@ -1199,21 +1474,13 @@
       sendMessage(val);
     });
 
-    // SIMULAR PEDIDO DE CATÁLOGO WEB
-    document.getElementById('btnSimulateWebOrder').addEventListener('click', () => {
-      const clientName = (inputCustomerName.value || '').trim() || 'Martín Gómez';
-      const webOrderText = `🍔 *Mi Pedido #12 — ComandaFast*\n\n• 1x Doble Cheddar — $ 9.500,00\n\n💵 *Subtotal:* $ 9.500,00\n💰 *TOTAL:* $ 9.500,00\n\n🚀 *Tipo de entrega:* Para llevar / Mostrador 🏃\n💳 *Forma de pago:* Efectivo 💵\n👤 *Nombre:* ${clientName}`;
-      sendMessage(webOrderText);
+    terminalInputForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const val = terminalInput.value.trim();
+      if (!val) return;
+      terminalInput.value = '';
+      sendMessage(val);
     });
-
-    const btnTransfer = document.getElementById('btnSimulateWebOrderTransfer');
-    if (btnTransfer) {
-      btnTransfer.addEventListener('click', () => {
-        const clientName = (inputCustomerName.value || '').trim() || 'Martín Gómez';
-        const webOrderText = `🍔 *Mi Pedido #15 — ComandaFast*\n\n• 1x Triple Bacon — $ 12.000,00\n\n💵 *Subtotal:* $ 12.000,00\n🛵 *Delivery:* $ 1.500,00\n💰 *TOTAL:* $ 13.500,00\n\n🚀 *Tipo de entrega:* Delivery con cadete 🛵\n💳 *Forma de pago:* Transferencia Bancaria / MP 🏦\n👤 *Nombre:* ${clientName}\n📍 *Dirección:* San Martín 450`;
-        sendMessage(webOrderText);
-      });
-    }
 
     // RESET SESSION
     document.getElementById('btnResetSession').addEventListener('click', async () => {
@@ -1222,41 +1489,77 @@
         await fetch('/api/bot/tester/reset', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jid: TEST_JID, clearMessages: false })
-        });
-        await fetchState();
-      } catch (_) {}
-    });
-
-    // CLEAR CHAT
-    document.getElementById('btnClearChat').addEventListener('click', async () => {
-      if (!confirm('¿Limpiar los mensajes de este chat?')) return;
-      try {
-        await fetch('/api/bot/tester/reset', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ jid: TEST_JID, clearMessages: true })
         });
         currentMessages = [];
         renderMessages([]);
+        appendTerminalLog(`[${new Date().toLocaleTimeString()}] 🧹 [RESET] Memoria del bot reiniciada.`, 'system');
+        await fetchState();
       } catch (_) {}
     });
 
+    // SIMULACIÓN DE PEDIDO WEB
+    document.getElementById('btnSimulateWebOrder').addEventListener('click', () => {
+      const clientName = (inputCustomerName.value || '').trim() || 'Cliente Móvil';
+      sendMessage(`🍔 *Mi Pedido #12 — ComandaFast*\n\n• 1x Doble Cheddar — $ 9.500,00\n\n💵 *Subtotal:* $ 9.500,00\n💰 *TOTAL:* $ 9.500,00\n\n🚀 *Tipo de entrega:* Para llevar 🏃\n💳 *Forma de pago:* Efectivo 💵\n👤 *Nombre:* ${clientName}`);
+    });
+
+    document.getElementById('btnSimulateWebOrderTransfer').addEventListener('click', () => {
+      const clientName = (inputCustomerName.value || '').trim() || 'Cliente Móvil';
+      sendMessage(`🍔 *Mi Pedido #15 — ComandaFast*\n\n• 1x Triple Bacon — $ 12.000,00\n• 1x Papas Cheddar — $ 5.000,00\n\n💵 *Subtotal:* $ 17.000,00\n🛵 *Delivery:* $ 1.500,00\n💰 *TOTAL:* $ 18.500,00\n\n🚀 *Tipo de entrega:* Delivery 🛵\n💳 *Forma de pago:* Transferencia Bancaria 🏦\n👤 *Nombre:* ${clientName}\n📍 *Dirección:* Belgrano 450`);
+    });
+
+    // MODAL DE CELULAR Y QR CODE
+    const mobileModalOverlay = document.getElementById('mobileModalOverlay');
+    const mobileUrlInput = document.getElementById('mobileUrlInput');
+    const qrCodeImage = document.getElementById('qrCodeImage');
+
+    async function setupMobileModal() {
+      let targetUrl = window.location.href;
+      try {
+        const res = await fetch('/api/network-ip');
+        if (res.ok) {
+          const ipData = await res.json();
+          if (ipData.ip && ipData.ip !== 'localhost' && ipData.ip !== '127.0.0.1') {
+            targetUrl = `http://${ipData.ip}:${window.location.port || 3002}/simulador`;
+          }
+        }
+      } catch (_) {}
+
+      detectedMobileUrl = targetUrl;
+      mobileUrlInput.value = targetUrl;
+      qrCodeImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(targetUrl)}`;
+    }
+
+    document.getElementById('btnOpenMobileModal').addEventListener('click', () => {
+      setupMobileModal();
+      mobileModalOverlay.style.display = 'flex';
+    });
+
+    document.getElementById('btnCloseMobileModal').addEventListener('click', () => {
+      mobileModalOverlay.style.display = 'none';
+    });
+
+    mobileModalOverlay.addEventListener('click', (e) => {
+      if (e.target === mobileModalOverlay) mobileModalOverlay.style.display = 'none';
+    });
+
+    document.getElementById('btnCopyMobileUrl').addEventListener('click', () => {
+      navigator.clipboard.writeText(detectedMobileUrl).then(() => {
+        document.getElementById('btnCopyMobileUrl').textContent = '¡Copiado!';
+        setTimeout(() => document.getElementById('btnCopyMobileUrl').textContent = 'Copiar', 2000);
+      });
+    });
+
     // INICIALIZACIÓN
+    setupMobileModal();
     fetchState().then(() => {
       scrollToBottom(true);
       inputField.focus({ preventScroll: true });
     });
 
-    // Polling continuo cada 2.5s para recibir notificaciones del KDS y cambios de la cocina
-    setInterval(fetchState, 2500);
-
-    // Salvaguarda: Asegurar que el viewport permanezca en (0,0)
-    window.addEventListener('scroll', () => {
-      if (window.scrollY !== 0 || window.scrollX !== 0) {
-        window.scrollTo(0, 0);
-      }
-    });
+    // Polling cada 3 segundos
+    setInterval(fetchState, 3000);
   </script>
 </body>
 </html>

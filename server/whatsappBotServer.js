@@ -9,6 +9,7 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -5322,13 +5323,31 @@ app.get('/api/orders', (req, res) => {
 // =========================================================
 // ENDPOINTS PARA EL LABORATORIO DE PRUEBAS DEL BOT (TESTER)
 // =========================================================
-app.get('/tester', (req, res) => {
+app.get(['/tester', '/simulador', '/simulador-consola'], (req, res) => {
   const testerPath = path.join(__dirname, 'tester.html');
   if (fs.existsSync(testerPath)) {
     res.sendFile(testerPath);
   } else {
     res.status(404).send('tester.html no encontrado');
   }
+});
+
+app.get('/api/network-ip', (req, res) => {
+  const interfaces = os.networkInterfaces();
+  let localIp = 'localhost';
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        localIp = iface.address;
+        break;
+      }
+    }
+  }
+  res.json({
+    ip: localIp,
+    port: PORT,
+    simuladorUrl: `http://${localIp}:${PORT}/simulador`
+  });
 });
 
 app.post('/api/bot/tester/message', async (req, res) => {
@@ -5428,9 +5447,23 @@ app.post('/api/bot/tester/reset', (req, res) => {
 });
 
 const server = app.listen(PORT, async () => {
+  const interfaces = os.networkInterfaces();
+  let localIp = 'localhost';
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        localIp = iface.address;
+        break;
+      }
+    }
+  }
+
   console.log(`\n=========================================================`);
   console.log(`🍔 SERVIDOR WHATSAPP BOT COMANDAFAST (BAILEYS MULTI-DEVICE)`);
   console.log(`👉 Puerto: ${PORT} | Endpoint: http://localhost:${PORT}/status`);
+  console.log(`📱 SIMULADOR WEB DISPONIBLE PARA TU CELULAR:`);
+  console.log(`   👉 En tu Celular (Wi-Fi): http://${localIp}:${PORT}/simulador`);
+  console.log(`   👉 En esta PC:            http://localhost:${PORT}/simulador`);
   console.log(`=========================================================\n`);
   await syncAllFromSupabaseCloud();
 });

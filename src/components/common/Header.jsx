@@ -256,6 +256,19 @@ export default function Header({
           <QrCode size={15} />
         </button>
 
+        {/* Simulador Bot Button */}
+        <button 
+          type="button"
+          className="header-icon-btn" 
+          onClick={() => {
+            window.location.hash = '#simulador';
+          }}
+          title="Abrir Simulador del Bot WhatsApp para probar en PC o Celular"
+          style={{ color: '#25D366' }}
+        >
+          <span style={{ fontSize: '15px' }}>🧪</span>
+        </button>
+
         {/* Settings Modal Button */}
         <button 
           type="button"
@@ -344,6 +357,20 @@ export default function Header({
           <UtensilsCrossed size={19} />
         </div>
         <span className="mobile-nav-label">Menú</span>
+      </button>
+
+      <button 
+        type="button"
+        className="mobile-nav-item"
+        onClick={() => {
+          window.location.hash = '#simulador';
+        }}
+        title="Simulador Bot WhatsApp"
+      >
+        <div className="mobile-nav-icon-box">
+          <span style={{ fontSize: '18px' }}>🧪</span>
+        </div>
+        <span className="mobile-nav-label" style={{ color: '#25D366' }}>Simulador</span>
       </button>
     </nav>
     </>
