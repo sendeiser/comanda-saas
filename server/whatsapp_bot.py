@@ -672,6 +672,77 @@ class MultiTenantBotEngine:
                 "store": store_name
             }
 
+        # 4.1 RECEPCIÓN Y CONFIRMACIÓN DE COMPROBANTE DE PAGO
+        is_receipt = any(w in text_lower for w in [
+            "comprobante", "ya transferi", "ya transferí", "ya te transferi", "ya te transferí",
+            "ya pague", "ya pagué", "listo transferido", "ahi te mande", "ahí te mandé",
+            "te mande el comprobante", "te mandé el comprobante", "adjunto comprobante",
+            "ya mande la plata", "ya mandé la plata", "pago enviado", "pago realizado"
+        ])
+
+        if is_receipt:
+            reply = (
+                f"📸 *¡Comprobante de Transferencia Recibido con Éxito!* 🙌🍔\n\n"
+                f"¡Muchas gracias! Ya notificamos a nuestro encargado en caja para validar la acreditación del pago.\n"
+                f"🔥 Tu pedido ingresó a la cocina y está siendo preparado a fuego fuerte.\n\n"
+                f"🛵 Te avisaremos por este mismo chat en cuanto el cadete salga en camino. ¡Gracias por elegirnos! ✨"
+            )
+            return {
+                "reply": reply,
+                "order_created": None,
+                "mode": bot_mode,
+                "store": store_name
+            }
+
+        # 4.2 CONFIRMACIÓN DE PAGO EN EFECTIVO
+        is_cash_confirm = text_lower in ["efectivo", "en efectivo", "pago en efectivo", "pago efectivo", "efectivo al recibir"] or (
+            "efectivo" in text_lower and any(w in text_lower for w in ["pago", "abono", "llevo", "pago con"])
+        )
+
+        if is_cash_confirm:
+            reply = (
+                f"💵 *¡Forma de Pago en Efectivo Confirmada!* 🍔\n\n"
+                f"¡Entendido! Abonás en mano al momento de la entrega o retiro.\n"
+                f"👨‍🍳 La cocina ya se encuentra preparando tus productos.\n\n"
+                f"_Si necesitás vuelto de algún billete en específico, avísanos por acá (ej: 'pago con 20mil'). ¡Gracias!_ 🔥"
+            )
+            return {
+                "reply": reply,
+                "order_created": None,
+                "mode": bot_mode,
+                "store": store_name
+            }
+
+        # 4.3 CONSULTA DE DATOS BANCARIOS / TRANSFERENCIA / ALIAS / CBU
+        is_bank_query = any(w in text_lower for w in [
+            "datos para transferir", "datos de transferencia", "pasame los datos", "datos bancarios",
+            "alias", "cbu", "cvu", "transferencia", "como pago", "como te pago", "como abonar",
+            "formas de pago", "medios de pago", "cuenta bancaria", "mercado pago"
+        ]) or bool(re.search(r"\bmp\b", text_lower)) or text_lower in ["datos", "cuenta", "2", "pago"]
+
+        if is_bank_query:
+            alias = self.variables.get("alias_banco") or store.get("payment_settings", {}).get("transferAlias") or store.get("bank_alias") or "comandafast.mp"
+            banco = self.variables.get("banco") or store.get("payment_settings", {}).get("bankName") or "Mercado Pago"
+            titular = self.variables.get("titular") or store.get("payment_settings", {}).get("bankHolder") or store.get("name", "ComandaFast Burgers")
+            cbu = self.variables.get("cbu") or store.get("payment_settings", {}).get("transferCbu") or ""
+            cbu_str = f"\n• *CBU/CVU:* `{cbu}`" if cbu and cbu != "—" else ""
+
+            reply = (
+                f"💳 *Datos para Transferencia Bancaria:* 🏦\n\n"
+                f"• *Alias:* `{alias}`\n"
+                f"• *Banco / Billetera:* {banco}\n"
+                f"• *Titular:* {titular}"
+                f"{cbu_str}\n\n"
+                f"📸 *Una vez realizada la transferencia, podés enviar la captura o foto del comprobante por este mismo chat para comenzar a cocinar.* 🔥\n\n"
+                f"_Escribí *MENU* para volver al menú o consultar opciones._"
+            )
+            return {
+                "reply": reply,
+                "order_created": None,
+                "mode": bot_mode,
+                "store": store_name
+            }
+
         # 5. MODO TEXTO / AUTO-PEDIDO: PARSING DE PRODUCTOS Y CREACIÓN DE COMANDA EN SUPABASE
         if bot_mode in ["templates", "auto_order", "hybrid", "ai"]:
             matched_items = []
@@ -754,17 +825,41 @@ class MultiTenantBotEngine:
                 # Formatear comprobante WhatsApp
                 items_text = "\n".join([f"• {it['qty']}x {it['name']} (${int(it['unitPrice'] * it['qty']):,})".replace(",", ".") for it in matched_items])
 
-                payment_extra = ""
+                alias = self.variables.get("alias_banco") or store.get("payment_settings", {}).get("transferAlias") or store.get("bank_alias") or "comandafast.mp"
+                banco = self.variables.get("banco") or store.get("payment_settings", {}).get("bankName") or "Mercado Pago"
+                titular = self.variables.get("titular") or store.get("payment_settings", {}).get("bankHolder") or store.get("name", "ComandaFast Burgers")
+                cbu = self.variables.get("cbu") or store.get("payment_settings", {}).get("transferCbu") or ""
+                cbu_line = f"\n• *CBU/CVU:* `{cbu}`" if cbu and cbu != "—" else ""
+
                 if payment_method == "transferencia":
-                    alias = store.get("payment_settings", {}).get("transferAlias", "COMANDA.FAST")
-                    payment_extra = f"\n💳 *Datos de Transferencia:*\n• Alias: *{alias}*\n• Por favor enviá el comprobante por acá.\n"
+                    payment_block = (
+                        f"💳 *Medio de Pago: TRANSFERENCIA BANCARIA / MERCADO PAGO*\n"
+                        f"• *Alias:* `{alias}`\n"
+                        f"• *Banco / Billetera:* {banco}\n"
+                        f"• *Titular:* {titular}"
+                        f"{cbu_line}\n"
+                        f"• *Total exacto a transferir:* ${int(total):,}\n\n"
+                        f"📸 *IMPORTANTE:* Por favor enviá la captura o foto del comprobante por este chat para confirmar tu pago y pasarlo a la cocina. 🔥"
+                    )
+                else:
+                    payment_block = (
+                        f"💳 *¿Abonás por Transferencia Bancaria o Mercado Pago?*\n"
+                        f"• *Alias:* `{alias}`\n"
+                        f"• *Banco / Billetera:* {banco}\n"
+                        f"• *Titular:* {titular}"
+                        f"{cbu_line}\n"
+                        f"• *Monto exacto:* ${int(total):,}\n"
+                        f"📸 *Enviá la captura del comprobante por acá para comenzar a cocinar.*\n\n"
+                        f"💵 *¿Abonás en Efectivo al recibir?*\n"
+                        f"Respondé *EFECTIVO* (y avísanos con cuánto pagás si necesitás vuelto)."
+                    )
 
                 reply = (
                     f"✅ *¡Comanda #{order_num} Registrada en {store_name}!* 🔥\n\n"
                     f"📋 *Tu Pedido:*\n{items_text}\n\n"
                     f"🛵 Envío: ${int(delivery_fee):,}\n"
-                    f"💰 *Total a abonar: ${int(total):,}* ({payment_method.capitalize()})\n"
-                    f"{payment_extra}\n"
+                    f"💰 *Total a abonar: ${int(total):,}*\n\n"
+                    f"{payment_block}\n\n"
                     f"📍 Dirección: {cust_addr}\n"
                     f"⏱️ Tiempo estimado: {self.templates.get('delay_minutes', '25 a 40')} min.\n"
                     f"¡Ya dimos aviso a la cocina para su preparación! 🚀"

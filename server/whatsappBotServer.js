@@ -3980,8 +3980,36 @@ class WhatsAppBotServer {
               }
             }
 
+            // RECEPCIÓN DE COMPROBANTE DE PAGO (POR TEXTO O IMAGEN)
+            const isReceiptText = /\b(comprobante|transferi|transfer[ií]|ya\s+pagu[eé]|te\s+transfer[ií]|listo\s+transferido|ah[ií]\s+te\s+mand[eé]|pago\s+enviado|adjunto\s+comprobante)\b/i.test(lower);
+            if (isReceiptText) {
+              const orders = getStoredOrders();
+              const customerDigits = extractCleanDigits(remoteJid);
+              const activeTransferOrder = orders.find(o => {
+                if (o.status === 'cancelado' || o.status === 'entregado') return false;
+                const oDigits = extractCleanDigits(o.customer?.phone || o.customer?.remoteJid || o.remoteJid || '');
+                return oDigits && (oDigits.endsWith(customerDigits.slice(-8)) || customerDigits.endsWith(oDigits.slice(-8)));
+              });
+
+              if (activeTransferOrder) {
+                activeTransferOrder.paymentStatus = 'comprobante_recibido';
+                activeTransferOrder.paymentMethod = 'transferencia';
+                activeTransferOrder.comprobanteReceivedAt = new Date().toISOString();
+                activeTransferOrder.updatedAt = Date.now();
+                saveStoredOrder(activeTransferOrder);
+                pushOrderToSupabase(activeTransferOrder).catch(() => {});
+              }
+
+              const reply = `📸 *¡Comprobante de Transferencia Recibido!* 🙌🍔\n\n¡Muchas gracias! Ya dimos aviso al encargado de caja y a la cocina para validar la acreditación.\n⏳ Tu pedido está confirmado y marchando en la cocina. ¡Te avisamos en cuanto salga el cadete! 🔥`;
+              await this.safeSendMessage(remoteJid, { text: reply }, msg.key);
+              continue;
+            }
+
             // DATOS BANCARIOS / TRANSFERENCIA
-            if (lower === 'alias' || lower === 'cbu' || lower === 'transferencia' || lower === 'datos banco' || lower === 'datos') {
+            const isBankQuery = /^(alias|cbu|cvu|transferencia|datos|datos banco|cuenta|banco|pago)$/i.test(lower) ||
+              /\b(datos\s+para\s+transferir|pasame\s+los\s+datos|datos\s+de\s+transferencia|como\s+pago|como\s+te\s+pago|como\s+abonar|formas?\s+de\s+pago|medios?\s+de\s+pago|alias\s+de\s+transferencia|tenes\s+alias)\b/i.test(lower);
+
+            if (isBankQuery) {
               const biz = getBusinessContext();
               const tpls = getBotTemplates();
               const rawTpl = tpls.menu_response_2 || `💳 *Datos para Transferencia Bancaria:* 🏦\n\n• *Alias:* \`{alias_banco}\`\n• *Banco:* {banco}\n• *Titular:* {titular}\n• *CBU:* \`{cbu}\`\n\n📸 *Una vez realizada la transferencia, podés enviar la captura o foto del comprobante por este mismo chat.*\n\n_Enviá *MENU* para volver al menú principal._`;
