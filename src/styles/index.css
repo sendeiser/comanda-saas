@@ -4473,18 +4473,21 @@ h1, h2, h3, h4, .brand-title {
   border: none;
   font-family: var(--font-heading);
   font-weight: 900;
-  font-size: 0.85rem;
-  height: 38px;
-  min-height: 38px;
-  padding: 0 0.75rem;
+  font-size: 0.88rem;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 0.85rem;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  transition: all 0.15s ease;
+  gap: 0.45rem;
+  transition: all 0.15s var(--spring-bounce);
   white-space: nowrap;
+}
+.btn-kds-action:active {
+  transform: scale(0.97);
 }
 .btn-kds-action.to-cooking {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
@@ -4502,10 +4505,10 @@ h1, h2, h3, h4, .brand-title {
 }
 
 .kds-btn-cancel {
-  height: 38px;
-  width: 38px;
-  min-height: 38px;
-  min-width: 38px;
+  height: 44px;
+  width: 44px;
+  min-height: 44px;
+  min-width: 44px;
   padding: 0;
   border-radius: var(--radius-sm);
   border: 1px solid rgba(239, 68, 68, 0.35);
@@ -4515,6 +4518,10 @@ h1, h2, h3, h4, .brand-title {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: all 0.15s var(--spring-bounce);
+}
+.kds-btn-cancel:active {
+  transform: scale(0.95);
 }
 
 .kds-quick-move-bar {
