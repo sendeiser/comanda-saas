@@ -19,6 +19,7 @@ import { audioService } from './services/audioService';
 import { printerService } from './services/printerService';
 import { supabaseSync } from './services/supabaseClient';
 import CatalogPage from './pages/CatalogPage';
+import LandingPage from './pages/LandingPage';
 import CatalogQRModal from './components/pos/CatalogQRModal';
 import CustomerCrmModal from './components/pos/CustomerCrmModal';
 import WhatsAppLiveMonitor from './components/pos/WhatsAppLiveMonitor';
@@ -128,19 +129,48 @@ export default function App() {
     );
   };
 
+  // Helper para detectar si la URL corresponde a la aplicación interna (POS, KDS, Salón, etc.)
+  const checkIsAppRoute = () => {
+    if (typeof window === 'undefined') return false;
+    const hash = (window.location.hash || '').toLowerCase();
+    const search = (window.location.search || '').toLowerCase();
+
+    return (
+      hash === '#pos' ||
+      hash === '#caja' ||
+      hash === '#ventas' ||
+      hash === '#cocina' ||
+      hash === '#kds' ||
+      hash === '#pedidos' ||
+      hash === '#history' ||
+      hash === '#menu' ||
+      hash === '#whatsapp' ||
+      hash === '#dueno' ||
+      hash === '#admin' ||
+      hash === '#saas' ||
+      hash === '#superadmin' ||
+      search.includes('store=') ||
+      search.includes('comercio=') ||
+      search.includes('app=pos') ||
+      search.includes('tab=')
+    );
+  };
+
   // Catalog route: accessible via #catalog, ?mesa=X, #catalog?mesa=X, etc.
   const [isCatalogRoute, setIsCatalogRoute] = useState(() => checkIsCatalogRoute());
+  const [isAppRoute, setIsAppRoute] = useState(() => checkIsAppRoute());
 
   // Secret URL listener and secret keyboard shortcut (Ctrl + Shift + D)
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.toLowerCase();
       const search = window.location.search.toLowerCase();
-      const isMatch = hash === '#admin' || hash === '#dueno' || hash === '#dueÃ±o' || hash === '#auditoria' || search.includes('portal=admin') || search.includes('portal=dueno');
+      const isMatch = hash === '#admin' || hash === '#dueno' || hash === '#dueño' || hash === '#auditoria' || search.includes('portal=admin') || search.includes('portal=dueno');
       const isSaas = hash === '#saas' || hash === '#superadmin' || search.includes('portal=saas') || search.includes('portal=superadmin');
       setIsOwnerPortalRoute(isMatch);
       setIsSaasPortalRoute(isSaas);
       setIsCatalogRoute(checkIsCatalogRoute());
+      setIsAppRoute(checkIsAppRoute());
     };
     handleHash();
     window.addEventListener('hashchange', handleHash);
@@ -1007,8 +1037,6 @@ export default function App() {
     );
   }
 
-  if (!settings) return null;
-
   // SUPER-ADMIN SAAS WEB PORTAL (Multi-tenant subscriptions & client management)
   if (isSaasPortalRoute) {
     return (
@@ -1044,6 +1072,34 @@ export default function App() {
     );
   }
 
+  // PUBLIC SAAS LANDING PAGE (Presentada al ingresar a la raíz web sin parámetros de local)
+  if (!isAppRoute && !isDirectKitchenRoute) {
+    return (
+      <LandingPage 
+        onEnterStore={(storeSlug) => {
+          window.location.search = `?store=${storeSlug}`;
+          window.location.hash = '#pos';
+          setIsAppRoute(true);
+        }}
+        onOpenDemo={() => {
+          window.location.search = '?store=demo';
+          window.location.hash = '#pos';
+          setIsAppRoute(true);
+        }}
+        onOpenSaas={() => {
+          window.location.hash = '#saas';
+          setIsSaasPortalRoute(true);
+        }}
+        onOpenCatalog={() => {
+          window.location.hash = '#catalog';
+          setIsCatalogRoute(true);
+        }}
+      />
+    );
+  }
+
+  if (!settings) return null;
+
   // CASHIER LOGIN GATE: Solo pueden entrar los cajeros con credenciales válidas
   // (A menos que se acceda directamente a la pantalla de cocina #cocina o tab=kds)
   if (!currentCashier && !isDirectKitchenRoute) {
@@ -1058,6 +1114,11 @@ export default function App() {
           window.location.hash = '#cocina';
           setCurrentTab('kds');
           setIsKitchenZenMode(true);
+        }}
+        onBackToLanding={() => {
+          window.location.search = '';
+          window.location.hash = '';
+          setIsAppRoute(false);
         }}
       />
     );

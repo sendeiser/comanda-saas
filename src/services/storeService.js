@@ -85,10 +85,13 @@ export function validateStoreConfig(store = {}) {
  * @param {string} pathname 
  * @returns {string | null}
  */
-export function resolveStoreFromUrl(pathname) {
-  if (!pathname || typeof pathname !== 'string') return null;
-  const match = pathname.match(/^\/carta\/([^/?#]+)/i);
-  return match ? match[1].toLowerCase() : null;
+export function resolveStoreFromUrl(urlPathOrQuery) {
+  if (!urlPathOrQuery || typeof urlPathOrQuery !== 'string') return null;
+  const match = urlPathOrQuery.match(/^\/carta\/([^/?#]+)/i);
+  if (match) return match[1].toLowerCase();
+  const queryMatch = urlPathOrQuery.match(/[?&]store=([a-z0-9-]+)/i);
+  if (queryMatch) return queryMatch[1].toLowerCase();
+  return null;
 }
 
 /**

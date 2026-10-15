@@ -6,7 +6,7 @@ import {
 import { authService } from '../../services/authService';
 import { supabaseSync } from '../../services/supabaseClient';
 
-export default function CashierLogin({ onLoginSuccess, onOpenOwner, onOpenKitchen }) {
+export default function CashierLogin({ onLoginSuccess, onOpenOwner, onOpenKitchen, onBackToLanding }) {
   const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
   
   // Login form state
@@ -608,6 +608,29 @@ export default function CashierLogin({ onLoginSuccess, onOpenOwner, onOpenKitche
               <span>Portal de Auditoría →</span>
             </button>
           </div>
+
+          {onBackToLanding && (
+            <button
+              type="button"
+              onClick={onBackToLanding}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                fontSize: '0.78rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textAlign: 'center',
+                marginTop: '4px',
+                padding: '4px',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+            >
+              ← Volver a la Página de Inicio (Comanda SaaS)
+            </button>
+          )}
         </div>
       </div>
     </div>

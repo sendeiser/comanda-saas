@@ -7,6 +7,9 @@ test('resolveStoreFromUrl parses slug from various URL patterns', () => {
   assert.equal(resolveStoreFromUrl('/carta/pizzeria-roma'), 'pizzeria-roma');
   assert.equal(resolveStoreFromUrl('/carta/don-tito/'), 'don-tito');
   assert.equal(resolveStoreFromUrl('/carta/Hamburguesas-Extremas?ref=qr'), 'hamburguesas-extremas');
+  assert.equal(resolveStoreFromUrl('/?store=don-tito'), 'don-tito');
+  assert.equal(resolveStoreFromUrl('?store=pizzeria-napoli'), 'pizzeria-napoli');
   assert.equal(resolveStoreFromUrl('/pos'), null);
   assert.equal(resolveStoreFromUrl('/'), null);
 });
+
