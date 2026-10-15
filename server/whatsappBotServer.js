@@ -2521,6 +2521,115 @@ class WhatsAppBotServer {
     }
   }
 
+  /**
+   * Finaliza y registra una comanda generada por chat de texto de WhatsApp de manera directa.
+   * Inyecta directo en Supabase Cloud y la cola del POS / Cocina sin confirmaciones redundantes.
+   */
+  async submitConversationalOrder(session, remoteJid, originalMsgKey = null) {
+    if (!session || !Array.isArray(session.items) || session.items.length === 0) {
+      return null;
+    }
+
+    const latestOrderNum = await getLatestOrderNumber();
+    const nextOrderNum = latestOrderNum + 1;
+    const uniqueOrderId = 'ord-' + Date.now();
+    const displayCode = 'CMD-' + nextOrderNum;
+    const cleanPhone = remoteJid.replace('@s.whatsapp.net', '').replace('@lid', '');
+    
+    const isCash = (session.paymentMethod || 'efectivo').toLowerCase().includes('efectivo');
+    const customerName = session.customerName || 'Cliente';
+    const shippingAddress = session.shippingAddress || (session.shippingMethod === 'delivery' ? 'Domicilio' : 'Retiro en Local (Mostrador)');
+
+    const newOrder = {
+      id: uniqueOrderId,
+      code: displayCode,
+      orderNumber: nextOrderNum,
+      customer: {
+        name: customerName,
+        phone: cleanPhone,
+        remoteJid: remoteJid,
+        address: shippingAddress
+      },
+      remoteJid: remoteJid,
+      channel: 'whatsapp',
+      deliveryType: session.shippingMethod || 'local',
+      deliveryFee: Number(session.deliveryFee) || 0,
+      subtotal: Number(session.subtotal || session.total) || 0,
+      total: Number(session.total) || 0,
+      paymentMethod: isCash ? 'efectivo' : 'transferencia',
+      paymentStatus: isCash ? 'pendiente_efectivo' : 'pendiente_comprobante',
+      paymentConfirmed: isCash,
+      items: (session.items || []).map((it, idx) => ({
+        id: it.id || `item-${Date.now()}-${idx}`,
+        name: it.name,
+        price: Number(it.price) || 0,
+        unitPrice: Number(it.price) || 0,
+        qty: Number(it.qty || it.quantity || 1),
+        quantity: Number(it.qty || it.quantity || 1),
+        freeShipping: Boolean(it.freeShipping),
+        modifiers: it.modifiers || [],
+        notes: it.notes || ''
+      })),
+      status: isCash ? 'cocina' : 'pendiente',
+      notifiedStatuses: isCash ? ['cocina'] : [],
+      statusTimestamps: {
+        createdAt: new Date().toISOString(),
+        cookingAt: isCash ? new Date().toISOString() : null,
+        readyAt: null,
+        deliveredAt: null,
+        notifiedStatuses: isCash ? ['cocina'] : [],
+        cocinaNotifiedAt: isCash ? new Date().toISOString() : null
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: Date.now(),
+      source: 'whatsapp_bot'
+    };
+
+    if (isCash) {
+      markStatusNotified(newOrder, 'cocina');
+      markStatusNotified(displayCode, 'cocina');
+      markStatusNotified(nextOrderNum, 'cocina');
+      markStatusNotified(uniqueOrderId, 'cocina');
+    }
+
+    // Guardar pedido localmente y en cola para el POS / Cocina
+    saveStoredOrder(newOrder);
+    deductStockForOrder(newOrder);
+    await pushOrderToSupabase(newOrder);
+    pendingOrdersForPos.push(newOrder);
+    console.log(`🔔 [NUEVO PEDIDO WHATSAPP DIRECTO]: #${displayCode} (${uniqueOrderId}) de ${customerName} ($${newOrder.total}) inyectado a cocina.`);
+
+    const itemsList = session.items.map(it => `• *${it.name}* (x${it.qty || 1}) - $${((Number(it.price) || 0) * (it.qty || 1)).toLocaleString('es-AR')}${it.modifiers?.length ? ' [' + it.modifiers.join(', ') + ']' : ''}`).join('\n');
+    const biz = getBusinessContext();
+
+    let confirmMsg = '';
+    if (!isCash) {
+      confirmMsg = `🎉 *¡PEDIDO #${nextOrderNum} REGISTRADO!* 🍔🔥\n\n` +
+        `¡Muchas gracias *${customerName}*!\n\n` +
+        `📋 *Detalle del pedido:*\n${itemsList}\n\n` +
+        `💰 *Total a transferir:* *$${newOrder.total.toLocaleString('es-AR')}*\n` +
+        `🛵 *Modo:* ${session.shippingMethod === 'delivery' ? `Envío a *${shippingAddress}*` : '🛍️ *Retiro por el Local*'}\n\n` +
+        `💳 *Datos para Transferencia:*\n` +
+        `• *Alias:* \`${biz.alias_banco}\`\n` +
+        `• *Banco:* ${biz.banco}\n` +
+        `• *Titular:* ${biz.titular}${biz.cbu ? `\n• *CBU:* \`${biz.cbu}\`` : ''}\n\n` +
+        `📸 *Por favor enviá la foto o captura del comprobante por acá.*\n` +
+        `En cuanto lo confirmemos, ¡tu pedido pasa directo a la plancha! 🔥🙌`;
+    } else {
+      confirmMsg = `🎉 *¡PEDIDO #${nextOrderNum} CONFIRMADO Y A COCINA!* 🔥🍔\n\n` +
+        `¡Muchas gracias *${customerName}*!\n\n` +
+        `📋 *Detalle:* \n${itemsList}\n\n` +
+        `💵 *Total:* *$${newOrder.total.toLocaleString('es-AR')}* en Efectivo\n` +
+        `🛵 *Entrega:* ${session.shippingMethod === 'delivery' ? `Envío a *${shippingAddress}*` : '🛍️ *Retiro por el Local*'}\n` +
+        `⏱️ *Demora estimada:* ${biz.demora || '30 a 45 min'}\n\n` +
+        `Abonás al ${session.shippingMethod === 'delivery' ? 'recibir el pedido' : 'retirar'}. ¡Nuestros cocineros ya están marchando tus burgers! 🍔✨`;
+    }
+
+    resetCustomerSession(remoteJid);
+    await this.safeSendMessage(remoteJid, { text: confirmMsg }, originalMsgKey);
+    return newOrder;
+  }
+
   async start(force = false) {
     if (this.sock && this.status === 'connected' && !force) {
       return { status: this.status, qrCode: this.qrCode };
@@ -3324,88 +3433,11 @@ class WhatsAppBotServer {
           // MÁQUINA DE ESTADOS CONVERSACIONAL DE COMANDAS
           // -------------------------------------------------------------
 
-          // ESTADO: CONFIRMING (Esperando SI / CANCELAR)
+          // ESTADO: CONFIRMING (Esperando SI / CANCELAR - Fallback compatibilidad)
           if (session.step === 'CONFIRMING') {
             if (lower === 'si' || lower === 'sí' || lower === 'confirmar' || lower === 'dale' || lower === 'ok' || lower === 's') {
-              // Generar número de comanda correlativo sincronizado
-              const latestOrderNum = await getLatestOrderNumber();
-              const nextOrderNum = latestOrderNum + 1;
-              const uniqueOrderId = 'ord-' + Date.now();
-              const displayCode = 'CMD-' + nextOrderNum;
-              const cleanPhone = remoteJid.replace('@s.whatsapp.net', '').replace('@lid', '');
-              
-              const isCash = session.paymentMethod === 'efectivo';
-              const newOrder = {
-                id: uniqueOrderId,
-                code: displayCode,
-                orderNumber: nextOrderNum,
-                customer: {
-                  name: session.customerName || 'Cliente WhatsApp',
-                  phone: cleanPhone,
-                  remoteJid: remoteJid,
-                  address: session.shippingAddress || (session.shippingMethod === 'delivery' ? 'Domicilio' : 'Retiro en Local')
-                },
-                remoteJid: remoteJid,
-                channel: 'whatsapp',
-                deliveryType: session.shippingMethod, // 'local' o 'delivery'
-                deliveryFee: Number(session.deliveryFee) || 0,
-                subtotal: Number(session.subtotal || session.total) || 0,
-                total: Number(session.total) || 0,
-                paymentMethod: session.paymentMethod, // 'efectivo' o 'transferencia'
-                paymentStatus: session.paymentMethod === 'transferencia' ? 'pendiente_comprobante' : 'pendiente_efectivo',
-                paymentConfirmed: isCash,
-                items: (session.items || []).map((it, idx) => ({
-                  id: it.id || `item-${Date.now()}-${idx}`,
-                  name: it.name,
-                  price: Number(it.price) || 0,
-                  unitPrice: Number(it.price) || 0,
-                  qty: Number(it.qty || it.quantity || 1),
-                  quantity: Number(it.qty || it.quantity || 1),
-                  freeShipping: Boolean(it.freeShipping),
-                  modifiers: it.modifiers || [],
-                  notes: it.notes || ''
-                })),
-                status: isCash ? 'cocina' : 'pendiente',
-                notifiedStatuses: isCash ? ['cocina'] : [],
-                statusTimestamps: {
-                  createdAt: new Date().toISOString(),
-                  cookingAt: isCash ? new Date().toISOString() : null,
-                  readyAt: null,
-                  deliveredAt: null,
-                  notifiedStatuses: isCash ? ['cocina'] : [],
-                  cocinaNotifiedAt: isCash ? new Date().toISOString() : null
-                },
-                createdAt: new Date().toISOString(),
-                updatedAt: Date.now(),
-                source: 'whatsapp_bot'
-              };
-
-              if (isCash) {
-                markStatusNotified(newOrder, 'cocina');
-                markStatusNotified(displayCode, 'cocina');
-                markStatusNotified(nextOrderNum, 'cocina');
-                markStatusNotified(uniqueOrderId, 'cocina');
-              }
-
-              // Guardar pedido localmente y en cola para el POS / Cocina
-              saveStoredOrder(newOrder);
-              deductStockForOrder(newOrder);
-              await pushOrderToSupabase(newOrder);
-              pendingOrdersForPos.push(newOrder);
-              console.log(`🔔 [NUEVO PEDIDO WHATSAPP]: Pedido #${displayCode} (${uniqueOrderId}) de ${newOrder.customer.name} ($${newOrder.total}) inyectado.`);
-
-              const itemsList = session.items.map(it => `• ${it.name} (x${it.qty || 1}) - $${(it.price * (it.qty || 1)).toLocaleString('es-AR')}${it.modifiers?.length ? ' [' + it.modifiers.join(', ') + ']' : ''}`).join('\n');
-              
-              let confirmMsg = '';
-              if (session.paymentMethod === 'transferencia') {
-                const biz = getBusinessContext();
-                confirmMsg = `🎉 *¡PEDIDO #${nextOrderNum} REGISTRADO!* 🍔🔥\n\n¡Muchas gracias *${newOrder.customer.name}*!\n\n📋 *Detalle de tu pedido:*\n${itemsList}\n\n💵 *Total a transferir:* $${newOrder.total.toLocaleString('es-AR')}\n🛵 *Modo:* ${session.shippingMethod === 'delivery' ? '🛵 Envío a Domicilio' : '🛍️ Retiro por el Local'}\n📍 *Dirección:* ${newOrder.customer.address}\n\n💳 *Datos para Transferencia:*\n• *Alias:* \`${biz.alias_banco}\`\n• *Banco:* ${biz.banco}\n• *Titular:* ${biz.titular}${biz.cbu ? `\n• *CBU:* \`${biz.cbu}\`` : ''}\n\n📸 *IMPORTANTE:* Por favor enviá la foto o captura del comprobante por aquí.\n⏳ *Tu pedido quedará pendiente hasta que una persona de nuestro equipo confirme el comprobante y lo mande a cocina.* 🔥`;
-              } else {
-                confirmMsg = `🎉 *¡PEDIDO #${nextOrderNum} CONFIRMADO Y ENVIADO A LA COCINA!* 🔥🍔\n\n¡Muchas gracias *${newOrder.customer.name}*, tu pedido ya ingresó al sistema de la plancha!\n\n📋 *Detalle:*\n${itemsList}\n\n💵 *Total:* $${newOrder.total.toLocaleString('es-AR')}\n🛵 *Modo:* ${session.shippingMethod === 'delivery' ? '🛵 Envío a Domicilio' : '🛍️ Retiro por el Local'}\n📍 *Dirección:* ${newOrder.customer.address}\n\n💵 *Pago en Efectivo:* Abonás al recibir tu comida. ¡La cocina ya está marchando tus burgers! 🔥`;
-              }
-
-              resetCustomerSession(remoteJid);
-              await this.safeSendMessage(remoteJid, { text: confirmMsg }, msg.key);
+              session.customerName = session.customerName || msg.pushName || 'Cliente';
+              await this.submitConversationalOrder(session, remoteJid, msg.key);
               continue;
             } else if (lower === 'cancelar' || lower === 'no' || lower === 'cancel') {
               resetCustomerSession(remoteJid);
@@ -3419,11 +3451,11 @@ class WhatsAppBotServer {
             }
           }
 
-          // ESTADO: ASK_PAYMENT (Forma de pago)
+          // ESTADO: ASK_PAYMENT (Forma de pago -> Envío directo a cocina)
           if (session.step === 'ASK_PAYMENT') {
             if (lower === '1' || lower.includes('efectivo')) {
               session.paymentMethod = 'efectivo';
-            } else if (lower === '2' || lower.includes('transferencia') || lower.includes('alias') || lower.includes('mp')) {
+            } else if (lower === '2' || lower.includes('transferencia') || lower.includes('alias') || lower.includes('mp') || lower.includes('mercado')) {
               session.paymentMethod = 'transferencia';
             } else {
               await this.safeSendMessage(remoteJid, {
@@ -3457,7 +3489,7 @@ class WhatsAppBotServer {
               let confirmMsg = '';
               if (session.paymentMethod === 'transferencia') {
                 confirmMsg = `🎉 *¡FORMA DE PAGO REGISTRADA PARA PEDIDO #${orderId}!* 🏦\n\n` +
-                  `💵 *Total a transferir:* ${Number(session.total).toLocaleString('es-AR')}\n\n` +
+                  `💵 *Total a transferir:* $${Number(session.total).toLocaleString('es-AR')}\n\n` +
                   `💳 *Datos para la Transferencia:*\n` +
                   `• *Alias:* \`${biz.alias_banco}\`\n` +
                   `• *Banco:* ${biz.banco}\n` +
@@ -3466,7 +3498,7 @@ class WhatsAppBotServer {
               } else {
                 confirmMsg = `🎉 *¡PEDIDO #${orderId} CONFIRMADO Y ENVIADO A LA COCINA!* 🔥🍔\n\n` +
                   `¡Muchas gracias *${session.customerName || 'amigo/a'}*!\n` +
-                  `💵 *Total en Efectivo:* ${Number(session.total).toLocaleString('es-AR')}\n` +
+                  `💵 *Total en Efectivo:* $${Number(session.total).toLocaleString('es-AR')}\n` +
                   `🛵 Abonás al recibir o retirar tu comida. ¡Nuestros cocineros ya están marchando tus burgers! 🍔✨`;
               }
 
@@ -3475,54 +3507,76 @@ class WhatsAppBotServer {
               continue;
             }
 
-            session.step = 'CONFIRMING';
-            const itemsList = session.items.map(it => `• ${it.name} (x${it.qty || 1}) - $${(it.price * (it.qty || 1)).toLocaleString('es-AR')}${it.modifiers?.length ? ' [' + it.modifiers.join(', ') + ']' : ''}`).join('\n');
-            const hasFreeShippingItem = (session.items || []).some(it => it.freeShipping);
-            const shippingLabel = session.shippingMethod === 'delivery' 
-              ? (session.deliveryFee > 0 
-                  ? `🛵 Envío a Domicilio (+$${session.deliveryFee.toLocaleString('es-AR')})` 
-                  : (hasFreeShippingItem ? '🛵 Envío a Domicilio (¡Envío Gratis por Promo!)' : '🛵 Envío a Domicilio (¡Envío Gratis!)'))
-              : '🛍️ Retiro por el Local (Mostrador)';
-
-            const summary = `🍔 *RESUMEN DE TU PEDIDO* 🔥\n\n🛒 *Items:*\n${itemsList}\n\n💵 *Subtotal:* $${session.subtotal.toLocaleString('es-AR')}\n🛵 *Entrega:* ${shippingLabel}\n📍 *Dirección:* ${session.shippingAddress}\n👤 *Cliente:* ${session.customerName}\n💳 *Forma de Pago:* ${session.paymentMethod === 'efectivo' ? 'Efectivo' : 'Transferencia Bancaria'}\n\n💵 *TOTAL A PAGAR:* $${session.total.toLocaleString('es-AR')}\n\n¿Está todo perfecto para mandar a la cocina?\n👉 Respondé *SI* para confirmar tu pedido o *CANCELAR*.`;
-            
-            await this.safeSendMessage(remoteJid, { text: summary }, msg.key);
+            // Pedido conversacional directo: confirmación inmediata sin paso redundante
+            session.customerName = session.customerName || msg.pushName || 'Cliente';
+            await this.submitConversationalOrder(session, remoteJid, msg.key);
             continue;
           }
 
-          // ESTADO: ASK_NAME (Nombre del cliente)
+          // ESTADO: ASK_NAME (Nombre del cliente - Fallback de compatibilidad)
           if (session.step === 'ASK_NAME') {
             session.customerName = text.trim();
             session.step = 'ASK_PAYMENT';
             await this.safeSendMessage(remoteJid, {
-              text: `¡Perfecto *${session.customerName}*! 👍\n\n💳 *¿Cómo preferís abonar?*\n\n1️⃣ *Efectivo* (al recibir o retirar)\n2️⃣ *Transferencia Bancaria / Mercado Pago*\n\n_Respondé con 1 o 2:_`
+              text: `¡Perfecto *${session.customerName}*! 👍\n💵 *Total:* $${session.total.toLocaleString('es-AR')}\n\n💳 *¿Cómo preferís abonar?*\n1️⃣ *Efectivo* (al recibir o retirar)\n2️⃣ *Transferencia Bancaria / Mercado Pago*\n\n_Respondé con 1 o 2:_`
             }, msg.key);
             continue;
           }
 
-          // ESTADO: ASK_ADDRESS (Dirección para delivery)
+          // ESTADO: ASK_ADDRESS (Dirección para delivery - Salta directo a pago)
           if (session.step === 'ASK_ADDRESS') {
             session.shippingAddress = text.trim();
-            session.step = 'ASK_NAME';
+            session.customerName = session.customerName || msg.pushName || 'Cliente';
+
+            // Detección directa de pago si el cliente escribió "Rivadavia 123 efectivo"
+            if (lower.includes('efectivo')) {
+              session.paymentMethod = 'efectivo';
+              await this.submitConversationalOrder(session, remoteJid, msg.key);
+              continue;
+            } else if (lower.includes('transferencia') || lower.includes('alias') || lower.includes('mp') || lower.includes('mercado')) {
+              session.paymentMethod = 'transferencia';
+              await this.submitConversationalOrder(session, remoteJid, msg.key);
+              continue;
+            }
+
+            session.step = 'ASK_PAYMENT';
             await this.safeSendMessage(remoteJid, {
-              text: '👤 *¿A nombre de quién preparamos el pedido?*\n(Escribí tu nombre y apellido):'
+              text: `📍 *Dirección:* ${session.shippingAddress}\n💵 *Total con envío:* $${session.total.toLocaleString('es-AR')}\n\n💳 *¿Cómo preferís abonar?*\n1️⃣ *Efectivo* (al recibir)\n2️⃣ *Transferencia Bancaria / Mercado Pago*\n\n_Respondé con 1 o 2:_`
             }, msg.key);
             continue;
           }
 
-          // ESTADO: ASK_SHIPPING_METHOD (Las dos opciones: Retiro en local o Delivery)
+          // ESTADO: ASK_SHIPPING_METHOD (Retiro en local o Delivery - Salta directo a pago)
           if (session.step === 'ASK_SHIPPING_METHOD') {
-            if (lower === '1' || lower.includes('retiro') || lower.includes('local') || lower.includes('mostrador') || lower.includes('take away')) {
+            session.customerName = session.customerName || msg.pushName || 'Cliente';
+
+            const wantsLocal = lower === '1' || lower.includes('retiro') || lower.includes('local') || lower.includes('mostrador') || lower.includes('take away') || lower.includes('paso a buscar');
+            const wantsDelivery = lower === '2' || lower.includes('envio') || lower.includes('envío') || lower.includes('delivery') || lower.includes('domicilio') || /(?:calle|av|avenida|entre|dpto|piso|barrio|\b[a-zá-ÿ]{3,}\s+\d{2,5}\b)/i.test(text);
+
+            if (wantsLocal) {
               session.shippingMethod = 'local';
               session.shippingAddress = 'Retiro en Local (Mostrador)';
               session.deliveryFee = 0;
               session.total = session.subtotal;
-              session.step = 'ASK_NAME';
+
+              // Si ya especificó medio de pago en el mismo mensaje (ej: "1 efectivo")
+              if (lower.includes('efectivo')) {
+                session.paymentMethod = 'efectivo';
+                await this.submitConversationalOrder(session, remoteJid, msg.key);
+                continue;
+              } else if (lower.includes('transferencia') || lower.includes('alias') || lower.includes('mp') || lower.includes('mercado')) {
+                session.paymentMethod = 'transferencia';
+                await this.submitConversationalOrder(session, remoteJid, msg.key);
+                continue;
+              }
+
+              // Salto directo a selección de pago
+              session.step = 'ASK_PAYMENT';
               await this.safeSendMessage(remoteJid, {
-                text: '🛍️ *Retiro por el local seleccionado.* (Sin costo de envío)\n\n👤 *¿A nombre de quién registramos el pedido?*\n(Escribí tu nombre y apellido):'
+                text: `🛍️ *Retiro por el local* (Sin costo de envío)\n💵 *Total:* $${session.total.toLocaleString('es-AR')}\n\n💳 *¿Cómo preferís abonar?*\n1️⃣ *Efectivo* (al retirar)\n2️⃣ *Transferencia Bancaria / Mercado Pago*\n\n_Respondé con 1 o 2:_`
               }, msg.key);
               continue;
-            } else if (lower === '2' || lower.includes('envio') || lower.includes('envío') || lower.includes('delivery') || lower.includes('domicilio') || /(?:calle|av|avenida|entre|dpto|piso|barrio|\b[a-zá-ÿ]{3,}\s+\d{2,5}\b)/i.test(text)) {
+            } else if (wantsDelivery) {
               session.shippingMethod = 'delivery';
               const biz = getBusinessContext();
               const rawCost = String(biz.costo_envio || '').replace(/\D/g, '');
@@ -3541,27 +3595,40 @@ class WhatsAppBotServer {
               }
               session.total = session.subtotal + session.deliveryFee;
 
+              const feeText = session.deliveryFee > 0 
+                ? `🛵 Costo de envío: *$${session.deliveryFee.toLocaleString('es-AR')}*`
+                : (hasFreeShippingItem ? `🛵 Costo de envío: *¡GRATIS POR PROMO!* 🎁🛵` : `🛵 Costo de envío: *¡GRATIS!* 🎉`);
+
               const candidateAddr = text.replace(/^(?:2|delivery|envio|envío|a\s+domicilio)\s*(?:a|en|es)?[:\s]*/i, '').trim();
               if (candidateAddr.length >= 4 && !candidateAddr.toLowerCase().startsWith('delivery')) {
                 session.shippingAddress = candidateAddr;
-                session.step = 'ASK_NAME';
+
+                // Si también especificó pago en el mismo mensaje (ej: "2 San Martin 123 efectivo")
+                if (lower.includes('efectivo')) {
+                  session.paymentMethod = 'efectivo';
+                  await this.submitConversationalOrder(session, remoteJid, msg.key);
+                  continue;
+                } else if (lower.includes('transferencia') || lower.includes('alias') || lower.includes('mp') || lower.includes('mercado')) {
+                  session.paymentMethod = 'transferencia';
+                  await this.submitConversationalOrder(session, remoteJid, msg.key);
+                  continue;
+                }
+
+                session.step = 'ASK_PAYMENT';
                 await this.safeSendMessage(remoteJid, {
-                  text: `🛵 *Envío a domicilio registrado:* "${candidateAddr}".\n\n👤 *¿A nombre de quién preparamos el pedido?*\n(Escribí tu nombre y apellido):`
+                  text: `🛵 *Envío a:* ${candidateAddr}\n${feeText}\n💵 *Total con envío:* $${session.total.toLocaleString('es-AR')}\n\n💳 *¿Cómo preferís abonar?*\n1️⃣ *Efectivo* (al recibir)\n2️⃣ *Transferencia Bancaria / Mercado Pago*\n\n_Respondé con 1 o 2:_`
                 }, msg.key);
                 continue;
               }
 
               session.step = 'ASK_ADDRESS';
-              const feeText = session.deliveryFee > 0 
-                ? `🛵 Costo de envío: *$${session.deliveryFee.toLocaleString('es-AR')}*`
-                : (hasFreeShippingItem ? `🛵 Costo de envío: *¡GRATIS POR PROMO!* 🎁🛵` : `🛵 Costo de envío: *¡GRATIS!* 🎉`);
               await this.safeSendMessage(remoteJid, {
-                text: `🛵 *Envío a domicilio seleccionado.*\n${feeText}\n\n📍 *Por favor escribí tu dirección exacta y entrecalles para el cadete:*`
+                text: `🛵 *Envío a domicilio.*\n${feeText}\n\n📍 *Por favor escribí tu dirección exacta y entrecalles:*`
               }, msg.key);
               continue;
             } else {
               await this.safeSendMessage(remoteJid, {
-                text: '⚠️ Por favor elegí una de las dos opciones:\n\n1️⃣ *Retiro por el local (Take Away)*\n2️⃣ *Envío a domicilio con cadete (Delivery)*'
+                text: '⚠️ Por favor elegí una de las opciones:\n\n1️⃣ *Retiro por el local (Take Away)*\n2️⃣ *Envío a domicilio con cadete (Delivery)*'
               }, msg.key);
               continue;
             }
@@ -3654,7 +3721,8 @@ class WhatsAppBotServer {
             }
 
             // 3. Finalizar armado de carrito y avanzar al checkout (entrega y pago)
-            const isCheckoutTrigger = /^(listo|pedir|comprar|terminar|seguir|avanzar|pagar|ya\s+esta|ya\s+está|nada\s+mas|nada\s+más|eso\s+es\s+todo|eso\s+solo|fin)$/i.test(cleanNormSelecting);
+            const isCheckoutTrigger = /^(listo|pedir|comprar|terminar|seguir|avanzar|pagar|ya\s+esta|ya\s+está|nada\s+mas|nada\s+más|eso\s+es\s+todo|eso\s+solo|fin|delivery|envio|envío|retiro|take\s*away|para\s+llevar)$/i.test(cleanNormSelecting) ||
+              (/\b(para\s+llevar|para\s+retirar|es\s+para\s+delivery|mandamelo|traemelo)\b/i.test(cleanNormSelecting) && session.items.length > 0);
             if (isCheckoutTrigger) {
               if (session.items.length === 0) {
                 await this.safeSendMessage(remoteJid, {
@@ -3662,9 +3730,51 @@ class WhatsAppBotServer {
                 }, msg.key);
                 continue;
               }
+              session.customerName = session.customerName || msg.pushName || 'Cliente';
+
+              // Si ya indicó retiro en el mismo mensaje
+              if (/retiro|local|mostrador|take\s*away|para\s+retirar/i.test(lower)) {
+                session.shippingMethod = 'local';
+                session.shippingAddress = 'Retiro en Local (Mostrador)';
+                session.deliveryFee = 0;
+                session.total = session.subtotal;
+                session.step = 'ASK_PAYMENT';
+                await this.safeSendMessage(remoteJid, {
+                  text: `🛍️ *Retiro por el local* (Sin costo de envío)\n💵 *Total:* $${session.total.toLocaleString('es-AR')}\n\n💳 *¿Cómo preferís abonar?*\n1️⃣ *Efectivo* (al retirar)\n2️⃣ *Transferencia Bancaria / Mercado Pago*\n\n_Respondé 1 o 2:_`
+                }, msg.key);
+                continue;
+              }
+
+              // Si ya indicó delivery en el mismo mensaje
+              if (/delivery|envio|envío|domicilio|mandamelo|traemelo/i.test(lower)) {
+                session.shippingMethod = 'delivery';
+                const biz = getBusinessContext();
+                const rawCost = String(biz.costo_envio || '').replace(/\D/g, '');
+                const costoEnvio = parseInt(rawCost, 10) || 0;
+                const rawGratis = String(biz.envio_gratis_desde || '').replace(/\D/g, '');
+                const gratisDesde = parseInt(rawGratis, 10) || 0;
+                const hasFreeShippingItem = (session.items || []).some(it => it.freeShipping);
+                if (hasFreeShippingItem || (gratisDesde > 0 && session.subtotal >= gratisDesde)) {
+                  session.deliveryFee = 0;
+                } else {
+                  session.deliveryFee = costoEnvio;
+                }
+                session.total = session.subtotal + session.deliveryFee;
+
+                const feeText = session.deliveryFee > 0 
+                  ? `🛵 Costo de envío: *$${session.deliveryFee.toLocaleString('es-AR')}*`
+                  : (hasFreeShippingItem ? `🛵 Costo de envío: *¡GRATIS POR PROMO!* 🎁🛵` : `🛵 Costo de envío: *¡GRATIS!* 🎉`);
+
+                session.step = 'ASK_ADDRESS';
+                await this.safeSendMessage(remoteJid, {
+                  text: `🛵 *Envío a domicilio seleccionado.*\n${feeText}\n\n📍 *Por favor escribí tu dirección exacta y entrecalles:*`
+                }, msg.key);
+                continue;
+              }
+
               session.step = 'ASK_SHIPPING_METHOD';
               await this.safeSendMessage(remoteJid, {
-                text: `🛵 *¿Cómo querés recibir tu pedido?*\n\nRespondé con el número de opción:\n1️⃣ *Retiro por el local (Take Away)* 🏷️ Sin costo\n2️⃣ *Envío a domicilio con cadete (Delivery)*`
+                text: `🛵 *¿Cómo querés recibir tu pedido?*\n\n1️⃣ *Retiro por el local* (Take Away)\n2️⃣ *Envío a domicilio* (Delivery)\n\n_Respondé 1 o 2:_`
               }, msg.key);
               continue;
             }
@@ -3818,11 +3928,11 @@ class WhatsAppBotServer {
               const itemsList = session.items.map(it => `• ${it.name} (x${it.qty || 1}) - $${((Number(it.price) || 0) * (it.qty || 1)).toLocaleString('es-AR')}${it.modifiers?.length ? ' [' + it.modifiers.join(', ') + ']' : ''}`).join('\n');
 
               const addedText = addedDescriptions.length === 1 
-                ? `✅ *¡Sumaste ${itemsToAdd[0].prod.name}${itemsToAdd[0].qty > 1 ? ` (x${itemsToAdd[0].qty})` : ''}!* 🍔`
-                : `✅ *¡Sumamos ${addedDescriptions.length} productos a tu pedido!* 🍔\n${addedDescriptions.join('\n')}`;
+                ? `✅ *Sumaste ${itemsToAdd[0].prod.name}${itemsToAdd[0].qty > 1 ? ` (x${itemsToAdd[0].qty})` : ''}* 🍔`
+                : `✅ *Sumamos ${addedDescriptions.length} productos:*\n${addedDescriptions.join('\n')}`;
 
               await this.safeSendMessage(remoteJid, {
-                text: `${addedText}\n\n🛒 *Tu pedido actual:*\n${itemsList}\n\n💵 *Subtotal:* $${session.total.toLocaleString('es-AR')}\n\n👉 *¿Querés sumar algo más?*\n• Podés pedir directamente por *nombre* (ej: *"1 Coca"*, *"papas"*) o por *número*.\n• Escribí *CARTA* para ver la lista sin perder tu carrito.\n👉 O escribí *LISTO* para avanzar con la entrega y el pago.`
+                text: `${addedText}\n\n🛒 *Pedido:* ${session.items.map(it => `${it.name} (x${it.qty || 1})`).join(', ')}\n💵 *Subtotal:* $${session.total.toLocaleString('es-AR')}\n\n_Escribí otro producto para sumar, o respondé *LISTO* para pedir._`
               }, msg.key);
               continue;
             }
