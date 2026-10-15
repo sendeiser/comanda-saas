@@ -17,10 +17,12 @@ import { auditService } from '../../services/auditService';
 import { storageService } from '../../services/storageService';
 import { supabaseSync } from '../../services/supabaseClient';
 import { authService } from '../../services/authService';
+import { getActiveStore } from '../../services/storeService';
 
 export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, theme, onToggleTheme, onRefreshSystem }) {
   const portalRef = useRef(null);
   const [activeTab, setActiveTab] = useState('kpis'); // 'kpis' | 'shifts' | 'security' | 'menu' | 'settings' | 'bot' | 'database'
+  const [botSubTab, setBotSubTab] = useState('connection'); // 'connection' | 'security' | 'templates' | 'flows'
   const [showOnboarding, setShowOnboarding] = useState(() => {
     try {
       const active = getActiveStore();
