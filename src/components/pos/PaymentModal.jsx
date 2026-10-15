@@ -35,6 +35,15 @@ export default function PaymentModal({
     }).catch(console.warn);
   }, [storeId, customer]);
 
+  // Keyboard accessibility: Close with Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const numCashPaid = parseFloat(cashPaid) || 0;
   const cashChange = Math.max(0, numCashPaid - cartTotal);
 
@@ -105,7 +114,7 @@ export default function PaymentModal({
           textAlign: 'center' 
         }}>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 700 }}>TOTAL A COBRAR</div>
-          <div style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--accent-amber)', fontFamily: 'var(--font-heading)' }}>
+          <div className="tabular-nums" style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--accent-amber)', fontFamily: 'var(--font-heading)', fontVariantNumeric: 'tabular-nums' }}>
             ${cartTotal.toLocaleString('es-AR')}
           </div>
         </div>
@@ -115,7 +124,7 @@ export default function PaymentModal({
           <button
             type="button"
             className={`cat-pill-btn ${method === 'efectivo' ? 'active' : ''}`}
-            style={{ justifyContent: 'center', fontSize: '0.78rem', padding: '0.5rem 0.2rem' }}
+            style={{ justifyContent: 'center', fontSize: '0.78rem', minHeight: '44px', padding: '0.5rem 0.2rem' }}
             onClick={() => setMethod('efectivo')}
           >
             <DollarSign size={15} />
@@ -125,7 +134,7 @@ export default function PaymentModal({
           <button
             type="button"
             className={`cat-pill-btn ${method === 'transferencia' ? 'active' : ''}`}
-            style={{ justifyContent: 'center', fontSize: '0.78rem', padding: '0.5rem 0.2rem' }}
+            style={{ justifyContent: 'center', fontSize: '0.78rem', minHeight: '44px', padding: '0.5rem 0.2rem' }}
             onClick={() => setMethod('transferencia')}
           >
             <Smartphone size={15} />
@@ -135,7 +144,7 @@ export default function PaymentModal({
           <button
             type="button"
             className={`cat-pill-btn ${method === 'tarjeta' ? 'active' : ''}`}
-            style={{ justifyContent: 'center', fontSize: '0.78rem', padding: '0.5rem 0.2rem' }}
+            style={{ justifyContent: 'center', fontSize: '0.78rem', minHeight: '44px', padding: '0.5rem 0.2rem' }}
             onClick={() => setMethod('tarjeta')}
           >
             <CreditCard size={15} />

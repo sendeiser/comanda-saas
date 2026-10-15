@@ -46,11 +46,20 @@ export default function App() {
     if (isDirectKitchenRoute) return 'kds';
     return 'pos';
   });
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [cashShift, setCashShift] = useState(null);
-  const [settings, setSettings] = useState(null);
+  const [products, setProducts] = useState(() => storageService.getProducts());
+  const [orders, setOrders] = useState(() => storageService.getOrders());
+  const [cashShift, setCashShift] = useState(() => storageService.getCashShift());
+  const [settings, setSettings] = useState(() => storageService.getSettings());
   const [currentCashier, setCurrentCashier] = useState(() => authService.getCurrentCashier());
+
+  useEffect(() => {
+    const handleCashierChanged = (e) => {
+      setCurrentCashier(e.detail || authService.getCurrentCashier());
+    };
+    window.addEventListener('comandafast:cashier_changed', handleCashierChanged);
+    return () => window.removeEventListener('comandafast:cashier_changed', handleCashierChanged);
+  }, []);
+
   const [activeWhatsAppCount, setActiveWhatsAppCount] = useState(0);
   const [orderToLoadInPOS, setOrderToLoadInPOS] = useState(null);
   const [isCrmModalOpen, setIsCrmModalOpen] = useState(false);
@@ -836,6 +845,7 @@ export default function App() {
   };
 
   const handleCashierLoginSuccess = (cashier) => {
+    storageService.setCurrentCashier(cashier);
     setCurrentCashier(cashier);
   };
 
