@@ -14,7 +14,8 @@ import {
 export default function CatalogQRModal({ settings, onClose }) {
   // URL por defecto del catálogo
   const defaultOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
-  const initialUrl = (settings?.store_website_url || defaultOrigin).replace(/\/$/, '') + '/#catalog';
+  const storeSlug = settings?.slug || settings?.store_slug || 'comandafast-demo';
+  const initialUrl = settings?.store_website_url || `${defaultOrigin}/#catalog?store=${encodeURIComponent(storeSlug)}`;
 
   const [catalogUrl, setCatalogUrl] = useState(initialUrl);
   const [tableNumber, setTableNumber] = useState(''); // E.g. '', '1', '2', 'Barra'

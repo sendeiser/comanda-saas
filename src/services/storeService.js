@@ -81,16 +81,39 @@ export function validateStoreConfig(store = {}) {
 }
 
 /**
- * Extracts store slug from the current URL pathname (e.g. /carta/:storeSlug)
- * @param {string} pathname 
+ * Extracts store slug from the current URL pathname, hash, query or full URL
+ * Supports:
+ * - /carta/:storeSlug
+ * - /catalog/:storeSlug
+ * - /c/:storeSlug
+ * - #/carta/:storeSlug or #/catalog/:storeSlug
+ * - ?store=:storeSlug or &store=:storeSlug
+ * - #catalog?store=:storeSlug
+ * @param {string} [urlPathOrQuery] 
  * @returns {string | null}
  */
 export function resolveStoreFromUrl(urlPathOrQuery) {
-  if (!urlPathOrQuery || typeof urlPathOrQuery !== 'string') return null;
-  const match = urlPathOrQuery.match(/^\/carta\/([^/?#]+)/i);
-  if (match) return match[1].toLowerCase();
-  const queryMatch = urlPathOrQuery.match(/[?&]store=([a-z0-9-]+)/i);
+  let raw = urlPathOrQuery;
+  if (!raw || typeof raw !== 'string') {
+    if (typeof window !== 'undefined') {
+      raw = (window.location.pathname || '') + (window.location.search || '') + (window.location.hash || '');
+    } else {
+      return null;
+    }
+  }
+
+  // 1. Explicit query parameter ?store=xyz or &store=xyz
+  const queryMatch = raw.match(/[?&]store=([a-z0-9-]+)/i);
   if (queryMatch) return queryMatch[1].toLowerCase();
+
+  // 2. Hash route: #/carta/:slug, #/catalog/:slug, #/c/:slug
+  const hashPathMatch = raw.match(/#\/?(?:carta|catalog|c)\/([a-z0-9-]+)/i);
+  if (hashPathMatch) return hashPathMatch[1].toLowerCase();
+
+  // 3. Path route: /carta/:slug, /catalog/:slug, /c/:slug
+  const pathMatch = raw.match(/(?:^|\/)(?:carta|catalog|c)\/([^/?#]+)/i);
+  if (pathMatch) return pathMatch[1].toLowerCase();
+
   return null;
 }
 
@@ -256,9 +279,12 @@ export async function saveStoreConfig(storeData) {
           is_active: updatedStore.isActive,
           updated_at: new Date().toISOString()
         };
+        if (updatedStore.id) {
+          payload.id = updatedStore.id;
+        }
 
-        const endpoint = supabaseSync._url('stores');
-        await fetch(endpoint, {
+        const endpoint = supabaseSync._url('stores', 'on_conflict=slug');
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
             ...supabaseSync._headers(),
@@ -266,6 +292,16 @@ export async function saveStoreConfig(storeData) {
           },
           body: JSON.stringify(payload)
         });
+
+        // If conflict or error, gracefully fallback to PATCH by slug
+        if (!res.ok && (res.status === 409 || res.status === 400)) {
+          const patchEndpoint = supabaseSync._url('stores', `slug=eq.${encodeURIComponent(updatedStore.slug)}`);
+          await fetch(patchEndpoint, {
+            method: 'PATCH',
+            headers: supabaseSync._headers(),
+            body: JSON.stringify(payload)
+          }).catch(() => {});
+        }
       }
     } catch (err) {
       console.warn('Supabase store sync deferred (operating offline):', err);
@@ -273,4 +309,17 @@ export async function saveStoreConfig(storeData) {
   }
 
   return updatedStore;
+}
+
+/**
+ * Generates the direct URL for a store's public digital catalog.
+ * @param {string} [slug] 
+ * @param {string} [baseUrl]
+ * @returns {string}
+ */
+export function getStoreCatalogUrl(slug, baseUrl) {
+  const storeSlug = slug || getActiveStore()?.slug || 'comandafast-demo';
+  const base = baseUrl || (typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : 'http://localhost:5173/');
+  const cleanBase = base.replace(/\/$/, '');
+  return `${cleanBase}#catalog?store=${encodeURIComponent(storeSlug)}`;
 }

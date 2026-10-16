@@ -16,6 +16,7 @@
   --cat-red: #dc2626;
   --cat-red-hover: #ef4444;
   --cat-red-dark: #b91c1c;
+  --cat-primary-glow: rgba(220, 38, 38, 0.35);
   --cat-text: #ffffff;
   --cat-text-muted: #8e8e93;
   --cat-text-secondary: #d1d5db;
@@ -24,6 +25,11 @@
   --cat-radius-sm: 8px;
   --cat-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
   --cat-font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --cat-banner-bg: linear-gradient(45deg, #b91c1c 25%, transparent 25%), linear-gradient(-45deg, #b91c1c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #b91c1c 75%), linear-gradient(-45deg, transparent 75%, #b91c1c 75%);
+  --cat-banner-size: 34px 34px;
+  --cat-banner-color: #ffffff;
+  --cat-banner-title-color: #b91c1c;
+  --cat-banner-title-bg: #ffffff;
 }
 
 /* ---- Base Reset & Mobile Performance ---- */
@@ -37,6 +43,7 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .catalog-app * {
@@ -52,24 +59,25 @@
 }
 
 /* ============================================================
-   1. RETRO CHECKERBOARD BANNER (DAMERO ROJO Y BLANCO)
+   1. RETRO CHECKERBOARD BANNER & THEMED BANNERS
    ============================================================ */
 .cat-header-banner {
   position: relative;
   height: 135px;
   width: 100%;
-  background-color: #ffffff;
-  background-image: 
+  background-color: var(--cat-banner-color, #ffffff);
+  background-image: var(--cat-banner-bg, 
     linear-gradient(45deg, #b91c1c 25%, transparent 25%), 
     linear-gradient(-45deg, #b91c1c 25%, transparent 25%), 
     linear-gradient(45deg, transparent 75%, #b91c1c 75%), 
-    linear-gradient(-45deg, transparent 75%, #b91c1c 75%);
-  background-size: 34px 34px;
+    linear-gradient(-45deg, transparent 75%, #b91c1c 75%));
+  background-size: var(--cat-banner-size, 34px 34px);
   background-position: 0 0, 0 17px, 17px -17px, -17px 0px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: background 0.3s ease;
 }
 
 .cat-header-banner-inner {
@@ -80,15 +88,15 @@
   margin: 0 auto;
 }
 
-/* Center Horizontal White Band with Retro Condensed Red Typography */
+/* Center Horizontal White Band with Retro Condensed Typography */
 .cat-banner-center-title {
   position: absolute;
   top: 48%;
   left: 0;
   right: 0;
   transform: translateY(-50%);
-  background: #ffffff;
-  color: #b91c1c;
+  background: var(--cat-banner-title-bg, #ffffff);
+  color: var(--cat-banner-title-color, #b91c1c);
   font-family: 'Impact', 'Arial Black', sans-serif;
   font-size: 1.55rem;
   font-weight: 900;
@@ -101,6 +109,7 @@
   text-overflow: ellipsis;
   z-index: 5;
   text-transform: uppercase;
+  transition: all 0.25s ease;
 }
 
 /* Top-Left Pill Badge: 🟢 Abierto */
@@ -204,7 +213,7 @@
 .cat-store-title {
   font-size: 1.55rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--cat-text, #ffffff);
   letter-spacing: -0.3px;
   margin-bottom: 6px;
 }
@@ -318,7 +327,7 @@
 .cat-nav-tab-item {
   background: none;
   border: none;
-  color: #ffffff;
+  color: var(--cat-text-secondary, #d1d5db);
   font-size: 0.95rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -332,7 +341,7 @@
 }
 
 .cat-nav-tab-item.active {
-  color: #ef4444;
+  color: var(--cat-red, #ef4444);
 }
 
 .cat-nav-tab-indicator {
@@ -341,8 +350,9 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: #ef4444;
+  background: var(--cat-red, #ef4444);
   border-radius: 2px;
+  box-shadow: 0 0 10px var(--cat-primary-glow, rgba(239, 68, 68, 0.4));
 }
 
 /* SEARCH BAR (Toggled) */
@@ -405,7 +415,7 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: -0.2px;
-  color: #ffffff;
+  color: var(--cat-text, #ffffff);
   margin: 20px 0 14px;
 }
 
@@ -490,7 +500,7 @@
 .cat-product-card-name {
   font-size: 1.08rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--cat-text, #ffffff);
   text-transform: uppercase;
   letter-spacing: 0.3px;
   line-height: 1.3;
@@ -500,7 +510,7 @@
 .cat-product-card-desc {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #8e8e93;
+  color: var(--cat-text-muted, #8e8e93);
   text-transform: uppercase;
   letter-spacing: 0.2px;
   line-height: 1.35;
@@ -521,7 +531,7 @@
 .cat-product-card-price {
   font-size: 1.15rem;
   font-weight: 900;
-  color: #ffffff;
+  color: var(--cat-text, #ffffff);
   letter-spacing: -0.3px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1;
@@ -595,7 +605,7 @@
   height: 38px;
   min-width: 44px;
   min-height: 44px;
-  background: #dc2626;
+  background: var(--cat-red, #dc2626);
   color: #ffffff;
   border: none;
   border-radius: 10px;
@@ -617,13 +627,13 @@
 }
 
 .cat-add-btn:hover {
-  background: #ef4444;
+  background: var(--cat-red-hover, #ef4444);
   transform: scale(1.04);
 }
 
 .cat-add-btn:active {
   transform: scale(0.92);
-  background: #b91c1c;
+  background: var(--cat-red-dark, #b91c1c);
 }
 
 /* ============================================================
@@ -645,19 +655,19 @@
   justify-content: space-between;
   width: 100%;
   padding: 13px 18px;
-  background: #dc2626;
+  background: var(--cat-red, #dc2626);
   color: #ffffff;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.45);
+  box-shadow: 0 8px 24px var(--cat-primary-glow, rgba(220, 38, 38, 0.45));
   transition: background 0.15s ease, transform 0.12s ease;
 }
 
 .cat-floating-cart-btn:hover {
-  background: #ef4444;
+  background: var(--cat-red-hover, #ef4444);
 }
 
 .cat-floating-cart-btn:active {
@@ -666,7 +676,7 @@
 
 .cat-floating-cart-badge {
   background: #ffffff;
-  color: #dc2626;
+  color: var(--cat-red, #dc2626);
   border-radius: 9999px;
   min-width: 22px;
   height: 22px;
@@ -2648,5 +2658,276 @@
 .cat-alias-copy-btn:hover {
   background: rgba(255, 255, 255, 0.22);
 }
+
+/* ============================================================
+   9. CATALOG THEMES SYSTEM (DATA-CAT-THEME RULES)
+   ============================================================ */
+
+/* Theme 1: Retro American Diner */
+.catalog-app[data-cat-theme="retro-burger"] {
+  --cat-bg: #09090b;
+  --cat-surface: #141416;
+  --cat-surface-2: #1c1c1f;
+  --cat-surface-3: #27272a;
+  --cat-border: rgba(255, 255, 255, 0.08);
+  --cat-border-strong: #27272a;
+  --cat-red: #dc2626;
+  --cat-red-hover: #ef4444;
+  --cat-red-dark: #b91c1c;
+  --cat-primary-glow: rgba(220, 38, 38, 0.35);
+  --cat-text: #ffffff;
+  --cat-text-muted: #8e8e93;
+  --cat-text-secondary: #d1d5db;
+  --cat-banner-bg: linear-gradient(45deg, #b91c1c 25%, transparent 25%), linear-gradient(-45deg, #b91c1c 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #b91c1c 75%), linear-gradient(-45deg, transparent 75%, #b91c1c 75%);
+  --cat-banner-size: 34px 34px;
+  --cat-banner-color: #ffffff;
+  --cat-banner-title-color: #b91c1c;
+  --cat-banner-title-bg: #ffffff;
+}
+
+/* Theme 2: Cyber Midnight Glow */
+.catalog-app[data-cat-theme="neon-cyber"] {
+  --cat-bg: #060709;
+  --cat-surface: #0d1117;
+  --cat-surface-2: #161b22;
+  --cat-surface-3: #21262d;
+  --cat-border: rgba(245, 158, 11, 0.18);
+  --cat-border-strong: rgba(245, 158, 11, 0.35);
+  --cat-red: #f59e0b;
+  --cat-red-hover: #fbbf24;
+  --cat-red-dark: #d97706;
+  --cat-primary-glow: rgba(245, 158, 11, 0.45);
+  --cat-text: #f8fafc;
+  --cat-text-muted: #94a3b8;
+  --cat-text-secondary: #cbd5e1;
+  --cat-banner-bg: radial-gradient(ellipse at top, #2d1a04 0%, #060709 72%), repeating-linear-gradient(0deg, rgba(245, 158, 11, 0.06) 0px, rgba(245, 158, 11, 0.06) 1px, transparent 1px, transparent 32px), repeating-linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0px, rgba(245, 158, 11, 0.06) 1px, transparent 1px, transparent 32px);
+  --cat-banner-size: auto, 32px 32px, 32px 32px;
+  --cat-banner-color: #060709;
+  --cat-banner-title-color: #f59e0b;
+  --cat-banner-title-bg: rgba(13, 17, 23, 0.95);
+}
+
+/* Theme 3: Trattoria & Pizzería */
+.catalog-app[data-cat-theme="italian-trattoria"] {
+  --cat-bg: #0d1110;
+  --cat-surface: #141a17;
+  --cat-surface-2: #1c2420;
+  --cat-surface-3: #26312c;
+  --cat-border: rgba(34, 197, 94, 0.15);
+  --cat-border-strong: rgba(34, 197, 94, 0.3);
+  --cat-red: #e11d48;
+  --cat-red-hover: #f43f5e;
+  --cat-red-dark: #be123c;
+  --cat-primary-glow: rgba(225, 29, 72, 0.35);
+  --cat-text: #ffffff;
+  --cat-text-muted: #9ca3af;
+  --cat-text-secondary: #d1d5db;
+  --cat-banner-bg: linear-gradient(135deg, #15803d 0%, #15803d 33.3%, #fef3c7 33.3%, #fef3c7 66.6%, #b91c1c 66.6%, #b91c1c 100%);
+  --cat-banner-size: cover;
+  --cat-banner-color: #141a17;
+  --cat-banner-title-color: #166534;
+  --cat-banner-title-bg: #ffffff;
+}
+
+/* Theme 4: Bistro & Fine Gourmet */
+.catalog-app[data-cat-theme="bistro-gourmet"] {
+  --cat-bg: #101012;
+  --cat-surface: #17171a;
+  --cat-surface-2: #202024;
+  --cat-surface-3: #2a2a30;
+  --cat-border: rgba(212, 175, 55, 0.2);
+  --cat-border-strong: rgba(212, 175, 55, 0.4);
+  --cat-red: #d4af37;
+  --cat-red-hover: #e5c158;
+  --cat-red-dark: #b89628;
+  --cat-primary-glow: rgba(212, 175, 55, 0.35);
+  --cat-text: #fcfcfc;
+  --cat-text-muted: #a1a1aa;
+  --cat-text-secondary: #e4e4e7;
+  --cat-banner-bg: linear-gradient(135deg, #18181b 0%, #27272a 50%, #18181b 100%);
+  --cat-banner-size: cover;
+  --cat-banner-color: #18181b;
+  --cat-banner-title-color: #d4af37;
+  --cat-banner-title-bg: #09090b;
+}
+
+/* Theme 5: Cafetería, Bakery & Brunch */
+.catalog-app[data-cat-theme="warm-cafe"] {
+  --cat-bg: #181412;
+  --cat-surface: #221c19;
+  --cat-surface-2: #2c2521;
+  --cat-surface-3: #38302a;
+  --cat-border: rgba(217, 119, 6, 0.2);
+  --cat-border-strong: rgba(217, 119, 6, 0.38);
+  --cat-red: #d97706;
+  --cat-red-hover: #f59e0b;
+  --cat-red-dark: #b45309;
+  --cat-primary-glow: rgba(217, 119, 6, 0.35);
+  --cat-text: #fef3c7;
+  --cat-text-muted: #d6d3d1;
+  --cat-text-secondary: #f5f5f4;
+  --cat-banner-bg: linear-gradient(135deg, #451a03 0%, #78350f 50%, #b45309 100%);
+  --cat-banner-size: cover;
+  --cat-banner-color: #221c19;
+  --cat-banner-title-color: #78350f;
+  --cat-banner-title-bg: #fef3c7;
+}
+
+/* Theme 6: Street Food & Taquería */
+.catalog-app[data-cat-theme="street-fiesta"] {
+  --cat-bg: #0b0f14;
+  --cat-surface: #121820;
+  --cat-surface-2: #1b2430;
+  --cat-surface-3: #263342;
+  --cat-border: rgba(236, 72, 153, 0.22);
+  --cat-border-strong: rgba(236, 72, 153, 0.45);
+  --cat-red: #ec4899;
+  --cat-red-hover: #f472b6;
+  --cat-red-dark: #db2777;
+  --cat-primary-glow: rgba(236, 72, 153, 0.42);
+  --cat-text: #ffffff;
+  --cat-text-muted: #94a3b8;
+  --cat-text-secondary: #e2e8f0;
+  --cat-banner-bg: linear-gradient(135deg, #831843 0%, #ec4899 50%, #84cc16 100%);
+  --cat-banner-size: cover;
+  --cat-banner-color: #121820;
+  --cat-banner-title-color: #ec4899;
+  --cat-banner-title-bg: #ffffff;
+}
+
+/* Theme 7: Clean Light (Modo Claro) */
+.catalog-app[data-cat-theme="clean-light"] {
+  --cat-bg: #f8fafc;
+  --cat-surface: #ffffff;
+  --cat-surface-2: #f1f5f9;
+  --cat-surface-3: #e2e8f0;
+  --cat-border: rgba(0, 0, 0, 0.08);
+  --cat-border-strong: rgba(0, 0, 0, 0.16);
+  --cat-red: #0284c7;
+  --cat-red-hover: #0369a1;
+  --cat-red-dark: #075985;
+  --cat-primary-glow: rgba(2, 132, 199, 0.25);
+  --cat-text: #0f172a;
+  --cat-text-muted: #64748b;
+  --cat-text-secondary: #334155;
+  --cat-banner-bg: linear-gradient(135deg, #0284c7 0%, #0ea5e9 50%, #38bdf8 100%);
+  --cat-banner-size: cover;
+  --cat-banner-color: #ffffff;
+  --cat-banner-title-color: #0369a1;
+  --cat-banner-title-bg: #ffffff;
+}
+
+/* Special Light Mode Contrast & Surface Fine-tuning */
+.catalog-app[data-cat-theme="clean-light"] .cat-sticky-nav-bar {
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-product-card {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-product-card-image-box {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-store-info-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-store-info-btn:hover {
+  background: #f1f5f9;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-theme-toggle-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-theme-toggle-btn:hover {
+  background: #f1f5f9;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-info-sheet,
+.catalog-app[data-cat-theme="clean-light"] .cat-drawer-sheet,
+.catalog-app[data-cat-theme="clean-light"] .cat-modal-box {
+  background: #ffffff;
+  color: #0f172a;
+  border-top: 1px solid #e2e8f0;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-info-sheet h3,
+.catalog-app[data-cat-theme="clean-light"] .cat-drawer-sheet h3 {
+  color: #0f172a !important;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-info-item-title {
+  color: #0f172a;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-drawer-item {
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-drawer-badge {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-sheet-close-btn {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-promos-banner {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-promo-chip {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-promo-chip-name {
+  color: #0f172a;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-checkout-summary {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-checkout-summary-item {
+  color: #334155;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-checkout-summary-total {
+  color: #0f172a;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-form-input {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-payment-btn {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.catalog-app[data-cat-theme="clean-light"] .cat-payment-text strong {
+  color: #0f172a;
+}
+
+
 
 

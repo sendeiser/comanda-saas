@@ -8,13 +8,14 @@ import {
   Search, Menu, Info, X, Clock, MapPin, 
   MessageCircle, ExternalLink, ChevronRight, Check,
   ShoppingBag, ArrowLeft, Plus, Minus, Trash2, Phone,
-  Flame, Sparkles, Tag, RefreshCw, ChefHat, CheckCircle2, AlertCircle
+  Flame, Sparkles, Tag, RefreshCw, ChefHat, CheckCircle2, AlertCircle, Palette
 } from 'lucide-react';
 import { supabaseSync, DEFAULT_SUPABASE_URL, DEFAULT_SUPABASE_ANON_KEY } from '../services/supabaseClient';
 import { storageService } from '../services/storageService';
 import { chatbotService } from '../services/chatbotService';
 import { getStoreBySlug, getActiveStore, resolveStoreFromUrl } from '../services/storeService.js';
 import { applyStoreTheme } from '../services/themeService.js';
+import { CATALOG_THEMES, getCatalogTheme, applyCatalogTheme } from '../data/catalogThemes.js';
 import ProductModal from '../components/catalog/ProductModal';
 import '../styles/catalog.css';
 
@@ -514,17 +515,31 @@ export default function CatalogPage({ initialCashShift }) {
     try {
       const local = storageService.getSettings();
       const botSettings = chatbotService.getSettings();
+      const activeStore = getActiveStore();
       if (local && typeof local === 'object') {
-        const merged = { ...DEFAULT_SETTINGS, menu_mode: botSettings.menu_mode || 'catalog_direct', ...local };
-        if (merged.telefono_whatsapp === '5493826451122' || !merged.telefono_whatsapp) {
-          merged.telefono_whatsapp = DEFAULT_SETTINGS.telefono_whatsapp;
-        }
-        if (merged.telefono_contacto === '5493826451122' || merged.telefono_contacto === '+54 9 3826 40-1234' || !merged.telefono_contacto) {
-          merged.telefono_contacto = DEFAULT_SETTINGS.telefono_contacto;
-        }
-        if (merged.catalogo_instagram === 'burgas.chamical' || !merged.catalogo_instagram) {
-          merged.catalogo_instagram = DEFAULT_SETTINGS.catalogo_instagram;
-        }
+        const businessName = local.businessName || local.nombre_local || activeStore?.name || DEFAULT_SETTINGS.nombre_local;
+        const address = local.address || local.direccion || activeStore?.contactInfo?.address || DEFAULT_SETTINGS.direccion;
+        const phone = local.phone || local.telefono_whatsapp || local.telefono_contacto || activeStore?.contactInfo?.whatsapp || DEFAULT_SETTINGS.telefono_whatsapp;
+        const alias = local.alias || local.alias_banco || activeStore?.paymentSettings?.transferAlias || DEFAULT_SETTINGS.alias_banco;
+        const logoUrl = local.logo_url || local.logo || activeStore?.logoUrl || '';
+        const bannerUrl = local.banner_url || local.banner || activeStore?.bannerUrl || '';
+
+        const merged = { 
+          ...DEFAULT_SETTINGS, 
+          menu_mode: botSettings.menu_mode || 'catalog_direct', 
+          ...local,
+          businessName,
+          nombre_local: businessName,
+          address,
+          direccion: address,
+          phone,
+          telefono_whatsapp: phone,
+          telefono_contacto: phone,
+          alias,
+          alias_banco: alias,
+          logo_url: logoUrl,
+          banner_url: bannerUrl
+        };
         return merged;
       }
       return { ...DEFAULT_SETTINGS, menu_mode: botSettings.menu_mode || 'catalog_direct' };
@@ -538,7 +553,10 @@ export default function CatalogPage({ initialCashShift }) {
   useEffect(() => {
     let isMounted = true;
     const loadStore = async () => {
-      const slug = resolveStoreFromUrl(typeof window !== 'undefined' ? window.location.pathname : '');
+      const fullUrl = typeof window !== 'undefined' 
+        ? ((window.location.pathname || '') + (window.location.search || '') + (window.location.hash || ''))
+        : '';
+      const slug = resolveStoreFromUrl(fullUrl);
       if (slug) {
         const found = await getStoreBySlug(slug);
         if (!isMounted) return;
@@ -549,12 +567,18 @@ export default function CatalogPage({ initialCashShift }) {
           setSettings(prev => ({
             ...prev,
             nombre_local: found.name,
+            businessName: found.name,
             direccion: found.contactInfo?.address || prev.direccion,
+            address: found.contactInfo?.address || prev.address,
             telefono_whatsapp: found.contactInfo?.whatsapp || prev.telefono_whatsapp,
             telefono_contacto: found.contactInfo?.phone || prev.telefono_contacto,
+            phone: found.contactInfo?.phone || prev.phone,
             costo_envio: found.deliverySettings?.baseFee ?? prev.costo_envio,
             catalogo_instagram: found.contactInfo?.instagram || prev.catalogo_instagram,
-            alias_banco: found.paymentSettings?.transferAlias || prev.alias_banco
+            alias_banco: found.paymentSettings?.transferAlias || prev.alias_banco,
+            alias: found.paymentSettings?.transferAlias || prev.alias,
+            logo_url: found.logoUrl || prev.logo_url,
+            banner_url: found.bannerUrl || prev.banner_url
           }));
         } else {
           setStoreNotFound(true);
@@ -566,11 +590,80 @@ export default function CatalogPage({ initialCashShift }) {
           setStoreProfile(active);
           setStoreNotFound(false);
           if (active.theme) applyStoreTheme(active.theme);
+          setSettings(prev => ({
+            ...prev,
+            nombre_local: active.name || prev.nombre_local,
+            businessName: active.name || prev.businessName,
+            direccion: active.contactInfo?.address || prev.direccion,
+            address: active.contactInfo?.address || prev.address,
+            telefono_whatsapp: active.contactInfo?.whatsapp || prev.telefono_whatsapp,
+            telefono_contacto: active.contactInfo?.phone || prev.telefono_contacto,
+            phone: active.contactInfo?.phone || prev.phone,
+            costo_envio: active.deliverySettings?.baseFee ?? prev.costo_envio,
+            catalogo_instagram: active.contactInfo?.instagram || prev.catalogo_instagram,
+            alias_banco: active.paymentSettings?.transferAlias || prev.alias_banco,
+            alias: active.paymentSettings?.transferAlias || prev.alias,
+            logo_url: active.logoUrl || prev.logo_url,
+            banner_url: active.bannerUrl || prev.banner_url
+          }));
         }
       }
     };
+
     loadStore();
-    return () => { isMounted = false; };
+
+    const handleStoreChange = () => {
+      loadStore();
+      try {
+        const local = storageService.getSettings();
+        if (local && typeof local === 'object') {
+          const businessName = local.businessName || local.nombre_local;
+          const address = local.address || local.direccion;
+          const phone = local.phone || local.telefono_whatsapp || local.telefono_contacto;
+          const alias = local.alias || local.alias_banco;
+          const logoUrl = local.logo_url || local.logo;
+          const bannerUrl = local.banner_url || local.banner;
+          setSettings(prev => ({
+            ...prev,
+            ...local,
+            ...(businessName ? { businessName, nombre_local: businessName } : {}),
+            ...(address ? { address, direccion: address } : {}),
+            ...(phone ? { phone, telefono_whatsapp: phone, telefono_contacto: phone } : {}),
+            ...(alias ? { alias, alias_banco: alias } : {}),
+            ...(logoUrl ? { logo_url: logoUrl } : {}),
+            ...(bannerUrl ? { banner_url: bannerUrl } : {})
+          }));
+        }
+      } catch (_) {}
+      const freshProds = storageService.getProducts();
+      if (Array.isArray(freshProds) && freshProds.length > 0) {
+        setProducts(freshProds);
+      }
+    };
+
+    const handleProductsChange = (e) => {
+      const prods = e?.detail || storageService.getProducts();
+      if (Array.isArray(prods) && prods.length > 0) {
+        setProducts(prods);
+      }
+    };
+
+    window.addEventListener('hashchange', handleStoreChange);
+    window.addEventListener('popstate', handleStoreChange);
+    window.addEventListener('comandafast:store_updated', handleStoreChange);
+    window.addEventListener('comandafast:settings_updated', handleStoreChange);
+    window.addEventListener('comandafast:products_updated', handleProductsChange);
+    window.addEventListener('storage', handleStoreChange);
+
+    return () => { 
+      isMounted = false; 
+      window.removeEventListener('hashchange', handleStoreChange);
+      window.removeEventListener('popstate', handleStoreChange);
+      window.removeEventListener('comandafast:store_updated', handleStoreChange);
+      window.removeEventListener('comandafast:settings_updated', handleStoreChange);
+      window.removeEventListener('comandafast:products_updated', handleProductsChange);
+      window.removeEventListener('storage', handleStoreChange);
+    };
   }, []);
 
   const [loading, setLoading] = useState(() => {
@@ -597,6 +690,13 @@ export default function CatalogPage({ initialCashShift }) {
   const [serviceType, setServiceType] = useState(initialMesa ? 'dine_in' : null); // 'dine_in' | 'takeaway' | 'delivery'
   const [toast, setToast] = useState('');
   const [logoError, setLogoError] = useState(false);
+
+  // Active Catalog Visual Theme configured exclusively from POS Settings
+  const activeCatalogThemeId = settings?.catalog_theme || storeProfile?.catalogTheme || storeProfile?.theme?.catalog_theme || 'retro-burger';
+
+  useEffect(() => {
+    applyCatalogTheme(activeCatalogThemeId);
+  }, [activeCatalogThemeId]);
 
   // Pedido activo de mesa para seguimiento en vivo y reordenar
   const [activeTableOrder, setActiveTableOrder] = useState(() => {
@@ -775,12 +875,24 @@ export default function CatalogPage({ initialCashShift }) {
           }
         }
 
+        // Do NOT overwrite user-configured store identity with bot_config template defaults
+        const STORE_IDENTITY_KEYS = new Set([
+          'nombre_local', 'businessName', 'direccion', 'address',
+          'telefono_whatsapp', 'telefono_contacto', 'phone',
+          'alias_banco', 'alias', 'logo_url', 'banner_url', 'cbu', 'titular', 'banco',
+          'catalogo_instagram', 'costo_envio'
+        ]);
+
         let updatedSettings = {};
         if (settingsRes.ok) {
           const sRows = await settingsRes.json();
           if (Array.isArray(sRows) && sRows.length > 0 && Array.isArray(sRows[0].data)) {
             const varMap = {};
-            sRows[0].data.forEach(v => { if (v.key) varMap[v.key] = v.value ?? v.defaultValue; });
+            sRows[0].data.forEach(v => { 
+              if (v.key && !STORE_IDENTITY_KEYS.has(v.key)) {
+                varMap[v.key] = v.value ?? v.defaultValue; 
+              }
+            });
             updatedSettings = { ...varMap };
           }
         }
@@ -790,19 +902,11 @@ export default function CatalogPage({ initialCashShift }) {
           if (Array.isArray(tRows) && tRows.length > 0 && tRows[0].data) {
             const tData = tRows[0].data;
             if (tData.menu_mode) updatedSettings.menu_mode = tData.menu_mode;
-            if (tData.bank_alias) updatedSettings.alias_banco = tData.bank_alias;
-            if (tData.bank_name) updatedSettings.banco = tData.bank_name;
-            if (tData.bank_holder) updatedSettings.titular = tData.bank_holder;
-            if (tData.bank_cbu) updatedSettings.cbu = tData.bank_cbu;
           }
         }
 
         if (Object.keys(updatedSettings).length > 0) {
-          setSettings(prev => {
-            const final = { ...prev, ...updatedSettings };
-            try { storageService.saveSettings(final); } catch (_) {}
-            return final;
-          });
+          setSettings(prev => ({ ...prev, ...updatedSettings }));
         }
       } catch (err) {
         console.warn('[CatalogPage] Error cargando datos de Supabase:', err.message);
@@ -1092,7 +1196,7 @@ export default function CatalogPage({ initialCashShift }) {
 
       // 5. Si eligió transferencia, abrir WhatsApp automáticamente con los datos de la mesa y lo pedido para adjuntar el comprobante
       if (paymentMethod === 'transferencia') {
-        const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.telefono_contacto);
+        const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.phone || storeProfile?.contactInfo?.whatsapp || settings.telefono_contacto);
         const waMsg = generateWhatsAppMessage(
           cart.items,
           cart.subtotal,
@@ -1240,7 +1344,7 @@ export default function CatalogPage({ initialCashShift }) {
       } catch (_) {}
 
       // 4. Generar enlace de WhatsApp
-      const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.telefono_contacto);
+      const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.phone || storeProfile?.contactInfo?.whatsapp || settings.telefono_contacto);
       const message = generateWhatsAppMessage(
         cart.items,
         cart.subtotal,
@@ -1305,10 +1409,17 @@ export default function CatalogPage({ initialCashShift }) {
   };
 
   const businessOpen = isCashOpen;
-  const igHandle = settings.catalogo_instagram || 'burga_chamical';
-  const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.telefono_contacto);
-  const displayPhone = settings.telefono_contacto || '+54 9 3826 43-0159';
-  const brandBannerTitle = (settings.nombre_local || "BURGA'S CHAMICAL").toUpperCase();
+  const brandName = settings.nombre_local || settings.businessName || storeProfile?.name || "Burga's Chamical";
+  const brandBannerTitle = brandName.toUpperCase();
+  const brandAddress = settings.direccion || settings.address || storeProfile?.contactInfo?.address || 'Av. Perón 145 (frente al super x día)';
+  const brandPhone = settings.telefono_contacto || settings.phone || storeProfile?.contactInfo?.phone || '+54 9 3826 43-0159';
+  const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.phone || storeProfile?.contactInfo?.whatsapp || brandPhone);
+  const displayPhone = brandPhone;
+  const igHandle = settings.catalogo_instagram || storeProfile?.contactInfo?.instagram || 'burga_chamical';
+  const brandAlias = settings.alias_banco || settings.alias || settings.bank_alias || storeProfile?.paymentSettings?.transferAlias || 'burga.chamical.nx';
+  const brandBank = settings.banco || storeProfile?.paymentSettings?.bank || 'Mercado Pago';
+  const brandLogo = settings.logo_url || settings.logoUrl || settings.logo || storeProfile?.logoUrl || '';
+  const brandBanner = settings.banner_url || settings.bannerUrl || settings.banner || storeProfile?.bannerUrl || '';
 
   // ============================================================
   // RENDER VIEWS
@@ -1316,7 +1427,7 @@ export default function CatalogPage({ initialCashShift }) {
 
   if (loading) {
     return (
-      <div className="catalog-app" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="catalog-app" data-cat-theme={activeCatalogThemeId} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="cat-loading">
           <div className="cat-spinner" />
           Cargando carta...
@@ -1329,7 +1440,7 @@ export default function CatalogPage({ initialCashShift }) {
   if (view === 'checkout') {
     const deliveryFee = serviceType === 'delivery' ? (Number(settings.costo_envio) || 1500) : 0;
     return (
-      <div className="catalog-app">
+      <div className="catalog-app" data-cat-theme={activeCatalogThemeId}>
         <div className="cat-checkout-page">
           <div className="cat-cart-header">
             <button type="button" className="cat-cart-back-btn" onClick={() => setView('cart')}>
@@ -1482,7 +1593,7 @@ export default function CatalogPage({ initialCashShift }) {
                 {serviceType === 'dine_in' ? (
                   <div>
                     <div style={{ marginBottom: 6 }}>
-                      💳 <strong>Alias:</strong> <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: 4, fontWeight: 800, color: '#fff' }}>{settings.alias_banco || 'burga.chamical.nx'}</code> ({settings.banco || 'Mercado Pago'})
+                      💳 <strong>Alias:</strong> <code style={{ background: 'rgba(255,255,255,0.1)', padding: '2px 6px', borderRadius: 4, fontWeight: 800, color: '#fff' }}>{brandAlias}</code> ({brandBank})
                     </div>
                     <div>
                       📲 <strong>Importante:</strong> Al confirmar, tu pedido se enviará a cocina y se abrirá WhatsApp con el detalle de tu mesa para que puedas adjuntar tu comprobante de pago.
@@ -1617,7 +1728,7 @@ export default function CatalogPage({ initialCashShift }) {
     const currentStepIndex = statusOrderMap[currentStatus] ?? 0;
 
     return (
-      <div className="catalog-app">
+      <div className="catalog-app" data-cat-theme={activeCatalogThemeId}>
         <div className="cat-order-status-page">
           {/* Top Bar */}
           <div className="cat-status-top-bar">
@@ -1775,15 +1886,15 @@ export default function CatalogPage({ initialCashShift }) {
                   <div className="cat-alias-box">
                     <div>
                       <span style={{ fontSize: '0.72rem', color: '#a1a1aa' }}>Alias: </span>
-                      <strong style={{ color: '#fff', fontSize: '0.88rem' }}>{settings.alias_banco || 'burga.chamical.nx'}</strong>
-                      <span style={{ fontSize: '0.72rem', color: '#a1a1aa', marginLeft: 4 }}>({settings.banco || 'Mercado Pago'})</span>
+                      <strong style={{ color: '#fff', fontSize: '0.88rem' }}>{brandAlias}</strong>
+                      <span style={{ fontSize: '0.72rem', color: '#a1a1aa', marginLeft: 4 }}>({brandBank})</span>
                     </div>
                     <button
                       type="button"
                       className="cat-alias-copy-btn"
                       onClick={() => {
                         try {
-                          navigator.clipboard.writeText(settings.alias_banco || 'burga.chamical.nx');
+                          navigator.clipboard.writeText(brandAlias);
                           showToast('📋 Alias copiado al portapapeles');
                         } catch (_) {}
                       }}
@@ -1811,7 +1922,7 @@ export default function CatalogPage({ initialCashShift }) {
                 type="button"
                 className="cat-send-proof-btn"
                 onClick={() => {
-                  const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.telefono_contacto);
+                  const waPhone = formatWhatsAppPhone(settings.telefono_whatsapp || settings.phone || storeProfile?.contactInfo?.whatsapp || settings.telefono_contacto);
                   const cleanTable = activeTableOrder.tableNumber ? (activeTableOrder.tableNumber.toLowerCase().startsWith('mesa') ? activeTableOrder.tableNumber : `Mesa ${activeTableOrder.tableNumber}`) : '';
                   const waMsg = generateWhatsAppMessage(
                     activeTableOrder.items || [],
@@ -1865,7 +1976,7 @@ export default function CatalogPage({ initialCashShift }) {
   // ---- CART VIEW ----
   if (view === 'cart') {
     return (
-      <div className="catalog-app">
+      <div className="catalog-app" data-cat-theme={activeCatalogThemeId}>
         <div className="cat-cart-page">
           <div className="cat-cart-header">
             <button type="button" className="cat-cart-back-btn" onClick={() => setView('catalog')}>
@@ -2068,9 +2179,17 @@ export default function CatalogPage({ initialCashShift }) {
   // CATALOG VIEW (Exact Tripp American Burger Style)
   // ============================================================
   return (
-    <div className="catalog-app">
+    <div className="catalog-app" data-cat-theme={activeCatalogThemeId}>
       {/* 1. RETRO CHECKERBOARD BANNER */}
-      <div className="cat-header-banner">
+      <div 
+        className="cat-header-banner"
+        style={brandBanner ? {
+          backgroundImage: `url(${brandBanner})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: 'var(--brand-primary, #111827)'
+        } : {}}
+      >
         <div className="cat-header-banner-inner">
           {/* Top-left: White Pill Status Badge */}
           <div className={`cat-banner-status-badge ${isCashOpen ? 'open' : 'closed'}`}>
@@ -2087,26 +2206,26 @@ export default function CatalogPage({ initialCashShift }) {
 
       {/* 2. CENTERED AVATAR LOGO (Overlapping the banner) */}
       <div className="cat-header-avatar-wrap">
-        {settings.logo_url || settings.logo ? (
+        {!logoError && brandLogo ? (
           <img 
-            src={settings.logo_url || settings.logo} 
+            src={brandLogo} 
             alt="Logo" 
             className="cat-header-avatar-img"
             onError={() => setLogoError(true)}
           />
         ) : (
-          <RetroMascotLogo brandName={settings.nombre_local || "BURGA'S CHAMICAL"} />
+          <RetroMascotLogo brandName={brandName} />
         )}
       </div>
 
       {/* 3. STORE HEADER INFO */}
       <div className="cat-store-info-section">
         <h1 className="cat-store-title">
-          {settings.nombre_local || "Burga's Chamical"}
+          {brandName}
         </h1>
         <div className="cat-store-location">
           <MapPin size={15} style={{ flexShrink: 0 }} />
-          <span>{settings.direccion || 'Av. Perón 145 (frente al super x día)'}</span>
+          <span>{brandAddress}</span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
@@ -2508,10 +2627,19 @@ export default function CatalogPage({ initialCashShift }) {
             <div className="cat-info-sheet-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 8, overflow: 'hidden' }}>
-                  <RetroMascotLogo brandName={settings.nombre_local || "BURGA'S CHAMICAL"} />
+                  {!logoError && brandLogo ? (
+                    <img 
+                      src={brandLogo} 
+                      alt="Logo" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                      onError={() => setLogoError(true)}
+                    />
+                  ) : (
+                    <RetroMascotLogo brandName={brandName} />
+                  )}
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>{settings.nombre_local || "Burga's Chamical"}</h3>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>{brandName}</h3>
                   <span style={{ fontSize: '0.75rem', color: isCashOpen ? '#22c55e' : '#ef4444', fontWeight: 700 }}>
                     ● {isCashOpen ? 'Abierto ahora' : 'Cerrado ahora'}
                   </span>
@@ -2547,7 +2675,7 @@ export default function CatalogPage({ initialCashShift }) {
                 <MapPin size={18} className="cat-info-item-icon" />
                 <div>
                   <div className="cat-info-item-title">Ubicación y Retiro</div>
-                  <div className="cat-info-item-desc">{settings.direccion}</div>
+                  <div className="cat-info-item-desc">{brandAddress}</div>
                 </div>
               </div>
 
@@ -2780,7 +2908,7 @@ export default function CatalogPage({ initialCashShift }) {
                   <div>
                     <div style={{ fontSize: '0.64rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Alias CBU / CVU</div>
                     <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#38bdf8', fontFamily: 'monospace' }}>
-                      {settings.alias_banco || settings.bank_alias || 'Burgachamical.nx'}
+                      {brandAlias}
                     </div>
                   </div>
                   <button
@@ -2799,8 +2927,7 @@ export default function CatalogPage({ initialCashShift }) {
                       gap: '4px'
                     }}
                     onClick={() => {
-                      const alias = settings.alias_banco || settings.bank_alias || 'Burgachamical.nx';
-                      navigator.clipboard.writeText(alias);
+                      navigator.clipboard.writeText(brandAlias);
                       setCopiedAlias(true);
                       setTimeout(() => setCopiedAlias(false), 2500);
                     }}

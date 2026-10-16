@@ -296,6 +296,9 @@ export const storageService = {
 
   saveProducts(products) {
     localStorage.setItem(KEYS.PRODUCTS, JSON.stringify(products));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('comandafast:products_updated', { detail: products }));
+    }
   },
 
   getOrders() {
@@ -1010,6 +1013,9 @@ export const storageService = {
       updated.supabaseAnonKey = DEFAULT_SETTINGS.supabaseAnonKey;
     }
     localStorage.setItem(KEYS.SETTINGS, JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('comandafast:settings_updated', { detail: updated }));
+    }
   },
 
   exportBackup() {

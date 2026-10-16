@@ -70,4 +70,22 @@ export function applyStoreTheme(themeConfig = {}) {
   root.style.setProperty('--brand-bg', theme.bgDark);
   root.style.setProperty('--brand-surface', theme.surfaceDark);
   root.style.setProperty('--brand-font', theme.fontFamily);
+
+  // Link POS & Catalog dynamic theme colors
+  root.style.setProperty('--accent-amber', theme.primaryColor);
+  root.style.setProperty('--amber-gradient', `linear-gradient(135deg, ${theme.primaryColor} 0%, ${theme.primaryColor}dd 100%)`);
+  
+  try {
+    const hex = theme.primaryColor.replace('#', '');
+    if (hex.length === 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      root.style.setProperty('--accent-amber-glow', `rgba(${r}, ${g}, ${b}, 0.28)`);
+    }
+  } catch (_) {}
+
+  if (theme.accentColor) {
+    root.style.setProperty('--accent-emerald', theme.accentColor);
+  }
 }

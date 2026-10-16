@@ -1,25 +1,41 @@
 import React, { useState } from 'react';
-import { X, Settings, Download, Upload, Printer, DollarSign, Database, Bluetooth, Usb, CheckCircle, Palette, FileText, Check, Hash, RotateCcw, QrCode } from 'lucide-react';
+import { 
+  X, Settings, Download, Upload, Printer, DollarSign, Database, 
+  Bluetooth, Usb, CheckCircle, Palette, FileText, Check, Hash, 
+  RotateCcw, QrCode, Globe, Copy, ExternalLink, Image, Sparkles 
+} from 'lucide-react';
 import { storageService } from '../../services/storageService';
 import { printerService } from '../../services/printerService';
 import { supabaseSync } from '../../services/supabaseClient';
+import { getActiveStore, sanitizeSlug } from '../../services/storeService';
+import { CATALOG_THEMES } from '../../data/catalogThemes';
 
 export default function SettingsModal({ settings, onSaveSettings, onOpenCatalogQR, onClose }) {
+  const activeStore = getActiveStore();
   const [form, setForm] = useState(() => {
     const creds = supabaseSync.getCredentials();
     return {
       ...settings,
+      slug: settings?.slug || activeStore?.slug || sanitizeSlug(settings?.businessName || settings?.nombre_local || 'mi-comercio'),
+      primaryColor: settings?.primaryColor || activeStore?.theme?.primaryColor || '#f59e0b',
+      accentColor: settings?.accentColor || activeStore?.theme?.accentColor || '#10b981',
+      catalog_theme: settings?.catalog_theme || activeStore?.catalogTheme || 'retro-burger',
+      logo_url: settings?.logo_url || settings?.logo || activeStore?.logoUrl || '',
+      banner_url: settings?.banner_url || settings?.banner || activeStore?.bannerUrl || '',
       supabaseUrl: settings?.supabaseUrl && !settings.supabaseUrl.includes('yqynuvjpipmvurualgtg') ? settings.supabaseUrl : creds.url,
       supabaseAnonKey: settings?.supabaseAnonKey && !settings.supabaseAnonKey.includes('yqynuvjpipmvurualgtg') ? settings.supabaseAnonKey : creds.anonKey
     };
   });
-  const [testingSupabase, setTestingSupabase] = useState(false);
-  const [supabaseStatus, setSupabaseStatus] = useState(null);
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const defaultOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
+  const currentSlug = sanitizeSlug(form.slug || form.businessName || 'mi-comercio');
+  const catalogDirectUrl = `${defaultOrigin}/#catalog?store=${encodeURIComponent(currentSlug)}`;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onSaveSettings(form);
-    alert('Configuraciones guardadas correctamente.');
+    alert('Configuraciones y estilo de marca guardados correctamente.');
     onClose();
   };
 
@@ -37,17 +53,6 @@ export default function SettingsModal({ settings, onSaveSettings, onOpenCatalogQ
 
   const handleConnectBluetooth = async () => {
     await printerService.connectBluetooth();
-  };
-
-  const handleTestSupabase = async () => {
-    if (!form.supabaseUrl || !form.supabaseAnonKey) {
-      alert('Ingresa la URL y Anon Key de Supabase primero.');
-      return;
-    }
-    setTestingSupabase(true);
-    const ok = await supabaseSync.testConnection(form.supabaseUrl, form.supabaseAnonKey);
-    setTestingSupabase(false);
-    setSupabaseStatus(ok ? 'ok' : 'fail');
   };
 
   const handleExport = () => {
@@ -114,6 +119,257 @@ export default function SettingsModal({ settings, onSaveSettings, onOpenCatalogQ
             <div>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Alias MP / Banco para Transferencias:</label>
               <input type="text" className="custom-input-sm" value={form.alias} onChange={e => setForm({ ...form, alias: e.target.value })} />
+            </div>
+          </div>
+
+          {/* IDENTIDAD DE MARCA, COLORES Y ENLACE ÚNICO DE CARTA DIGITAL */}
+          <div style={{ 
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(16, 185, 129, 0.04))', 
+            border: '1.5px solid var(--accent-amber)', 
+            borderRadius: 'var(--radius-md)', 
+            padding: '1rem', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '0.9rem' 
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-amber)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={20} />
+                <span>Identidad de Marca, Colores y Enlace de Catálogo</span>
+              </div>
+              <span className="brand-badge" style={{ background: 'rgba(245, 158, 11, 0.2)', color: 'var(--accent-amber)' }}>
+                Multi-Negocio
+              </span>
+            </div>
+
+            <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+              Personalizá el estilo exclusivo de tu local para el <strong>POS</strong> y tu <strong>Carta Digital</strong>. Cada comercio cuenta con su propio enlace web independiente para pedidos online y mesas.
+            </div>
+
+            {/* SLUG Y ENLACE DEL CATÁLOGO */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Globe size={15} style={{ color: 'var(--accent-blue, #38bdf8)' }} />
+                <span>Identificador Web / Slug del Catálogo:</span>
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input 
+                  type="text" 
+                  className="custom-input-sm" 
+                  style={{ flex: 1, fontFamily: 'monospace', fontWeight: 700 }}
+                  placeholder="ej: don-pepe, burga-chamical, sushi-zen"
+                  value={form.slug || ''} 
+                  onChange={e => setForm({ ...form, slug: sanitizeSlug(e.target.value) })}
+                  required
+                />
+              </div>
+              
+              {/* Preview Box & Quick Actions */}
+              <div style={{ 
+                background: 'var(--bg-main)', 
+                border: '1px solid var(--border-subtle)', 
+                borderRadius: '8px', 
+                padding: '8px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '8px',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Tu Enlace de Carta Digital:</span>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--accent-emerald)', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                    {catalogDirectUrl}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                  <button 
+                    type="button" 
+                    className="qty-btn"
+                    style={{ width: 'auto', padding: '0.35rem 0.75rem', fontSize: '0.75rem', gap: '5px', background: copySuccess ? 'rgba(16, 185, 129, 0.2)' : 'var(--bg-card)', color: copySuccess ? '#10b981' : 'var(--text-primary)' }}
+                    onClick={() => {
+                      if (navigator?.clipboard) {
+                        navigator.clipboard.writeText(catalogDirectUrl);
+                        setCopySuccess(true);
+                        setTimeout(() => setCopySuccess(false), 2500);
+                      }
+                    }}
+                  >
+                    {copySuccess ? <Check size={14} /> : <Copy size={14} />}
+                    <span>{copySuccess ? '¡Copiado!' : 'Copiar Link'}</span>
+                  </button>
+
+                  <a 
+                    href={catalogDirectUrl} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="qty-btn"
+                    style={{ width: 'auto', padding: '0.35rem 0.75rem', fontSize: '0.75rem', gap: '5px', textDecoration: 'none', background: 'var(--bg-card)', color: 'var(--accent-amber)' }}
+                  >
+                    <ExternalLink size={14} />
+                    <span>Ver Catálogo</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* SELECTOR DE COLOR PRINCIPAL (POS + CATÁLOGO) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Palette size={15} style={{ color: form.primaryColor }} />
+                  <span>Color de Marca del Local (POS & Catálogo):</span>
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    type="color" 
+                    value={form.primaryColor || '#f59e0b'} 
+                    onChange={e => setForm({ ...form, primaryColor: e.target.value })}
+                    style={{ width: 28, height: 28, padding: 0, border: 'none', borderRadius: '50%', cursor: 'pointer', background: 'transparent' }}
+                    title="Elegir color personalizado"
+                  />
+                  <span style={{ fontSize: '0.78rem', fontFamily: 'monospace', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                    {form.primaryColor || '#f59e0b'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Paletas Rápidas */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                {[
+                  { name: 'Ámbar Clásico', color: '#f59e0b', emoji: '🍔' },
+                  { name: 'Rojo Fuego', color: '#ef4444', emoji: '🔥' },
+                  { name: 'Verde Fresh', color: '#10b981', emoji: '🥗' },
+                  { name: 'Azul Urbano', color: '#3b82f6', emoji: '🍕' },
+                  { name: 'Púrpura Neon', color: '#8b5cf6', emoji: '🍸' },
+                  { name: 'Naranja Smash', color: '#f97316', emoji: '⚡' },
+                  { name: 'Rosa Pastel', color: '#ec4899', emoji: '🍰' },
+                  { name: 'Titanio Dark', color: '#475569', emoji: '🖤' },
+                ].map(p => (
+                  <button
+                    key={p.color}
+                    type="button"
+                    onClick={() => setForm({ ...form, primaryColor: p.color })}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '5px 8px',
+                      borderRadius: '6px',
+                      border: form.primaryColor === p.color ? `2px solid ${p.color}` : '1px solid var(--border-subtle)',
+                      background: form.primaryColor === p.color ? `${p.color}22` : 'var(--bg-card)',
+                      cursor: 'pointer',
+                      fontSize: '0.74rem',
+                      fontWeight: form.primaryColor === p.color ? 800 : 600,
+                      color: form.primaryColor === p.color ? p.color : 'var(--text-secondary)',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <span style={{ width: 12, height: 12, borderRadius: '50%', background: p.color, flexShrink: 0, boxShadow: form.primaryColor === p.color ? `0 0 6px ${p.color}` : 'none' }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* SELECTOR DE TEMA VISUAL DE LA CARTA DIGITAL */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Palette size={15} style={{ color: 'var(--accent-amber)' }} />
+                <span>Estilo Visual de la Carta Digital (Público):</span>
+              </label>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '8px' }}>
+                {CATALOG_THEMES.map(t => {
+                  const isSelected = (form.catalog_theme || 'retro-burger') === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setForm({ ...form, catalog_theme: t.id })}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                        gap: '4px',
+                        padding: '8px 10px',
+                        borderRadius: '8px',
+                        border: isSelected ? '2px solid var(--accent-amber)' : '1px solid var(--border-subtle)',
+                        background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'var(--bg-card)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <span style={{ fontSize: '1.1rem' }}>{t.icon}</span>
+                        {isSelected && <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--accent-amber)' }}>ACTIVO</span>}
+                      </div>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, color: isSelected ? 'var(--accent-amber)' : 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
+                        {t.name}
+                      </span>
+                      <div style={{ display: 'flex', gap: '4px', marginTop: '2px' }}>
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.tokens.primary }} />
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.tokens.accent }} />
+                        <span style={{ width: 8, height: 8, borderRadius: '50%', background: t.tokens.bg, border: '1px solid rgba(255,255,255,0.2)' }} />
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* LOGO Y PORTADA / BANNER URL */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
+              <div>
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                  <Image size={13} />
+                  <span>URL del Logo (POS y Carta):</span>
+                </label>
+                <input 
+                  type="text" 
+                  className="custom-input-sm" 
+                  placeholder="https://ejemplo.com/logo.png"
+                  value={form.logo_url || ''} 
+                  onChange={e => setForm({ ...form, logo_url: e.target.value })}
+                />
+                {form.logo_url && (
+                  <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <img 
+                      src={form.logo_url} 
+                      alt="Logo preview" 
+                      style={{ width: 28, height: 28, borderRadius: 6, objectFit: 'contain', background: '#fff', border: '1px solid var(--border-subtle)' }}
+                      onError={e => { e.currentTarget.style.display = 'none'; }}
+                    />
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Vista previa logo</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '3px' }}>
+                  <Image size={13} />
+                  <span>URL Portada / Banner (Catálogo):</span>
+                </label>
+                <input 
+                  type="text" 
+                  className="custom-input-sm" 
+                  placeholder="https://ejemplo.com/banner.jpg"
+                  value={form.banner_url || ''} 
+                  onChange={e => setForm({ ...form, banner_url: e.target.value })}
+                />
+                {form.banner_url && (
+                  <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <img 
+                      src={form.banner_url} 
+                      alt="Banner preview" 
+                      style={{ width: 48, height: 24, borderRadius: 4, objectFit: 'cover', border: '1px solid var(--border-subtle)' }}
+                      onError={e => { e.currentTarget.style.display = 'none'; }}
+                    />
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Vista previa portada</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -332,48 +588,6 @@ export default function SettingsModal({ settings, onSaveSettings, onOpenCatalogQ
             </div>
           </div>
 
-          {/* SUPABASE CLOUD SYNC */}
-          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.75rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--accent-blue)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Database size={16} /> Sincronización en la Nube (Supabase):
-              </label>
-              <button 
-                type="button"
-                className="qty-btn"
-                style={{ width: 'auto', padding: '0.2rem 0.6rem', fontSize: '0.75rem' }}
-                onClick={handleTestSupabase}
-                disabled={testingSupabase}
-              >
-                {testingSupabase ? 'Probando...' : 'Probar Conexión'}
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '6px' }}>
-              <input 
-                type="text" 
-                className="custom-input-sm" 
-                placeholder="https://xyz.supabase.co" 
-                value={form.supabaseUrl || ''} 
-                onChange={e => setForm({ ...form, supabaseUrl: e.target.value })} 
-              />
-              <input 
-                type="password" 
-                className="custom-input-sm" 
-                placeholder="Anon / Public Key" 
-                value={form.supabaseAnonKey || ''} 
-                onChange={e => setForm({ ...form, supabaseAnonKey: e.target.value })} 
-              />
-            </div>
-
-            {supabaseStatus && (
-              <div style={{ fontSize: '0.8rem', marginTop: '4px', fontWeight: 700, color: supabaseStatus === 'ok' ? 'var(--accent-emerald)' : 'var(--accent-rose)' }}>
-                {supabaseStatus === 'ok' ? '✅ Conexión exitosa a Supabase' : '❌ No se pudo conectar a Supabase (Verifica URL y Key o ejecuta el script SQL)'}
-              </div>
-            )}
-          </div>
-
-          
           {/* NUMERACIÓN DE PEDIDOS */}
           <div style={{ background: 'var(--bg-main)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-md)', padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

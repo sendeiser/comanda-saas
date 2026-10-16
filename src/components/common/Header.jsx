@@ -70,13 +70,28 @@ export default function Header({
     <>
     <header className="top-header">
       <div className="brand-section">
-        <div className="brand-logo-icon">
-          <Flame size={20} />
-        </div>
+        {settings?.logo_url || settings?.logo ? (
+          <img 
+            src={settings.logo_url || settings.logo} 
+            alt="Logo" 
+            className="brand-logo-custom"
+            style={{ width: 34, height: 34, borderRadius: 8, objectFit: 'contain' }}
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
+        ) : (
+          <div className="brand-logo-icon">
+            <Flame size={20} />
+          </div>
+        )}
         <div>
           <div className="brand-name">
-            <span className="brand-name-text">COMANDA</span><span style={{ color: 'var(--accent-amber)' }}>FAST</span>
-            <span className="brand-badge">POS & KDS</span>
+            <span className="brand-name-text">
+              {settings?.businessName || settings?.nombre_local ? (settings.businessName || settings.nombre_local) : 'COMANDA'}
+            </span>
+            {!(settings?.businessName || settings?.nombre_local) && (
+              <span style={{ color: 'var(--accent-amber)' }}>FAST</span>
+            )}
+            <span className="brand-badge">POS</span>
           </div>
         </div>
       </div>
@@ -88,7 +103,8 @@ export default function Header({
           title="Mostrador de Ventas"
         >
           <ShoppingCart size={17} />
-          <span>Mostrador</span>
+          <span className="nav-tab-label-full">Mostrador</span>
+          <span className="nav-tab-label-short">Ventas</span>
         </button>
 
         <button 
@@ -143,7 +159,8 @@ export default function Header({
           title="Directorio de Clientes y Cuentas Corrientes (Fiados)"
         >
           <Users size={17} style={{ color: 'var(--accent-blue, #3b82f6)' }} />
-          <span>Clientes & Fiados</span>
+          <span className="nav-tab-label-full">Clientes & Fiados</span>
+          <span className="nav-tab-label-short">Clientes</span>
         </button>
       </nav>
 
@@ -256,18 +273,6 @@ export default function Header({
           <QrCode size={15} />
         </button>
 
-        {/* Simulador Bot Button */}
-        <button 
-          type="button"
-          className="header-icon-btn" 
-          onClick={() => {
-            window.location.hash = '#simulador';
-          }}
-          title="Abrir Simulador del Bot WhatsApp para probar en PC o Celular"
-          style={{ color: '#25D366' }}
-        >
-          <span style={{ fontSize: '15px' }}>🧪</span>
-        </button>
 
         {/* Settings Modal Button */}
         <button 
@@ -359,19 +364,6 @@ export default function Header({
         <span className="mobile-nav-label">Menú</span>
       </button>
 
-      <button 
-        type="button"
-        className="mobile-nav-item"
-        onClick={() => {
-          window.location.hash = '#simulador';
-        }}
-        title="Simulador Bot WhatsApp"
-      >
-        <div className="mobile-nav-icon-box">
-          <span style={{ fontSize: '18px' }}>🧪</span>
-        </div>
-        <span className="mobile-nav-label" style={{ color: '#25D366' }}>Simulador</span>
-      </button>
     </nav>
     </>
   );

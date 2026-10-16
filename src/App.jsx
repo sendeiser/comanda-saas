@@ -26,6 +26,8 @@ import WhatsAppLiveMonitor from './components/pos/WhatsAppLiveMonitor';
 import WhatsAppToastAlert from './components/pos/WhatsAppToastAlert';
 import { liveChatService } from './services/liveChatService';
 import { offlineSyncService } from './services/offlineSyncService';
+import { getActiveStore, saveStoreConfig } from './services/storeService';
+import { applyStoreTheme } from './services/themeService';
 
 const isLocalEnv = () => {
   if (typeof window === 'undefined') return false;
@@ -58,6 +60,22 @@ export default function App() {
     };
     window.addEventListener('comandafast:cashier_changed', handleCashierChanged);
     return () => window.removeEventListener('comandafast:cashier_changed', handleCashierChanged);
+  }, []);
+
+  useEffect(() => {
+    const active = getActiveStore();
+    if (active?.theme) {
+      applyStoreTheme(active.theme);
+    }
+    const handleStoreUpdated = () => {
+      const updated = getActiveStore();
+      if (updated?.theme) {
+        applyStoreTheme(updated.theme);
+      }
+      setSettings(storageService.getSettings());
+    };
+    window.addEventListener('comandafast:store_updated', handleStoreUpdated);
+    return () => window.removeEventListener('comandafast:store_updated', handleStoreUpdated);
   }, []);
 
   const [activeWhatsAppCount, setActiveWhatsAppCount] = useState(0);
@@ -825,6 +843,9 @@ export default function App() {
 
     storageService.saveProducts(newProducts);
     setProducts(newProducts);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('comandafast:products_updated', { detail: newProducts }));
+    }
     // Upsert completo a Supabase Cloud (fuente de verdad de productos)
     await supabaseSync.pushProducts(newProducts);
 
@@ -838,10 +859,72 @@ export default function App() {
     } catch (_) {}
   };
 
-  const handleSaveSettings = (newSettings) => {
-    storageService.saveSettings(newSettings);
-    setSettings(newSettings);
-    supabaseSync.saveSettings(newSettings);
+  const handleSaveSettings = async (newSettings) => {
+    const businessName = newSettings.businessName || newSettings.nombre_local || 'Mi Comercio';
+    const address = newSettings.address || newSettings.direccion || '';
+    const phone = newSettings.phone || newSettings.telefono_whatsapp || newSettings.telefono_contacto || '';
+    const alias = newSettings.alias || newSettings.alias_banco || '';
+    const logoUrl = newSettings.logo_url || newSettings.logo || '';
+    const bannerUrl = newSettings.banner_url || newSettings.banner || '';
+    const slogan = newSettings.slogan || newSettings.tagline || '';
+
+    const normalized = {
+      ...newSettings,
+      businessName,
+      nombre_local: businessName,
+      address,
+      direccion: address,
+      phone,
+      telefono_whatsapp: phone,
+      telefono_contacto: phone,
+      alias,
+      alias_banco: alias,
+      logo_url: logoUrl,
+      banner_url: bannerUrl,
+      slogan
+    };
+
+    storageService.saveSettings(normalized);
+    setSettings(normalized);
+    supabaseSync.saveSettings(normalized);
+
+    try {
+      const activeStore = getActiveStore();
+      const primaryColor = normalized.primaryColor || activeStore?.theme?.primaryColor || '#f59e0b';
+      const accentColor = normalized.accentColor || activeStore?.theme?.accentColor || '#10b981';
+      const updatedTheme = {
+        primaryColor,
+        accentColor,
+        bgDark: activeStore?.theme?.bgDark || '#0b0f19',
+        surfaceDark: activeStore?.theme?.surfaceDark || '#111827',
+        fontFamily: activeStore?.theme?.fontFamily || "'Plus Jakarta Sans', sans-serif"
+      };
+
+      await saveStoreConfig({
+        name: businessName,
+        slug: normalized.slug || activeStore?.slug,
+        tagline: slogan,
+        logoUrl,
+        bannerUrl,
+        contactInfo: {
+          address,
+          phone,
+          whatsapp: phone,
+          instagram: normalized.catalogo_instagram || activeStore?.contactInfo?.instagram || ''
+        },
+        paymentSettings: {
+          transferAlias: alias,
+          bank: normalized.banco || activeStore?.paymentSettings?.bank || 'Mercado Pago'
+        },
+        theme: updatedTheme
+      });
+
+      applyStoreTheme(updatedTheme);
+      window.dispatchEvent(new CustomEvent('comandafast:store_updated'));
+      window.dispatchEvent(new CustomEvent('comandafast:settings_updated', { detail: normalized }));
+    } catch (err) {
+      console.warn('Could not sync store config from settings:', err);
+    }
   };
 
   const handleCashierLoginSuccess = (cashier) => {

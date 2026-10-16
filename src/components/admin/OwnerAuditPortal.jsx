@@ -314,173 +314,44 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="executive-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        {/* Right side of header: Clean CRM Dock Toggle Button & Active Module Pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <button
             type="button"
-            className="qty-btn tactile-btn"
-            style={{ 
-              width: 'auto', 
-              padding: '0.45rem 0.95rem', 
-              fontSize: '0.82rem', 
-              gap: '7px', 
-              minHeight: '38px',
-              color: refreshSuccess ? '#059669' : 'var(--accent-amber, #f59e0b)',
-              background: refreshSuccess ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.08)',
-              borderColor: refreshSuccess ? 'rgba(16, 185, 129, 0.4)' : 'rgba(245, 158, 11, 0.35)',
-              fontWeight: 800,
-              boxShadow: isRefreshing ? '0 0 12px var(--accent-amber-glow)' : 'none',
-              transition: 'all 0.2s ease',
-              cursor: isRefreshing ? 'wait' : 'pointer'
-            }}
-            onClick={handleRefreshSystem}
-            disabled={isRefreshing}
-            title="Guardar y sincronizar todos los cambios directamente en la Base de Datos (Supabase Cloud)"
+            className="admin-header-crm-badge tactile-btn"
+            onClick={toggleSidebar}
+            title={isSidebarCollapsed ? "Expandir menú CRM" : "Compactar menú CRM"}
           >
-            <RefreshCw size={16} className={isRefreshing ? 'spin' : ''} />
-            <span>
-              {isRefreshing ? 'Actualizando BD...' : refreshSuccess ? '¡BD Actualizada!' : 'Actualizar BD'}
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="qty-btn tactile-btn"
-            style={{ 
-              width: 'auto', 
-              padding: '0.45rem 0.95rem', 
-              fontSize: '0.82rem', 
-              gap: '6px', 
-              minHeight: '38px',
-              color: '#fff',
-              background: 'linear-gradient(135deg, var(--accent-amber, #f59e0b) 0%, #ea580c 100%)',
-              borderColor: 'transparent',
-              fontWeight: 800,
-              cursor: 'pointer'
-            }}
-            onClick={() => setShowOnboarding(true)}
-            title="Crear y configurar un nuevo comercio gastronómico"
-          >
-            <Store size={16} />
-            <span>+ Nuevo Comercio</span>
-          </button>
-
-          <button
-            type="button"
-            className="qty-btn tactile-btn"
-            style={{ 
-              width: 'auto', 
-              padding: '0.45rem 0.85rem', 
-              fontSize: '0.82rem', 
-              gap: '6px', 
-              minHeight: '38px',
-              color: '#059669',
-              background: 'rgba(16, 185, 129, 0.08)',
-              borderColor: 'rgba(16, 185, 129, 0.35)',
-              fontWeight: 800
-            }}
-            onClick={() => handleOpenBot('connection')}
-            title="Conexión y Estado de WhatsApp Web"
-          >
-            <Smartphone size={16} />
-            <span>Conexión Bot</span>
-          </button>
-
-          <button
-            type="button"
-            className="qty-btn tactile-btn"
-            style={{ 
-              width: 'auto', 
-              padding: '0.45rem 0.85rem', 
-              fontSize: '0.82rem', 
-              gap: '6px', 
-              minHeight: '38px',
-              color: '#d97706',
-              background: 'rgba(245, 158, 11, 0.08)',
-              borderColor: 'rgba(245, 158, 11, 0.35)',
-              fontWeight: 800
-            }}
-            onClick={() => handleOpenBot('security')}
-            title="Seguridad, Escudo Anti-Baneo y Filtro Anti-Spam"
-          >
-            <ShieldCheck size={16} />
-            <span>Seguridad & Anti-Spam</span>
-          </button>
-
-          {onToggleTheme && (
-            <button
-              type="button"
-              className="qty-btn tactile-btn theme-toggle-btn"
-              style={{ 
-                width: 'auto', 
-                padding: '0.45rem 0.85rem', 
-                fontSize: '0.82rem', 
-                gap: '6px', 
-                minHeight: '38px',
-                color: theme === 'dark' ? '#f59e0b' : '#0f172a',
-                background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(15, 23, 42, 0.05)',
-                borderColor: theme === 'dark' ? 'rgba(245, 158, 11, 0.35)' : 'rgba(15, 23, 42, 0.2)',
-                fontWeight: 800
-              }}
-              onClick={onToggleTheme}
-              title={theme === 'dark' ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun size={16} style={{ color: 'var(--accent-amber)' }} />
-                  <span>Modo Claro</span>
-                </>
-              ) : (
-                <>
-                  <Moon size={16} style={{ color: '#0f172a' }} />
-                  <span>Modo Oscuro</span>
-                </>
-              )}
-            </button>
-          )}
-
-          <button
-            type="button"
-            className="qty-btn tactile-btn"
-            style={{ width: 'auto', padding: '0.5rem 0.95rem', fontSize: '0.85rem', gap: '6px', minHeight: '38px' }}
-            onClick={onBackToPos}
-            title="Volver a la pantalla de ventas"
-          >
-            <ArrowLeft size={16} />
-            <span>Volver al POS</span>
-          </button>
-
-          <button
-            type="button"
-            className="qty-btn tactile-btn"
-            style={{ width: 'auto', padding: '0.5rem 0.95rem', fontSize: '0.85rem', gap: '6px', color: 'var(--accent-rose)', borderColor: 'rgba(239, 68, 68, 0.3)', minHeight: '38px' }}
-            onClick={onLogout}
-            title="Cerrar sesión de administrador"
-          >
-            <LogOut size={16} />
-            <span>Cerrar Sesión</span>
+            <CurrentNavIcon size={16} />
+            <span>Módulo: <strong>{currentNavItem.shortLabel || currentNavItem.label}</strong></span>
+            {isSidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
         </div>
       </div>
 
       {/* ADMIN PORTAL MAIN BODY */}
       <div className="admin-portal-layout">
-        {/* DESKTOP COLLAPSIBLE SIDEBAR */}
+        {/* DESKTOP COLLAPSIBLE CRM SIDEBAR (DOCK LEFT) */}
         <aside className={`admin-sidebar ${isSidebarCollapsed ? 'collapsed' : 'expanded'}`}>
           <div className="admin-sidebar-header">
             {!isSidebarCollapsed && (
-              <span className="admin-sidebar-header-title">MÓDULOS ADMIN</span>
+              <span className="admin-sidebar-header-title">MENÚ CRM</span>
             )}
             <button
               type="button"
               className="admin-sidebar-toggle-btn tactile-btn"
               onClick={toggleSidebar}
-              title={isSidebarCollapsed ? "Expandir menú de navegación" : "Colapsar menú lateral"}
-              aria-label={isSidebarCollapsed ? "Expandir menú lateral" : "Colapsar menú lateral"}
+              title={isSidebarCollapsed ? "Expandir menú CRM" : "Compactar menú CRM"}
+              aria-label={isSidebarCollapsed ? "Expandir menú CRM" : "Compactar menú CRM"}
             >
               {isSidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
           </div>
+
+          {/* Módulos */}
+          {!isSidebarCollapsed && (
+            <span className="admin-sidebar-section-title">Módulos</span>
+          )}
 
           <nav className="admin-sidebar-nav">
             {navItems.map(item => {
@@ -526,14 +397,145 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
             })}
           </nav>
 
+          {/* Acciones de Local */}
+          <div className="admin-sidebar-section-divider" />
+          {!isSidebarCollapsed && (
+            <span className="admin-sidebar-section-title">Acciones</span>
+          )}
+
+          <button
+            type="button"
+            className="admin-sidebar-action-btn tactile-btn"
+            onClick={() => setShowOnboarding(true)}
+            title={isSidebarCollapsed ? "Nuevo Comercio (+)" : undefined}
+          >
+            <div className="admin-sidebar-item-icon-wrap">
+              <Plus size={17} style={{ color: 'var(--accent-amber)' }} />
+            </div>
+            {!isSidebarCollapsed && (
+              <span className="admin-sidebar-item-label">+ Nuevo Comercio</span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="admin-sidebar-action-btn tactile-btn"
+            onClick={handleRefreshSystem}
+            disabled={isRefreshing}
+            title={isSidebarCollapsed ? "Actualizar BD y Sincronizar" : undefined}
+          >
+            <div className="admin-sidebar-item-icon-wrap">
+              {refreshSuccess ? (
+                <Check size={17} style={{ color: 'var(--accent-emerald)' }} />
+              ) : (
+                <RefreshCw size={17} className={isRefreshing ? 'cf-spin' : ''} style={{ color: 'var(--accent-emerald)' }} />
+              )}
+            </div>
+            {!isSidebarCollapsed && (
+              <span className="admin-sidebar-item-label">
+                {isRefreshing ? 'Actualizando...' : refreshSuccess ? '¡Actualizado!' : 'Actualizar BD'}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="admin-sidebar-action-btn tactile-btn"
+            onClick={() => handleOpenBot('connection')}
+            title={isSidebarCollapsed ? "Conexión WhatsApp Bot" : undefined}
+          >
+            <div className="admin-sidebar-item-icon-wrap">
+              <Bot size={17} style={{ color: 'var(--accent-emerald)' }} />
+            </div>
+            {!isSidebarCollapsed && (
+              <span className="admin-sidebar-item-label">Conexión Bot</span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            className="admin-sidebar-action-btn tactile-btn"
+            onClick={() => handleOpenBot('security')}
+            title={isSidebarCollapsed ? "Seguridad & Anti-Spam WA" : undefined}
+          >
+            <div className="admin-sidebar-item-icon-wrap">
+              <ShieldAlert size={17} style={{ color: 'var(--accent-amber)' }} />
+            </div>
+            {!isSidebarCollapsed && (
+              <span className="admin-sidebar-item-label">Anti-Spam WA</span>
+            )}
+          </button>
+
+          {/* Sistema & Sesión */}
+          <div className="admin-sidebar-section-divider" />
+          {!isSidebarCollapsed && (
+            <span className="admin-sidebar-section-title">Sistema</span>
+          )}
+
+          {onToggleTheme && (
+            <button
+              type="button"
+              className="admin-sidebar-action-btn tactile-btn"
+              onClick={onToggleTheme}
+              title={isSidebarCollapsed ? (theme === 'dark' ? "Modo Claro" : "Modo Oscuro") : undefined}
+            >
+              <div className="admin-sidebar-item-icon-wrap">
+                {theme === 'dark' ? (
+                  <Sun size={17} style={{ color: 'var(--accent-amber)' }} />
+                ) : (
+                  <Moon size={17} style={{ color: 'var(--accent-amber)' }} />
+                )}
+              </div>
+              {!isSidebarCollapsed && (
+                <span className="admin-sidebar-item-label">
+                  {theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
+                </span>
+              )}
+            </button>
+          )}
+
+          {onBackToPos && (
+            <button
+              type="button"
+              className="admin-sidebar-action-btn tactile-btn"
+              onClick={onBackToPos}
+              title={isSidebarCollapsed ? "Volver al POS (Esc)" : undefined}
+            >
+              <div className="admin-sidebar-item-icon-wrap">
+                <ArrowLeft size={17} />
+              </div>
+              {!isSidebarCollapsed && (
+                <span className="admin-sidebar-item-label">Volver al POS</span>
+              )}
+            </button>
+          )}
+
+          {onLogout && (
+            <button
+              type="button"
+              className="admin-sidebar-action-btn btn-danger tactile-btn"
+              onClick={onLogout}
+              title={isSidebarCollapsed ? "Cerrar Sesión" : undefined}
+            >
+              <div className="admin-sidebar-item-icon-wrap">
+                <LogOut size={17} style={{ color: 'var(--accent-rose)' }} />
+              </div>
+              {!isSidebarCollapsed && (
+                <span className="admin-sidebar-item-label" style={{ color: 'var(--accent-rose)' }}>
+                  Cerrar Sesión
+                </span>
+              )}
+            </button>
+          )}
+
           {!isSidebarCollapsed && (
             <div className="admin-sidebar-footer">
-              <span className="admin-sidebar-footer-text">ComandaFast Admin</span>
+              <span className="admin-sidebar-footer-text">ComandaFast CRM v2.0</span>
             </div>
           )}
         </aside>
 
-        {/* MAIN VIEWPORT */}
+        {/* MAIN VIEWPORT (RIGHT) */}
         <div className="admin-main-viewport">
           {/* MOBILE COUPLED ACCORDION NAVIGATION */}
           <div className="admin-mobile-accordion-container">
@@ -621,6 +623,103 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
                     </button>
                   );
                 })}
+
+                {/* Mobile Acciones de Local */}
+                <div className="admin-sidebar-section-divider" style={{ margin: '0.5rem 0 0.25rem' }} />
+                <span className="admin-sidebar-section-title">Acciones de Local</span>
+
+                <button
+                  type="button"
+                  className="admin-sidebar-action-btn tactile-btn"
+                  onClick={() => {
+                    setShowOnboarding(true);
+                    setIsMobileAccordionOpen(false);
+                  }}
+                >
+                  <Plus size={16} style={{ color: 'var(--accent-amber)' }} />
+                  <span>+ Nuevo Comercio</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="admin-sidebar-action-btn tactile-btn"
+                  onClick={() => {
+                    handleRefreshSystem();
+                    setIsMobileAccordionOpen(false);
+                  }}
+                  disabled={isRefreshing}
+                >
+                  {refreshSuccess ? (
+                    <Check size={16} style={{ color: 'var(--accent-emerald)' }} />
+                  ) : (
+                    <RefreshCw size={16} className={isRefreshing ? 'cf-spin' : ''} style={{ color: 'var(--accent-emerald)' }} />
+                  )}
+                  <span>{isRefreshing ? 'Actualizando...' : refreshSuccess ? '¡BD Actualizada!' : 'Actualizar BD'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="admin-sidebar-action-btn tactile-btn"
+                  onClick={() => handleOpenBot('connection')}
+                >
+                  <Bot size={16} style={{ color: 'var(--accent-emerald)' }} />
+                  <span>Conexión Bot</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="admin-sidebar-action-btn tactile-btn"
+                  onClick={() => handleOpenBot('security')}
+                >
+                  <ShieldAlert size={16} style={{ color: 'var(--accent-amber)' }} />
+                  <span>Anti-Spam WA</span>
+                </button>
+
+                {/* Mobile Sistema & Sesión */}
+                <div className="admin-sidebar-section-divider" style={{ margin: '0.5rem 0 0.25rem' }} />
+                <span className="admin-sidebar-section-title">Sistema</span>
+
+                {onToggleTheme && (
+                  <button
+                    type="button"
+                    className="admin-sidebar-action-btn tactile-btn"
+                    onClick={() => {
+                      onToggleTheme();
+                      setIsMobileAccordionOpen(false);
+                    }}
+                  >
+                    {theme === 'dark' ? <Sun size={16} style={{ color: 'var(--accent-amber)' }} /> : <Moon size={16} style={{ color: 'var(--accent-amber)' }} />}
+                    <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
+                  </button>
+                )}
+
+                {onBackToPos && (
+                  <button
+                    type="button"
+                    className="admin-sidebar-action-btn tactile-btn"
+                    onClick={() => {
+                      setIsMobileAccordionOpen(false);
+                      onBackToPos();
+                    }}
+                  >
+                    <ArrowLeft size={16} />
+                    <span>Volver al POS</span>
+                  </button>
+                )}
+
+                {onLogout && (
+                  <button
+                    type="button"
+                    className="admin-sidebar-action-btn btn-danger tactile-btn"
+                    onClick={() => {
+                      setIsMobileAccordionOpen(false);
+                      onLogout();
+                    }}
+                  >
+                    <LogOut size={16} style={{ color: 'var(--accent-rose)' }} />
+                    <span style={{ color: 'var(--accent-rose)' }}>Cerrar Sesión</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

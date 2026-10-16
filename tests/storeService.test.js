@@ -44,3 +44,13 @@ test('DEFAULT_DEMO_STORE contains baseline properties', () => {
   assert.ok(DEFAULT_DEMO_STORE.slug);
   assert.ok(DEFAULT_DEMO_STORE.theme);
 });
+
+test('getStoreCatalogUrl builds valid multi-tenant URL per business', async () => {
+  const { getStoreCatalogUrl } = await import('../src/services/storeService.js');
+  const url1 = getStoreCatalogUrl('don-pepe', 'http://localhost:5173/');
+  assert.equal(url1, 'http://localhost:5173#catalog?store=don-pepe');
+
+  const url2 = getStoreCatalogUrl('burga-chamical', 'https://comandafast.app');
+  assert.equal(url2, 'https://comandafast.app#catalog?store=burga-chamical');
+});
+
