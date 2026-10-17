@@ -16,6 +16,16 @@ function IconGridView({ size = 16, className = '' }) {
   );
 }
 
+function IconMenu({ size = 20, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  );
+}
+
 function IconArrowRight({ size = 16, className = '' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
@@ -182,6 +192,9 @@ export default function LandingPage({
   // FAQ Accordion State
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
+  // Mobile Navigation Drawer State
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   // Fast email lead capture
   const [leadEmail, setLeadEmail] = useState('');
   const [leadStatus, setLeadStatus] = useState('');
@@ -189,13 +202,14 @@ export default function LandingPage({
   // Keyboard accessibility: ESC to close modal
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isStoreModalOpen) {
-        setIsStoreModalOpen(false);
+      if (e.key === 'Escape') {
+        if (isStoreModalOpen) setIsStoreModalOpen(false);
+        if (isMobileMenuOpen) setIsMobileMenuOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isStoreModalOpen]);
+  }, [isStoreModalOpen, isMobileMenuOpen]);
 
   // Calculator computations
   const appCommission = useMemo(() => {
@@ -257,6 +271,7 @@ export default function LandingPage({
               <IconGridView size={14} />
             </div>
             <span className="st-logo-text">ComandaSaaS</span>
+            <span className="st-version-badge">v2.4</span>
           </a>
 
           {/* Desktop Navigation Links */}
@@ -295,8 +310,81 @@ export default function LandingPage({
                 <IconSettings size={15} />
               </button>
             )}
+            {/* Mobile Navigation Toggle */}
+            <button 
+              type="button" 
+              className="st-mobile-toggle"
+              aria-label="Abrir menú de navegación"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <IconClose size={20} /> : <IconMenu size={20} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div className="st-mobile-drawer open">
+            <a className="st-mobile-nav-link" href="#modulos" onClick={() => setIsMobileMenuOpen(false)}>
+              <span>Product (Módulos)</span>
+              <IconArrowRight size={14} />
+            </a>
+            <a className="st-mobile-nav-link" href="#calculadora" onClick={() => setIsMobileMenuOpen(false)}>
+              <span>Mise-en-Place (Calculadora)</span>
+              <IconArrowRight size={14} />
+            </a>
+            <a className="st-mobile-nav-link" href="#seguridad" onClick={() => setIsMobileMenuOpen(false)}>
+              <span>Architecture (Seguridad)</span>
+              <IconArrowRight size={14} />
+            </a>
+            <a className="st-mobile-nav-link" href="#precios" onClick={() => setIsMobileMenuOpen(false)}>
+              <span>Pricing (Planes)</span>
+              <IconArrowRight size={14} />
+            </a>
+            <a className="st-mobile-nav-link" href="#faq" onClick={() => setIsMobileMenuOpen(false)}>
+              <span>Preguntas Frecuentes</span>
+              <IconArrowRight size={14} />
+            </a>
+            <div className="st-mobile-drawer-actions">
+              <button 
+                type="button" 
+                className="st-btn-dark"
+                style={{ width: '100%', height: '44px' }}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onOpenDemo();
+                }}
+              >
+                Probar Demo Gratuita
+              </button>
+              <button 
+                type="button" 
+                className="st-btn-outline"
+                style={{ width: '100%', height: '44px' }}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setIsStoreModalOpen(true);
+                }}
+              >
+                Ingresar a mi Local
+              </button>
+              {typeof onOpenSaas === 'function' && (
+                <button
+                  type="button"
+                  className="st-btn-ghost"
+                  style={{ width: '100%', justifyContent: 'center', height: '40px' }}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    onOpenSaas();
+                  }}
+                >
+                  <IconSettings size={16} />
+                  <span style={{ marginLeft: '6px' }}>Portal Super-Admin</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       <main>
@@ -501,18 +589,22 @@ export default function LandingPage({
               <div className="st-trust-col">
                 <div className="st-trust-metric">0%</div>
                 <div className="st-trust-desc">Comisiones por pedido</div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--st-text-muted)', marginTop: '4px' }}>Cero intermediación forzada.</div>
               </div>
               <div className="st-trust-col">
                 <div className="st-trust-metric">&lt; 12 seg</div>
                 <div className="st-trust-desc">Por comanda emitida</div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--st-text-muted)', marginTop: '4px' }}>Velocidad pura en salón.</div>
               </div>
               <div className="st-trust-col">
                 <div className="st-trust-metric">100%</div>
                 <div className="st-trust-desc">Operativo offline-first</div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--st-text-muted)', marginTop: '4px' }}>Si cae internet, no frena.</div>
               </div>
               <div className="st-trust-col">
                 <div className="st-trust-metric">RLS Strict</div>
-                <div className="st-trust-desc">Aislamiento de bases de datos</div>
+                <div className="st-trust-desc">Aislamiento de bases</div>
+                <div style={{ fontSize: '0.74rem', color: 'var(--st-text-muted)', marginTop: '4px' }}>Aislamiento por sucursal.</div>
               </div>
             </div>
           </div>
@@ -1246,6 +1338,28 @@ export default function LandingPage({
           </div>
         </div>
       )}
+
+      {/* ==================================================================== */}
+      {/* 12. STICKY MOBILE BOTTOM BAR (Native Mobile Ergonomics)             */}
+      {/* ==================================================================== */}
+      <aside className="st-mobile-bottom-bar" aria-label="Acciones rápidas móviles">
+        <button 
+          type="button" 
+          className="st-btn-outline"
+          onClick={() => setIsStoreModalOpen(true)}
+        >
+          <IconStore size={16} />
+          <span>Mi Local</span>
+        </button>
+        <button 
+          type="button" 
+          className="st-btn-dark"
+          onClick={onOpenDemo}
+        >
+          <span>Empezar Demo</span>
+          <IconArrowRight size={16} />
+        </button>
+      </aside>
     </div>
   );
 }
