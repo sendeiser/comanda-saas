@@ -158,7 +158,7 @@ export default function Header({
           onClick={onOpenCrm}
           title="Directorio de Clientes y Cuentas Corrientes (Fiados)"
         >
-          <Users size={17} style={{ color: 'var(--accent-blue, #3b82f6)' }} />
+          <Users size={17} style={{ color: '#d4af37' }} />
           <span className="nav-tab-label-full">Clientes & Fiados</span>
           <span className="nav-tab-label-short">Clientes</span>
         </button>

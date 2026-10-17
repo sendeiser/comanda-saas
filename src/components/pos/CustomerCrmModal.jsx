@@ -27,6 +27,7 @@ import {
   recordCustomerPayment, 
   generateWhatsAppDebtReminder 
 } from '../../services/customerCrmService.js';
+import '../../styles/crm.css';
 
 export default function CustomerCrmModal({ 
   isOpen, 
@@ -206,14 +207,14 @@ export default function CustomerCrmModal({
           top: '20px',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: '#0f172a',
-          color: '#f8fafc',
-          border: '1px solid rgba(255, 255, 255, 0.15)',
+          background: '#080d1a',
+          color: '#ffffff',
+          border: '1px solid rgba(212, 175, 55, 0.4)',
           padding: '8px 18px',
           borderRadius: '24px',
           fontSize: '0.86rem',
           fontWeight: 700,
-          boxShadow: '0 10px 25px rgba(0,0,0,0.4)',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.6)',
           zIndex: 2000,
           display: 'flex',
           alignItems: 'center',
@@ -250,15 +251,11 @@ export default function CustomerCrmModal({
             <button
               type="button"
               onClick={() => setIsCreatingCustomer(true)}
-              className="btn btn-primary tactile-btn"
+              className="crm-btn-gold tactile-btn"
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '0.5rem 1rem',
-                fontSize: '0.84rem',
-                fontWeight: 800,
-                borderRadius: '10px'
+                gap: '6px'
               }}
             >
               <Plus size={16} />
@@ -280,7 +277,7 @@ export default function CustomerCrmModal({
         <section className="crm-stats-bar" aria-label="Métricas del Directorio">
           {/* Total Clientes */}
           <div className="crm-stat-card">
-            <div className="crm-stat-icon-wrap" style={{ background: 'rgba(59, 130, 246, 0.12)', color: '#3b82f6' }}>
+            <div className="crm-stat-icon-wrap" style={{ background: 'rgba(212, 175, 55, 0.16)', color: '#d4af37' }}>
               <Users size={19} />
             </div>
             <div>
@@ -291,16 +288,16 @@ export default function CustomerCrmModal({
           </div>
 
           {/* Deuda en la Calle */}
-          <div className="crm-stat-card" style={totalDebt > 0 ? { borderColor: 'rgba(245, 158, 11, 0.35)' } : {}}>
+          <div className="crm-stat-card" style={totalDebt > 0 ? { borderColor: 'rgba(212, 175, 55, 0.4)' } : {}}>
             <div className="crm-stat-icon-wrap" style={{ 
-              background: totalDebt > 0 ? 'rgba(245, 158, 11, 0.15)' : 'rgba(100, 116, 139, 0.12)', 
-              color: totalDebt > 0 ? '#d97706' : 'var(--text-muted)' 
+              background: totalDebt > 0 ? 'rgba(212, 175, 55, 0.18)' : 'rgba(100, 116, 139, 0.12)', 
+              color: totalDebt > 0 ? '#f3d07a' : 'var(--text-muted)' 
             }}>
               <DollarSign size={19} />
             </div>
             <div>
               <span className="crm-stat-label">Deuda en la Calle</span>
-              <span className="crm-stat-value" style={{ color: totalDebt > 0 ? '#d97706' : 'var(--text-primary)' }}>
+              <span className="crm-stat-value" style={{ color: totalDebt > 0 ? '#f3d07a' : '#ffffff' }}>
                 ${totalDebt.toLocaleString('es-AR')}
               </span>
               <span className="crm-stat-subtext">
@@ -311,12 +308,12 @@ export default function CustomerCrmModal({
 
           {/* Clientes al Día */}
           <div className="crm-stat-card">
-            <div className="crm-stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.12)', color: '#10b981' }}>
+            <div className="crm-stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.14)', color: '#10b981' }}>
               <CheckCircle2 size={19} />
             </div>
             <div>
               <span className="crm-stat-label">Clientes al Día</span>
-              <span className="crm-stat-value" style={{ color: '#10b981' }}>
+              <span className="crm-stat-value" style={{ color: '#34d399' }}>
                 {clearCount}
               </span>
               <span className="crm-stat-subtext">
@@ -338,7 +335,7 @@ export default function CustomerCrmModal({
             >
               <span>Todos</span>
               <span style={{ 
-                background: 'rgba(0,0,0,0.08)', 
+                background: 'rgba(255,255,255,0.08)', 
                 padding: '1px 6px', 
                 borderRadius: '10px', 
                 fontSize: '0.72rem' 
@@ -353,12 +350,12 @@ export default function CustomerCrmModal({
               aria-selected={filterTab === 'debt'}
               className={`crm-filter-tab ${filterTab === 'debt' ? 'active' : ''}`}
               onClick={() => setFilterTab('debt')}
-              style={debtorsCount > 0 && filterTab === 'debt' ? { color: '#d97706' } : {}}
+              style={debtorsCount > 0 && filterTab === 'debt' ? { color: '#f3d07a' } : {}}
             >
               <span>Con Deuda</span>
               <span style={{ 
-                background: debtorsCount > 0 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(0,0,0,0.08)', 
-                color: debtorsCount > 0 ? '#d97706' : 'inherit',
+                background: debtorsCount > 0 ? 'rgba(212, 175, 55, 0.22)' : 'rgba(255,255,255,0.08)', 
+                color: debtorsCount > 0 ? '#f3d07a' : 'inherit',
                 padding: '1px 6px', 
                 borderRadius: '10px', 
                 fontSize: '0.72rem',
@@ -471,8 +468,8 @@ export default function CustomerCrmModal({
                 <button
                   type="button"
                   onClick={() => setIsCreatingCustomer(true)}
-                  className="btn btn-primary tactile-btn"
-                  style={{ marginTop: '8px', padding: '0.5rem 1.25rem', fontSize: '0.84rem', fontWeight: 800 }}
+                  className="crm-btn-gold tactile-btn"
+                  style={{ marginTop: '8px' }}
                 >
                   <Plus size={16} /> + Registrar Primer Cliente
                 </button>
@@ -497,10 +494,10 @@ export default function CustomerCrmModal({
                       className="crm-customer-avatar"
                       style={{
                         background: hasDebt 
-                          ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.35) 100%)' 
+                          ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(184, 148, 40, 0.38) 100%)' 
                           : 'linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.3) 100%)',
-                        color: hasDebt ? '#d97706' : '#10b981',
-                        border: hasDebt ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid rgba(16, 185, 129, 0.4)'
+                        color: hasDebt ? '#f3d07a' : '#34d399',
+                        border: hasDebt ? '1px solid rgba(212, 175, 55, 0.45)' : '1px solid rgba(16, 185, 129, 0.35)'
                       }}
                       title={cust.name}
                     >
@@ -516,7 +513,7 @@ export default function CustomerCrmModal({
 
                         {hasDebt ? (
                           <span className="crm-badge-debt">
-                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d97706' }} />
+                            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d4af37' }} />
                             Saldo Deudor
                           </span>
                         ) : (
@@ -572,7 +569,7 @@ export default function CustomerCrmModal({
                     <div 
                       className="crm-balance-value"
                       style={{ 
-                        color: hasDebt ? (document.documentElement.getAttribute('data-theme') === 'light' ? '#b45309' : '#fbbf24') : 'var(--text-secondary)'
+                        color: hasDebt ? '#f3d07a' : 'var(--text-secondary)'
                       }}
                     >
                       ${balance.toLocaleString('es-AR')}
@@ -625,12 +622,10 @@ export default function CustomerCrmModal({
                           onSelectCustomer(cust);
                           onClose();
                         }}
-                        className="btn btn-primary tactile-btn"
+                        className="crm-btn-gold tactile-btn"
                         style={{
                           padding: '0.45rem 0.9rem',
-                          fontSize: '0.82rem',
-                          fontWeight: 800,
-                          borderRadius: '10px'
+                          fontSize: '0.82rem'
                         }}
                         title="Asignar cliente a la comanda actual"
                       >
@@ -655,7 +650,7 @@ export default function CustomerCrmModal({
           >
             <div className="crm-header" style={{ padding: '1.1rem 1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(212, 175, 55, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37' }}>
                   <Plus size={18} />
                 </div>
                 <div>
@@ -752,15 +747,15 @@ export default function CustomerCrmModal({
                 <button
                   type="button"
                   onClick={() => setIsCreatingCustomer(false)}
-                  className="btn btn-secondary tactile-btn"
-                  style={{ flex: 1, padding: '0.55rem', borderRadius: '8px', fontWeight: 700 }}
+                  className="crm-btn-secondary tactile-btn"
+                  style={{ flex: 1, padding: '0.55rem' }}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary tactile-btn"
-                  style={{ flex: 1, padding: '0.55rem', borderRadius: '8px', fontWeight: 800 }}
+                  className="crm-btn-gold tactile-btn"
+                  style={{ flex: 1, padding: '0.55rem', justifyContent: 'center' }}
                 >
                   Guardar Cliente
                 </button>
@@ -803,18 +798,18 @@ export default function CustomerCrmModal({
 
             <form onSubmit={handleConfirmPayment} style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div style={{ 
-                background: 'var(--bg-card-hover)', 
-                border: '1px solid var(--border-subtle)', 
+                background: '#131e36', 
+                border: '1px solid rgba(226, 232, 240, 0.1)', 
                 borderRadius: '12px', 
                 padding: '0.85rem 1rem' 
               }}>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Cliente</div>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>Cliente</div>
+                <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff' }}>
                   {payingCustomer.name}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Deuda acumulada actual:</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#d97706', fontWeight: 900 }}>
+                  <span style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>Deuda acumulada actual:</span>
+                  <strong style={{ fontSize: '1.15rem', color: '#f3d07a', fontWeight: 900 }}>
                     ${Number(payingCustomer.currentBalance || 0).toLocaleString('es-AR')}
                   </strong>
                 </div>
@@ -840,7 +835,7 @@ export default function CustomerCrmModal({
                   <button
                     type="button"
                     onClick={() => setPaymentAmount(payingCustomer.currentBalance)}
-                    className="btn btn-secondary tactile-btn"
+                    className="crm-btn-secondary tactile-btn"
                     style={{ flex: 1, padding: '5px', fontSize: '0.75rem', fontWeight: 800, borderRadius: '6px' }}
                   >
                     Total (${Number(payingCustomer.currentBalance || 0).toLocaleString('es-AR')})
@@ -848,7 +843,7 @@ export default function CustomerCrmModal({
                   <button
                     type="button"
                     onClick={() => setPaymentAmount(Math.round((payingCustomer.currentBalance || 0) / 2))}
-                    className="btn btn-secondary tactile-btn"
+                    className="crm-btn-secondary tactile-btn"
                     style={{ flex: 1, padding: '5px', fontSize: '0.75rem', fontWeight: 800, borderRadius: '6px' }}
                   >
                     50% (${Math.round((payingCustomer.currentBalance || 0) / 2).toLocaleString('es-AR')})
@@ -876,15 +871,15 @@ export default function CustomerCrmModal({
                 <button
                   type="button"
                   onClick={() => setPayingCustomer(null)}
-                  className="btn btn-secondary tactile-btn"
-                  style={{ flex: 1, padding: '0.55rem', borderRadius: '8px', fontWeight: 700 }}
+                  className="crm-btn-secondary tactile-btn"
+                  style={{ flex: 1, padding: '0.55rem' }}
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="btn btn-primary tactile-btn"
-                  style={{ flex: 1, padding: '0.55rem', borderRadius: '8px', fontWeight: 800, background: '#10b981', borderColor: '#10b981' }}
+                  className="tactile-btn"
+                  style={{ flex: 1, padding: '0.55rem', borderRadius: '8px', fontWeight: 800, background: '#10b981', color: '#080d1a', border: 'none', cursor: 'pointer' }}
                 >
                   Confirmar Cobro
                 </button>
@@ -904,7 +899,7 @@ export default function CustomerCrmModal({
           >
             <div className="crm-header" style={{ padding: '1.1rem 1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(59, 130, 246, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3b82f6' }}>
+                <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'rgba(212, 175, 55, 0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4af37' }}>
                   <History size={18} />
                 </div>
                 <div>
@@ -938,19 +933,19 @@ export default function CustomerCrmModal({
                     style={{
                       padding: '10px 14px',
                       borderRadius: '10px',
-                      background: 'var(--bg-card-hover)',
-                      border: '1px solid var(--border-subtle)',
+                      background: '#131e36',
+                      border: '1px solid rgba(226, 232, 240, 0.08)',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      borderLeft: entry.type === 'charge' ? '4px solid #f59e0b' : '4px solid #10b981'
+                      borderLeft: entry.type === 'charge' ? '4px solid #d4af37' : '4px solid #10b981'
                     }}
                   >
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                      <div style={{ fontWeight: 800, fontSize: '0.85rem', color: '#ffffff' }}>
                         {entry.concept || (entry.type === 'charge' ? 'Comanda a cuenta (Fiado)' : 'Cobro de saldo')}
                       </div>
-                      <div style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                      <div style={{ fontSize: '0.73rem', color: '#94a3b8', marginTop: '2px' }}>
                         {entry.date ? new Date(entry.date).toLocaleString('es-AR') : '—'}
                       </div>
                     </div>
@@ -959,11 +954,11 @@ export default function CustomerCrmModal({
                       <div style={{
                         fontWeight: 900,
                         fontSize: '0.94rem',
-                        color: entry.type === 'charge' ? '#d97706' : '#10b981'
+                        color: entry.type === 'charge' ? '#f3d07a' : '#34d399'
                       }}>
                         {entry.type === 'charge' ? `+$${Number(entry.amount || 0).toLocaleString('es-AR')}` : `-$${Number(entry.amount || 0).toLocaleString('es-AR')}`}
                       </div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                         Saldo posterior: ${Number(entry.balanceAfter || 0).toLocaleString('es-AR')}
                       </div>
                     </div>

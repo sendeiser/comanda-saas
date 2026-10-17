@@ -46,8 +46,9 @@ skills/
 ComandaFast-Bot-Portatil/
 ComandaFast-Bot-Portatil.zip
 
-# Scratch scripts
+# Scratch scripts & test outputs
 scratch/
+test-results/
 
 # Python cache & portable build
 __pycache__/
