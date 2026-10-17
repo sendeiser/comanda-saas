@@ -1,0 +1,122 @@
+[
+  {
+    "route": "landing",
+    "label": "Landing Principal",
+    "path": "/",
+    "device": "desktop",
+    "width": 1440,
+    "height": 900,
+    "screenshotPath": ".stitch\\crawler-screenshots\\landing-desktop.png",
+    "sizeBytes": 541133
+  },
+  {
+    "route": "pos-terminal",
+    "label": "Terminal POS Gastronómico",
+    "path": "/#pos",
+    "device": "desktop",
+    "width": 1440,
+    "height": 900,
+    "screenshotPath": ".stitch\\crawler-screenshots\\pos-terminal-desktop.png",
+    "sizeBytes": 264806
+  },
+  {
+    "route": "kitchen-kds",
+    "label": "KDS Pantalla de Cocina",
+    "path": "/#cocina",
+    "device": "desktop",
+    "width": 1440,
+    "height": 900,
+    "screenshotPath": ".stitch\\crawler-screenshots\\kitchen-kds-desktop.png",
+    "sizeBytes": 264806
+  },
+  {
+    "route": "public-catalog",
+    "label": "Carta Digital QR",
+    "path": "/#catalog",
+    "device": "desktop",
+    "width": 1440,
+    "height": 900,
+    "screenshotPath": ".stitch\\crawler-screenshots\\public-catalog-desktop.png",
+    "sizeBytes": 435235
+  },
+  {
+    "route": "saas-admin",
+    "label": "Portal de Administración SaaS",
+    "path": "/#saas",
+    "device": "desktop",
+    "width": 1440,
+    "height": 900,
+    "screenshotPath": ".stitch\\crawler-screenshots\\saas-admin-desktop.png",
+    "sizeBytes": 85924
+  },
+  {
+    "route": "owner-audit",
+    "label": "Portal Auditoría de Dueño",
+    "path": "/#dueno",
+    "device": "desktop",
+    "width": 1440,
+    "height": 900,
+    "screenshotPath": ".stitch\\crawler-screenshots\\owner-audit-desktop.png",
+    "sizeBytes": 51741
+  },
+  {
+    "route": "landing",
+    "label": "Landing Principal",
+    "path": "/",
+    "device": "mobile",
+    "width": 390,
+    "height": 844,
+    "screenshotPath": ".stitch\\crawler-screenshots\\landing-mobile.png",
+    "sizeBytes": 525989
+  },
+  {
+    "route": "pos-terminal",
+    "label": "Terminal POS Gastronómico",
+    "path": "/#pos",
+    "device": "mobile",
+    "width": 390,
+    "height": 844,
+    "screenshotPath": ".stitch\\crawler-screenshots\\pos-terminal-mobile.png",
+    "sizeBytes": 107512
+  },
+  {
+    "route": "kitchen-kds",
+    "label": "KDS Pantalla de Cocina",
+    "path": "/#cocina",
+    "device": "mobile",
+    "width": 390,
+    "height": 844,
+    "screenshotPath": ".stitch\\crawler-screenshots\\kitchen-kds-mobile.png",
+    "sizeBytes": 111009
+  },
+  {
+    "route": "public-catalog",
+    "label": "Carta Digital QR",
+    "path": "/#catalog",
+    "device": "mobile",
+    "width": 390,
+    "height": 844,
+    "screenshotPath": ".stitch\\crawler-screenshots\\public-catalog-mobile.png",
+    "sizeBytes": 278076
+  },
+  {
+    "route": "saas-admin",
+    "label": "Portal de Administración SaaS",
+    "path": "/#saas",
+    "device": "mobile",
+    "width": 390,
+    "height": 844,
+    "screenshotPath": ".stitch\\crawler-screenshots\\saas-admin-mobile.png",
+    "sizeBytes": 70642
+  },
+  {
+    "route": "owner-audit",
+    "label": "Portal Auditoría de Dueño",
+    "path": "/#dueno",
+    "device": "mobile",
+    "width": 390,
+    "height": 844,
+    "screenshotPath": ".stitch\\crawler-screenshots\\owner-audit-mobile.png",
+    "sizeBytes": 44168
+  }
+]
