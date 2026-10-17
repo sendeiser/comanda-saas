@@ -12,7 +12,7 @@
   --brand-accent: #10b981;
   --brand-bg: #09090b;
   --brand-surface: #111827;
-  --brand-font: 'Plus Jakarta Sans', sans-serif;
+  --brand-font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Taste-Design & UI-UX-Pro-Max Semantic Canvas (No pure black #000000) */
   --bg-canvas: #09090b;
@@ -90,9 +90,9 @@
   --glass-bg: rgba(18, 25, 41, 0.92);
   --safe-bottom: env(safe-area-inset-bottom, 12px);
 
-  /* Modern Typography */
-  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+  /* Modern Typography (Atelier Gastronomy OS) */
+  --font-main: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
@@ -4916,40 +4916,53 @@ h1, h2, h3, h4, .brand-title {
    LIGHT MODE
    ========================================================= */
 [data-theme="light"] {
-  --bg-main: #f8fafc;
+  --bg-main: #f9f9f8;
+  --bg-canvas: #f9f9f8;
   --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
-  --bg-card-active: #e2e8f0;
+  --bg-card-hover: #f1f1ef;
+  --bg-card-active: #eeeeed;
   --bg-input: #ffffff;
-  --bg-subtle: rgba(15, 23, 42, 0.04);
+  --bg-subtle: #f3f4f3;
   
-  --border-subtle: #e2e8f0;
-  --border-active: #cbd5e1;
-  --border-focus: #d97706;
-  --border-glass: rgba(15, 23, 42, 0.08);
+  --border-subtle: #e6e6e3;
+  --border-active: #d0d0cb;
+  --border-focus: #a43716;
+  --border-glass: #e6e6e3;
   
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
+  --text-primary: #1a1c1c;
+  --text-secondary: #5b5e67;
+  --text-muted: #8c909a;
   --text-inverse: #ffffff;
   
-  --accent-amber: #d97706;
-  --accent-amber-glow: rgba(217, 119, 6, 0.2);
+  --brand-primary: #a43716;
+  --brand-hover: #c54f2c;
+  --brand-primary-light: #ffdbd1;
+  --brand-bg: #f9f9f8;
+  --brand-surface: #ffffff;
+  --brand-font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 4px 10px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 10px 24px rgba(15, 23, 42, 0.12);
+  --accent-amber: #a43716;
+  --accent-amber-glow: rgba(164, 55, 22, 0.2);
+  --accent-terracotta: #a43716;
+  --accent-emerald: #10b981;
+  --accent-emerald-glow: rgba(16, 185, 129, 0.2);
+  --accent-rose: #ba1a1a;
+  --accent-rose-glow: rgba(186, 26, 26, 0.2);
+  
+  --shadow-sm: 0 1px 2px rgba(26, 28, 28, 0.04);
+  --shadow-md: 0 4px 10px rgba(26, 28, 28, 0.06);
+  --shadow-lg: 0 10px 24px rgba(26, 28, 28, 0.08);
 
   --card-gradient: #ffffff;
-  --amber-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --amber-gradient: linear-gradient(135deg, #c54f2c 0%, #a43716 100%);
 
-  /* Impeccable Light Surface Elevation */
+  /* Atelier Light Surface Elevation */
   --bg-surface-elevated: #ffffff;
   --bg-surface-card: #ffffff;
-  --glass-bg: rgba(255, 255, 255, 0.96);
-  --border-highlight: rgba(217, 119, 6, 0.28);
+  --glass-bg: rgba(255, 255, 255, 0.98);
+  --border-highlight: rgba(164, 55, 22, 0.28);
   --border-emerald-highlight: rgba(16, 185, 129, 0.28);
-  --border-rose-highlight: rgba(239, 68, 68, 0.28);
+  --border-rose-highlight: rgba(186, 26, 26, 0.28);
 }
 
 [data-theme="light"] body {
@@ -4959,232 +4972,250 @@ h1, h2, h3, h4, .brand-title {
 
 [data-theme="light"] .top-header {
   background: #ffffff;
-  border-bottom-color: var(--border-subtle);
+  border-bottom: 1px solid #e6e6e3;
 }
 
 [data-theme="light"] .nav-tabs {
-  background: #f1f5f9;
-  border-color: var(--border-subtle);
+  background: #f3f4f3;
+  border: 1px solid #e6e6e3;
 }
 
 [data-theme="light"] .nav-tab-btn.active {
   color: #ffffff;
-  background: var(--accent-amber);
+  background: #a43716;
 }
 
 [data-theme="light"] .catalog-sticky-header {
-  background: var(--bg-main);
-  border-bottom-color: var(--border-subtle);
+  background: #f9f9f8;
+  border-bottom: 1px solid #e6e6e3;
 }
 
 [data-theme="light"] .search-input-wrapper input {
   background: #ffffff;
-  border-color: #cbd5e1;
-  color: var(--text-primary);
+  border-color: #e6e6e3;
+  color: #1a1c1c;
 }
 
 [data-theme="light"] .cat-pill-btn {
   background: #ffffff;
-  border-color: #cbd5e1;
-  color: var(--text-secondary);
+  border-color: #e6e6e3;
+  color: #5b5e67;
 }
 
 [data-theme="light"] .cat-pill-btn:hover {
-  background: #f1f5f9;
-  color: var(--text-primary);
+  background: #f1f1ef;
+  color: #1a1c1c;
 }
 
 [data-theme="light"] .cat-pill-btn.active {
-  background: var(--amber-gradient);
+  background: #a43716;
   color: #ffffff;
   border-color: transparent;
 }
 
 [data-theme="light"] .product-card {
   background: #ffffff;
-  border-color: #e2e8f0;
-  box-shadow: var(--shadow-sm);
+  border-color: #e6e6e3;
+  box-shadow: 0 1px 3px rgba(26, 28, 28, 0.04);
 }
 
 [data-theme="light"] .product-card:hover {
-  border-color: var(--accent-amber);
+  border-color: #a43716;
 }
 
 [data-theme="light"] .product-name {
-  color: #0f172a;
+  color: #1a1c1c;
+  font-family: var(--font-main);
+  font-weight: 600;
 }
 
 [data-theme="light"] .product-desc {
-  color: #64748b;
+  color: #5b5e67;
 }
 
 [data-theme="light"] .product-card-media {
-  background: #f1f5f9;
-  border-color: #e2e8f0;
+  background: #f3f4f3;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .product-card-emoji-badge {
-  background: rgba(255, 255, 255, 0.88);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #e6e6e3;
+  box-shadow: 0 2px 5px rgba(26, 28, 28, 0.06);
 }
 
 [data-theme="light"] .cart-item-thumb {
   background: #ffffff;
-  border-color: #e2e8f0;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .cart-item-thumb-emoji {
   background: #ffffff;
-  border-color: #e2e8f0;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .product-card-fallback {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(245, 158, 11, 0.04));
+  background: linear-gradient(135deg, rgba(164, 55, 22, 0.08), rgba(164, 55, 22, 0.02));
 }
 
 [data-theme="light"] .pos-cash-closed-banner {
-  background: #fef2f2;
-  border-color: #fca5a5;
+  background: #fdf3f0;
+  border-color: #ffdbd1;
 }
 
 [data-theme="light"] .pos-cash-closed-icon-box {
-  background: #fee2e2;
-  color: #dc2626;
+  background: #ffdbd1;
+  color: #a43716;
 }
 
 [data-theme="light"] .pos-cart-panel {
   background: #ffffff;
-  border-color: #e2e8f0;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .channel-selector {
-  background: #f1f5f9;
+  background: #f3f4f3;
+  border: 1px solid #e6e6e3;
 }
 
 [data-theme="light"] .cart-item-row {
-  background: #f8fafc;
-  border-color: #e2e8f0;
+  background: #f9f9f8;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .cart-item-title {
-  color: #0f172a;
+  color: #1a1c1c;
+  font-weight: 600;
 }
 
 [data-theme="light"] .cart-footer {
-  background: #f8fafc;
+  background: #f9f9f8;
+  border-top: 1px solid #e6e6e3;
 }
 
 [data-theme="light"] .total-row-highlight {
-  color: #0f172a;
+  color: #1a1c1c;
+  font-family: var(--font-mono);
+  font-weight: 700;
 }
 
 [data-theme="light"] .btn-confirm-order {
+  background: #a43716;
   color: #ffffff;
 }
 
+[data-theme="light"] .btn-confirm-order:hover {
+  background: #c54f2c;
+}
+
 [data-theme="light"] .kds-column {
-  background: #ffffff;
-  border-color: #e2e8f0;
+  background: #f9f9f8;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .kds-order-card {
-  background: #f8fafc;
-  border-color: #e2e8f0;
+  background: #ffffff;
+  border-color: #e6e6e3;
+  box-shadow: 0 1px 3px rgba(26, 28, 28, 0.04);
+}
+
+[data-theme="light"] .kds-order-card:hover {
+  border-color: #d0d0cb;
 }
 
 [data-theme="light"] .kds-item-line {
-  color: #0f172a;
+  color: #1a1c1c;
 }
 
 [data-theme="light"] .modal-card {
   background: #ffffff;
-  border-color: #cbd5e1;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .modal-title {
-  color: #0f172a;
+  color: #1a1c1c;
 }
 
 [data-theme="light"] .pos-mobile-tabs {
   background: #ffffff;
-  border-color: #cbd5e1;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .pos-mobile-cart-bar {
   background: #ffffff;
-  color: #0f172a;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.2);
+  color: #1a1c1c;
+  border: 1px solid #e6e6e3;
+  box-shadow: 0 4px 16px rgba(26, 28, 28, 0.08);
 }
 
 /* Light Theme Brand Name visibility */
 [data-theme="light"] .brand-name,
 [data-theme="light"] .brand-name-text {
-  color: #0f172a !important;
+  color: #1a1c1c !important;
 }
 
 /* Light Theme Pure White Cart & Order Panel */
 [data-theme="light"] .pos-cart-panel {
   background: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid #e6e6e3 !important;
+  box-shadow: 0 1px 3px rgba(26, 28, 28, 0.04) !important;
 }
 
 [data-theme="light"] .cart-header {
   background: #ffffff !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+  border-bottom: 1px solid #e6e6e3 !important;
 }
 
 [data-theme="light"] .cart-header-top-bar {
-  border-bottom-color: #e2e8f0;
+  border-bottom-color: #e6e6e3;
 }
 
 [data-theme="light"] .cart-header-top-title {
-  color: #0f172a;
+  color: #1a1c1c;
 }
 
 [data-theme="light"] .cart-width-controls {
-  background: #f1f5f9;
-  border-color: #cbd5e1;
+  background: #f3f4f3;
+  border-color: #e6e6e3;
 }
 
 [data-theme="light"] .cart-width-label {
-  color: #475569;
+  color: #5b5e67;
 }
 
 [data-theme="light"] .cart-width-btn {
-  color: #475569;
+  color: #5b5e67;
 }
 
 [data-theme="light"] .cart-width-btn:hover {
   background: #ffffff;
-  color: #0f172a;
-  border-color: #94a3b8;
+  color: #1a1c1c;
+  border-color: #d0d0cb;
 }
 
 [data-theme="light"] .pos-resizer-line {
-  background: #cbd5e1;
+  background: #e6e6e3;
 }
 
 [data-theme="light"] .pos-resizer-grip {
   background: #ffffff;
-  border-color: #cbd5e1;
-  color: #64748b;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.1);
+  border-color: #e6e6e3;
+  color: #8c909a;
+  box-shadow: 0 1px 4px rgba(26, 28, 28, 0.06);
 }
 
 [data-theme="light"] .channel-selector {
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
+  background: #f3f4f3 !important;
+  border: 1px solid #e6e6e3 !important;
 }
 
 [data-theme="light"] .channel-btn {
-  color: #64748b !important;
+  color: #5b5e67 !important;
 }
 
 [data-theme="light"] .channel-btn:hover {
-  color: #0f172a !important;
-  background: #f1f5f9 !important;
+  color: #1a1c1c !important;
+  background: #f1f1ef !important;
 }
 
 [data-theme="light"] .channel-btn.active {

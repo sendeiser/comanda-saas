@@ -2928,6 +2928,159 @@
   color: #0f172a;
 }
 
+/* =========================================================
+   ATELIER GASTRONOMY OS — OFICIAL GOOGLE STITCH DESIGN
+   Fondo Alabastro Cálido (#f9f9f8), Tarjetas Blancas Hairline (#e6e6e3),
+   Acento Terracota (#a43716), Tipografía Geist + JetBrains Mono
+   ========================================================= */
+[data-theme="light"] .catalog-app,
+.catalog-app[data-cat-theme="atelier-gastronomy"] {
+  --cat-bg: #f9f9f8;
+  --cat-surface: #ffffff;
+  --cat-surface-2: #f3f4f3;
+  --cat-surface-3: #eeeeed;
+  --cat-border: #e6e6e3;
+  --cat-border-strong: #d0d0cb;
+  --cat-red: #a43716;
+  --cat-red-hover: #c54f2c;
+  --cat-red-dark: #862201;
+  --cat-primary-glow: rgba(164, 55, 22, 0.25);
+  --cat-text: #1a1c1c;
+  --cat-text-muted: #5b5e67;
+  --cat-text-secondary: #8c909a;
+  --cat-font: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  background-color: #f9f9f8;
+  color: #1a1c1c;
+  font-family: var(--cat-font);
+}
+
+[data-theme="light"] .catalog-app .cat-header-brand-info h1,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-header-brand-info h1 {
+  color: #1a1c1c;
+  font-family: var(--cat-font);
+  font-weight: 700;
+}
+
+[data-theme="light"] .catalog-app .cat-sticky-nav-bar,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-sticky-nav-bar {
+  background: rgba(249, 249, 248, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #e6e6e3;
+}
+
+[data-theme="light"] .catalog-app .cat-nav-square-btn,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-nav-square-btn {
+  background: #ffffff;
+  border-color: #e6e6e3;
+  color: #5b5e67;
+}
+
+[data-theme="light"] .catalog-app .cat-nav-square-btn:hover,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-nav-square-btn:hover {
+  background: #f1f1ef;
+  color: #1a1c1c;
+}
+
+[data-theme="light"] .catalog-app .cat-nav-tab-item,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-nav-tab-item {
+  color: #5b5e67;
+  font-family: var(--cat-font);
+  font-weight: 600;
+}
+
+[data-theme="light"] .catalog-app .cat-nav-tab-item.active,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-nav-tab-item.active {
+  color: #a43716;
+}
+
+[data-theme="light"] .catalog-app .cat-nav-tab-indicator,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-nav-tab-indicator {
+  background: #a43716;
+  box-shadow: 0 0 8px rgba(164, 55, 22, 0.35);
+}
+
+[data-theme="light"] .catalog-app .cat-section-title,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-section-title {
+  color: #1a1c1c;
+  font-family: var(--cat-font);
+  font-weight: 700;
+}
+
+[data-theme="light"] .catalog-app .cat-product-card,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card {
+  background: #ffffff;
+  border: 1px solid #e6e6e3;
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 1px 3px rgba(26, 28, 28, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+[data-theme="light"] .catalog-app .cat-product-card:hover,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card:hover {
+  border-color: #d0d0cb;
+  box-shadow: 0 4px 12px rgba(26, 28, 28, 0.06);
+}
+
+[data-theme="light"] .catalog-app .cat-product-card-name,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card-name {
+  color: #1a1c1c;
+  font-family: var(--cat-font);
+  font-weight: 600;
+}
+
+[data-theme="light"] .catalog-app .cat-product-card-desc,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card-desc {
+  color: #5b5e67;
+}
+
+[data-theme="light"] .catalog-app .cat-product-card-price,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card-price {
+  color: #1a1c1c;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+[data-theme="light"] .catalog-app .cat-product-card-add-btn,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card-add-btn {
+  background: #a43716;
+  color: #ffffff;
+  border-radius: 8px;
+}
+
+[data-theme="light"] .catalog-app .cat-product-card-add-btn:hover,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-product-card-add-btn:hover {
+  background: #c54f2c;
+}
+
+/* Floating Cart Drawer - Stitch Obsidian with Terracotta CTA */
+[data-theme="light"] .catalog-app .cat-floating-cart-bar,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-floating-cart-bar {
+  filter: drop-shadow(0 10px 25px rgba(26, 28, 28, 0.18));
+}
+
+[data-theme="light"] .catalog-app .cat-floating-cart-btn,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-floating-cart-btn {
+  background: #1a1c1c;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+}
+
+[data-theme="light"] .catalog-app .cat-floating-cart-badge,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-floating-cart-badge {
+  background: #a43716;
+  color: #ffffff;
+}
+
+[data-theme="light"] .catalog-app .cat-floating-cart-btn span:last-child,
+.catalog-app[data-cat-theme="atelier-gastronomy"] .cat-floating-cart-btn span:last-child {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+
 
 
 

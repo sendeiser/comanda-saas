@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-surface" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>ComandaSaaS - Atelier Gastronomy OS</title>
+<!-- Fonts: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#dadad9",
+            "primary-container": "#c54f2c",
+            "on-tertiary-container": "#fefcff",
+            "on-primary-fixed-variant": "#862201",
+            "tertiary-container": "#67758e",
+            "on-secondary-container": "#61646d",
+            "error": "#ba1a1a",
+            "on-secondary-fixed": "#181c23",
+            "surface-container-low": "#f3f4f3",
+            "inverse-on-surface": "#f1f1f0",
+            "outline": "#8b716a",
+            "primary": "#a43716",
+            "surface-container-highest": "#e2e2e2",
+            "secondary": "#5b5e67",
+            "on-tertiary": "#ffffff",
+            "surface-tint": "#a73918",
+            "on-background": "#1a1c1c",
+            "secondary-fixed": "#dfe2ec",
+            "primary-fixed": "#ffdbd1",
+            "on-primary-container": "#fffbff",
+            "on-surface": "#1a1c1c",
+            "on-primary-fixed": "#3b0900",
+            "tertiary-fixed-dim": "#b9c7e3",
+            "surface-container-lowest": "#ffffff",
+            "secondary-container": "#dfe2ec",
+            "on-secondary-fixed-variant": "#43474f",
+            "on-error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#39475e",
+            "background": "#f9f9f8",
+            "surface-variant": "#e2e2e2",
+            "outline-variant": "#dfc0b7",
+            "on-surface-variant": "#58423c",
+            "inverse-primary": "#ffb5a0",
+            "error-container": "#ffdad6",
+            "surface": "#f9f9f8",
+            "on-secondary": "#ffffff",
+            "inverse-surface": "#2f3130",
+            "surface-container": "#eeeeed",
+            "tertiary-fixed": "#d5e3ff",
+            "surface-container-high": "#e8e8e7",
+            "primary-fixed-dim": "#ffb5a0",
+            "on-error": "#ffffff",
+            "tertiary": "#4f5d75",
+            "on-primary": "#ffffff",
+            "surface-bright": "#f9f9f8",
+            "on-tertiary-fixed": "#0d1c31",
+            "secondary-fixed-dim": "#c3c6d0"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-md": "0.75rem",
+            "space-lg": "1.25rem",
+            "space-xs": "0.25rem",
+            "margin-desktop": "2.5rem",
+            "space-xl": "2rem",
+            "space-2xl": "3rem",
+            "gutter": "1rem",
+            "margin-tablet": "1.5rem",
+            "gutter-desktop": "1.5rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Geist"],
+            "body-md": ["Geist"],
+            "label-caps": ["Geist"],
+            "headline-xl": ["Geist"],
+            "body-lg": ["Geist"],
+            "headline-lg": ["Geist"],
+            "display-lg": ["Geist"],
+            "data-mono": ["JetBrains Mono"],
+            "headline-xl-mobile": ["Geist"],
+            "headline-sm": ["Geist"],
+            "headline-md": ["Geist"],
+            "data-mono-sm": ["JetBrains Mono"]
+          },
+          "fontSize": {
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-caps": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "body-lg": ["1rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "data-mono": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "data-mono-sm": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .touch-target { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-full bg-surface text-on-surface antialiased flex flex-col justify-between selection:bg-primary-fixed select-none">
+<!-- ========================================== -->
+<!-- 1. HEADER TÁCTIL SUPERIOR (TopAppBar JSON) -->
+<!-- ========================================== -->
+<header class="bg-surface-container-lowest dark:bg-surface-container-low border-b border-surface-container dark:border-surface-dim sticky top-0 z-40 w-full">
+<div class="flex justify-between items-center w-full px-space-md py-space-xs max-w-7xl mx-auto">
+<!-- Left: Table Selection Trigger -->
+<div class="flex items-center gap-2">
+<button aria-label="Cambiar Mesa" class="flex items-center gap-1.5 p-1 rounded-lg hover:bg-surface-container transition-colors touch-target active:scale-95 duration-100 ease-out">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-[20px]">table_restaurant</span>
+<div class="flex flex-col text-left">
+<div class="flex items-center gap-1">
+<span class="font-headline-sm text-headline-sm text-on-surface dark:text-inverse-on-surface font-medium tracking-tight">Mesa 04 · Salón (4p)</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">expand_more</span>
+</div>
+</div>
+</button>
+</div>
+<!-- Right: Sync & Actions -->
+<div class="flex items-center gap-2">
+<!-- Badge status -->
+<div class="hidden sm:flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-low border border-surface-container">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary">00:24m</span>
+</div>
+<button class="p-1.5 rounded-lg text-secondary hover:bg-surface-container transition-colors touch-target active:scale-95 duration-100 ease-out" title="Sincronización Local">
+<span class="material-symbols-outlined text-[20px] text-primary">sync_saved_locally</span>
+</button>
+<button class="p-1.5 rounded-lg text-secondary hover:bg-surface-container transition-colors touch-target active:scale-95 duration-100 ease-out" title="Buscador rápido">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+</div>
+</div>
+<!-- Secondary Meta Header Row: Waiter & Connectivity -->
+<div class="flex items-center justify-between px-space-md py-1 bg-surface-container-low border-t border-surface-container text-secondary">
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps text-secondary tracking-wider uppercase">Mozo: Lucas G.</span>
+<span class="text-surface-dim">|</span>
+<span class="flex items-center gap-1 font-data-mono-sm text-data-mono-sm text-emerald-700">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+          SQLite Local-First OK
+        </span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-sm text-data-mono-sm bg-surface-container-lowest px-1.5 py-0.5 rounded border border-surface-container text-on-surface">Comanda #M04-89</span>
+</div>
+</div>
+</header>
+<!-- ========================================== -->
+<!-- MAIN WORKSPACE SCROLL AREA                  -->
+<!-- ========================================== -->
+<main class="flex-1 overflow-y-auto no-scrollbar pb-44 px-3 pt-2 max-w-4xl mx-auto w-full">
+<!-- 2. SELECTOR HORIZONTAL DE CATEGORÍAS -->
+<nav aria-label="Categorías de menú" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2 sticky top-[77px] z-30 bg-surface/95 backdrop-blur-sm -mx-3 px-3 border-b border-surface-container">
+<button class="touch-target flex items-center px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-primary text-primary font-body-sm text-body-sm font-medium whitespace-nowrap shadow-sm active:scale-95 transition-all">
+        Todos (18)
+      </button>
+<button class="touch-target flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container text-on-surface font-body-sm text-body-sm hover:border-surface-dim whitespace-nowrap active:scale-95 transition-all">
+<span>🍔</span> Smash Burgers
+      </button>
+<button class="touch-target flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container text-on-surface font-body-sm text-body-sm hover:border-surface-dim whitespace-nowrap active:scale-95 transition-all">
+<span>🍟</span> Papas &amp; Entradas
+      </button>
+<button class="touch-target flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container text-on-surface font-body-sm text-body-sm hover:border-surface-dim whitespace-nowrap active:scale-95 transition-all">
+<span>🍺</span> Bebidas
+      </button>
+<button class="touch-target flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container text-on-surface font-body-sm text-body-sm hover:border-surface-dim whitespace-nowrap active:scale-95 transition-all">
+<span>🍰</span> Postres
+      </button>
+<button class="touch-target flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest border border-surface-container text-on-surface font-body-sm text-body-sm hover:border-surface-dim whitespace-nowrap active:scale-95 transition-all">
+<span>☕</span> Cafetería
+      </button>
+</nav>
+<!-- 4. PANEL DE ACCIONES RÁPIDAS DE MOZO (TOP ROW) -->
+<div class="grid grid-cols-3 gap-1.5 my-2.5">
+<button class="touch-target flex items-center justify-center gap-1 py-1.5 px-2 bg-surface-container-lowest border border-surface-container rounded-lg text-secondary hover:text-on-surface active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px] text-primary">edit_note</span>
+<span class="font-data-mono-sm text-data-mono-sm">+ Nota Cocina</span>
+</button>
+<button class="touch-target flex items-center justify-center gap-1 py-1.5 px-2 bg-surface-container-lowest border border-surface-container rounded-lg text-secondary hover:text-on-surface active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px] text-primary">person_add</span>
+<span class="font-data-mono-sm text-data-mono-sm">+ Comensal</span>
+</button>
+<button class="touch-target flex items-center justify-center gap-1 py-1.5 px-2 bg-surface-container-lowest border border-surface-container rounded-lg text-secondary hover:text-on-surface active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px] text-primary">skillet</span>
+<span class="font-data-mono-sm text-data-mono-sm">Marchar Tanda 1</span>
+</button>
+</div>
+<!-- 3. LISTA / GRID ERGONÓMICO DE PLATOS DE ALTA VELOCIDAD -->
+<div class="space-y-2">
+<!-- ITEM 1: Doble Smash Especial (Item en comanda: x2) -->
+<article class="bg-surface-container-lowest border border-primary/40 rounded-xl p-3 flex flex-col gap-2 relative shadow-sm">
+<div class="flex justify-between items-start">
+<div class="pr-2">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-sm text-data-mono-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded font-semibold">x2</span>
+<h2 class="font-body-md text-body-md font-semibold text-on-surface tracking-tight">Doble Smash Especial</h2>
+</div>
+<p class="font-data-mono-sm text-data-mono-sm text-primary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">tune</span>
+              Punto: Jugoso · Extra cheddar
+            </p>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface font-semibold">$8.900 <span class="text-[10px] text-secondary font-normal">ARS</span></span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-surface-container">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Subtotal: $17.800</span>
+<!-- Interactive Stepper -->
+<div class="flex items-center gap-2 bg-surface-container-low rounded-lg p-0.5 border border-surface-container">
+<button aria-label="Restar unidad" class="touch-target w-8 h-8 flex items-center justify-center rounded bg-surface-container-lowest border border-surface-container text-on-surface active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<span class="font-data-mono text-data-mono font-semibold px-2 min-w-[1.5rem] text-center">2</span>
+<button aria-label="Sumar unidad" class="touch-target w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary active:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- ITEM 2: Smash Clásica (Sin agregar aún) -->
+<article class="bg-surface-container-lowest border border-surface-container rounded-xl p-3 flex items-center justify-between shadow-sm active:border-surface-dim transition-all">
+<div class="pr-3">
+<h2 class="font-body-md text-body-md font-medium text-on-surface tracking-tight">Smash Clásica</h2>
+<p class="font-body-sm text-body-sm text-secondary line-clamp-1">Carne 120g, queso americano, cebolla crispy, salsa atelier</p>
+<span class="font-data-mono text-data-mono text-on-surface font-semibold mt-1 inline-block">$7.500 <span class="text-[10px] text-secondary font-normal">ARS</span></span>
+</div>
+<button aria-label="Agregar Smash Clásica" class="touch-target h-10 w-11 rounded-lg bg-surface-container-low border border-surface-container text-on-surface flex items-center justify-center active:bg-primary active:text-on-primary transition-all flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</article>
+<!-- ITEM 3: Papas Rústicas Trufadas (Item en comanda: x1) -->
+<article class="bg-surface-container-lowest border border-primary/40 rounded-xl p-3 flex flex-col gap-2 shadow-sm">
+<div class="flex justify-between items-start">
+<div class="pr-2">
+<div class="flex items-center gap-1.5">
+<span class="font-data-mono-sm text-data-mono-sm bg-primary/10 text-primary px-1.5 py-0.5 rounded font-semibold">x1</span>
+<h2 class="font-body-md text-body-md font-semibold text-on-surface tracking-tight">Papas Rústicas Trufadas</h2>
+</div>
+<p class="font-data-mono-sm text-data-mono-sm text-secondary mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">comment</span>
+              Dip de alioli aparte
+            </p>
+</div>
+<span class="font-data-mono text-data-mono text-on-surface font-semibold">$5.400 <span class="text-[10px] text-secondary font-normal">ARS</span></span>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-surface-container">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Subtotal: $5.400</span>
+<!-- Interactive Stepper -->
+<div class="flex items-center gap-2 bg-surface-container-low rounded-lg p-0.5 border border-surface-container">
+<button aria-label="Restar unidad" class="touch-target w-8 h-8 flex items-center justify-center rounded bg-surface-container-lowest border border-surface-container text-on-surface active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">remove</span>
+</button>
+<span class="font-data-mono text-data-mono font-semibold px-2 min-w-[1.5rem] text-center">1</span>
+<button aria-label="Sumar unidad" class="touch-target w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary active:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+</button>
+</div>
+</div>
+</article>
+<!-- ITEM 4: Cerveza IPA Patagonia 500ml -->
+<article class="bg-surface-container-lowest border border-surface-container rounded-xl p-3 flex items-center justify-between shadow-sm active:border-surface-dim transition-all">
+<div class="pr-3">
+<div class="flex items-center gap-1.5">
+<span class="font-label-caps text-label-caps bg-surface-container px-1 py-0.2 rounded text-secondary">Tirada</span>
+<h2 class="font-body-md text-body-md font-medium text-on-surface tracking-tight">Cerveza IPA Patagonia 500ml</h2>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">Copa fría · 5.8% ABV</p>
+<span class="font-data-mono text-data-mono text-on-surface font-semibold mt-1 inline-block">$3.800 <span class="text-[10px] text-secondary font-normal">ARS</span></span>
+</div>
+<button aria-label="Agregar IPA Patagonia" class="touch-target h-10 w-11 rounded-lg bg-surface-container-low border border-surface-container text-on-surface flex items-center justify-center active:bg-primary active:text-on-primary transition-all flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</article>
+<!-- ITEM 5: Agua Mineral con Gas 500ml -->
+<article class="bg-surface-container-lowest border border-surface-container rounded-xl p-3 flex items-center justify-between shadow-sm active:border-surface-dim transition-all">
+<div class="pr-3">
+<h2 class="font-body-md text-body-md font-medium text-on-surface tracking-tight">Agua Mineral con Gas 500ml</h2>
+<p class="font-body-sm text-body-sm text-secondary">Vidrio · Rodaja de limón opcional</p>
+<span class="font-data-mono text-data-mono text-on-surface font-semibold mt-1 inline-block">$1.800 <span class="text-[10px] text-secondary font-normal">ARS</span></span>
+</div>
+<button aria-label="Agregar Agua Mineral" class="touch-target h-10 w-11 rounded-lg bg-surface-container-low border border-surface-container text-on-surface flex items-center justify-center active:bg-primary active:text-on-primary transition-all flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</article>
+<!-- ITEM 6: Volcán de Chocolate Belga -->
+<article class="bg-surface-container-lowest border border-surface-container rounded-xl p-3 flex items-center justify-between shadow-sm active:border-surface-dim transition-all">
+<div class="pr-3">
+<div class="flex items-center gap-1.5">
+<span class="font-label-caps text-label-caps bg-surface-container px-1 py-0.2 rounded text-secondary">Postre</span>
+<h2 class="font-body-md text-body-md font-medium text-on-surface tracking-tight">Volcán de Chocolate Belga</h2>
+</div>
+<p class="font-body-sm text-body-sm text-secondary">Con bocha de crema americana y pistachos tostados</p>
+<span class="font-data-mono text-data-mono text-on-surface font-semibold mt-1 inline-block">$8.200 <span class="text-[10px] text-secondary font-normal">ARS</span></span>
+</div>
+<button aria-label="Agregar Volcán de Chocolate" class="touch-target h-10 w-11 rounded-lg bg-surface-container-low border border-surface-container text-on-surface flex items-center justify-center active:bg-primary active:text-on-primary transition-all flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</article>
+</div>
+</main>
+<!-- ========================================== -->
+<!-- 5. STICKY BOTTOM ORDER BAR (ONE-HAND CONTROL) -->
+<!-- ========================================== -->
+<section class="fixed bottom-[53px] left-0 w-full z-40 bg-surface-container-lowest/98 backdrop-blur-md border-t border-surface-container px-3 py-2.5 shadow-lg">
+<div class="max-w-4xl mx-auto flex flex-col gap-2">
+<!-- Top Row: Order Details Summary & Bill shortcut -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+<div>
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">3 ítems</span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary"> · Mesa #M04</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="touch-target text-secondary hover:text-on-surface flex items-center gap-1 font-body-sm text-body-sm active:scale-95 transition-all" title="Pedir Cuenta">
+<span class="material-symbols-outlined text-[16px]">receipt</span>
+<span>Pedir Cuenta</span>
+</button>
+<div class="text-right">
+<span class="font-data-mono text-headline-sm text-on-surface font-semibold tracking-tight">$23.200</span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary ml-0.5">ARS</span>
+</div>
+</div>
+</div>
+<!-- Main Action Buttons Row -->
+<div class="grid grid-cols-12 gap-2">
+<!-- Modifiers Option -->
+<button class="col-span-4 touch-target h-11 bg-surface-container-low border border-surface-container text-on-surface rounded-lg flex items-center justify-center gap-1 font-body-sm text-body-sm font-medium hover:bg-surface-container active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px] text-secondary">tune</span>
+<span>Modificadores</span>
+</button>
+<!-- Primary Thumb Action: Marchar a Cocina -->
+<button class="col-span-8 touch-target h-11 bg-primary hover:bg-primary-container text-on-primary rounded-lg flex items-center justify-center gap-2 font-body-md text-body-md font-semibold tracking-wide shadow-sm active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+<span>Marchar a Cocina (KDS)</span>
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ========================================== -->
+<!-- BOTTOM NAV BAR (BottomNavBar JSON COMPONENT) -->
+<!-- ========================================== -->
+<nav aria-label="Navegación principal" class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-space-sm py-space-xs bg-surface-container-lowest dark:bg-surface-container-low border-t border-surface-container dark:border-surface-dim">
+<!-- Item 1: Comanda (ACTIVE) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim py-1 touch-target" href="#comanda">
+<span class="material-symbols-outlined text-[22px]">receipt_long</span>
+<span class="font-label-caps text-label-caps tracking-wider uppercase mt-0.5">Comanda</span>
+</a>
+<!-- Item 2: Mesas (INACTIVE) -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim py-1 touch-target hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-150" href="#mesas">
+<span class="material-symbols-outlined text-[22px]">grid_view</span>
+<span class="font-label-caps text-label-caps tracking-wider uppercase mt-0.5">Mesas</span>
+</a>
+<!-- Item 3: Cocina KDS (INACTIVE) -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim py-1 touch-target hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-150" href="#kds">
+<span class="material-symbols-outlined text-[22px]">skillet</span>
+<span class="font-label-caps text-label-caps tracking-wider uppercase mt-0.5">Cocina KDS</span>
+</a>
+<!-- Item 4: Cuenta (INACTIVE) -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim py-1 touch-target hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-150" href="#cuenta">
+<span class="material-symbols-outlined text-[22px]">point_of_sale</span>
+<span class="font-label-caps text-label-caps tracking-wider uppercase mt-0.5">Cuenta</span>
+</a>
+</nav>
+</body></html>

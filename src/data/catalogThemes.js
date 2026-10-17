@@ -33,6 +33,36 @@ export const CATALOG_THEMES = [
     }
   },
   {
+    id: 'atelier-gastronomy',
+    name: 'Atelier Gastronomy OS',
+    subtitle: 'Alabastro cálido, tarjetas blancas hairline y acento terracota',
+    icon: '✨',
+    badge: 'Oficial Stitch',
+    isLight: true,
+    tokens: {
+      bg: '#f9f9f8',
+      surface: '#ffffff',
+      surface2: '#f3f4f3',
+      surface3: '#eeeeed',
+      border: '#e6e6e3',
+      borderStrong: '#d0d0cb',
+      primary: '#a43716',
+      primaryHover: '#c54f2c',
+      primaryGlow: 'rgba(164, 55, 22, 0.25)',
+      accent: '#10b981',
+      text: '#1a1c1c',
+      textMuted: '#5b5e67',
+      textSecondary: '#8c909a',
+      bannerBg: 'linear-gradient(135deg, #a43716 0%, #c54f2c 50%, #ffdbd1 100%)',
+      bannerSize: 'cover',
+      bannerColor: '#f9f9f8',
+      bannerTitleColor: '#ffffff',
+      bannerTitleBg: '#a43716',
+      chipBtnBg: '#a43716',
+      fontFamily: "'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+    }
+  },
+  {
     id: 'neon-cyber',
     name: 'Cyber Midnight Glow',
     subtitle: 'Obsidiana profunda con destellos ámbar y neón eléctrico',

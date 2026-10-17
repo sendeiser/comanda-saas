@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-background text-on-surface antialiased" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>BURGA Atelier · Carta Digital &amp; Pedidos</title>
+<!-- Google Fonts: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Container & Form plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config verbatum from specification -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-surface-variant": "#58423c",
+            "on-secondary-fixed-variant": "#43474f",
+            "on-primary-fixed-variant": "#862201",
+            "background": "#f9f9f8",
+            "on-surface": "#1a1c1c",
+            "on-tertiary": "#ffffff",
+            "on-error-container": "#93000a",
+            "inverse-surface": "#2f3130",
+            "tertiary": "#4f5d75",
+            "on-tertiary-container": "#fefcff",
+            "on-tertiary-fixed-variant": "#39475e",
+            "on-secondary-fixed": "#181c23",
+            "surface-container": "#eeeeed",
+            "on-secondary": "#ffffff",
+            "on-primary-container": "#fffbff",
+            "inverse-primary": "#ffb5a0",
+            "error-container": "#ffdad6",
+            "primary-fixed": "#ffdbd1",
+            "surface-container-high": "#e8e8e7",
+            "error": "#ba1a1a",
+            "surface-variant": "#e2e2e2",
+            "on-secondary-container": "#61646d",
+            "tertiary-fixed-dim": "#b9c7e3",
+            "inverse-on-surface": "#f1f1f0",
+            "primary-fixed-dim": "#ffb5a0",
+            "on-background": "#1a1c1c",
+            "secondary": "#5b5e67",
+            "outline-variant": "#dfc0b7",
+            "on-error": "#ffffff",
+            "surface-dim": "#dadad9",
+            "secondary-fixed": "#dfe2ec",
+            "tertiary-fixed": "#d5e3ff",
+            "primary": "#a43716",
+            "surface-container-low": "#f3f4f3",
+            "surface-container-highest": "#e2e2e2",
+            "surface-container-lowest": "#ffffff",
+            "surface-bright": "#f9f9f8",
+            "on-primary-fixed": "#3b0900",
+            "on-primary": "#ffffff",
+            "primary-container": "#c54f2c",
+            "tertiary-container": "#67758e",
+            "secondary-container": "#dfe2ec",
+            "surface": "#f9f9f8",
+            "outline": "#8b716a",
+            "surface-tint": "#a73918",
+            "secondary-fixed-dim": "#c3c6d0",
+            "on-tertiary-fixed": "#0d1c31"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-lg": "1.25rem",
+            "space-xl": "2rem",
+            "margin-desktop": "2.5rem",
+            "margin": "1rem",
+            "margin-tablet": "1.5rem",
+            "space-md": "0.75rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-2xl": "3rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem"
+          },
+          "fontFamily": {
+            "label-caps": ["Geist", "sans-serif"],
+            "display-lg": ["Geist", "sans-serif"],
+            "headline-lg": ["Geist", "sans-serif"],
+            "body-lg": ["Geist", "sans-serif"],
+            "headline-sm": ["Geist", "sans-serif"],
+            "headline-xl": ["Geist", "sans-serif"],
+            "headline-xl-mobile": ["Geist", "sans-serif"],
+            "body-sm": ["Geist", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "data-mono-sm": ["JetBrains Mono", "monospace"],
+            "data-mono": ["JetBrains Mono", "monospace"],
+            "headline-md": ["Geist", "sans-serif"]
+          },
+          "fontSize": {
+            "label-caps": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "body-lg": ["1rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "data-mono-sm": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "data-mono": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .tap-highlight-transparent { -webkit-tap-highlight-color: transparent; }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-full bg-surface text-on-surface font-body-md flex justify-center selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Mobile Viewport Container Cap (~390px - 430px) -->
+<div class="w-full max-w-md min-h-screen bg-background border-x border-surface-container-highest flex flex-col relative pb-32 shadow-sm">
+<!-- 1. TopAppBar / Status Header (Shared Component Spec) -->
+<header class="sticky top-0 z-40 flex items-center justify-between px-margin py-space-sm w-full bg-surface border-b border-surface-container-highest transition-colors duration-150">
+<div class="flex items-center gap-space-sm">
+<button aria-label="Menu" class="flex items-center justify-center w-8 h-8 rounded-lg text-primary hover:bg-surface-container-low transition-colors duration-150 active:scale-95" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="restaurant_menu">restaurant_menu</span>
+</button>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">BURGA Atelier</span>
+</div>
+<div class="flex items-center gap-space-xs">
+<!-- Table indicator pill -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container border border-surface-container-highest font-data-mono-sm text-data-mono-sm text-on-surface">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span>Mesa 04</span>
+</div>
+<!-- Currency Selector -->
+<button class="px-2 py-1 rounded bg-surface border border-surface-container-highest text-secondary hover:text-on-surface font-data-mono-sm text-data-mono-sm transition-colors">
+          ARS $
+        </button>
+<!-- Trailing search icon button -->
+<button aria-label="Buscar" class="flex items-center justify-center w-8 h-8 rounded-lg text-secondary hover:text-primary hover:bg-surface-container-low transition-colors duration-150 active:scale-95" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="search">search</span>
+</button>
+</div>
+</header>
+<main class="flex-1 flex flex-col">
+<!-- 2. Portada & Hero Gastro -->
+<section class="relative w-full">
+<!-- Hero Photography -->
+<div class="relative w-full h-52 overflow-hidden bg-inverse-surface">
+<img class="w-full h-full object-cover object-center" data-alt="Close-up macro shot of a gourmet double smash burger with rich melted aged yellow cheddar, crispy caramelized bacon, and house atelier sauce dripping onto an artisanal glossy toasted brioche bun. Professional high-key restaurant kitchen lighting with warm natural shadows and neutral background tones, modern Michelin-grade culinary presentation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLcVAVkOaQEQ1LG2rRQoCwjC3xka1X8ODqJwhCudz4ve7Ibe0KSGwOId8N2Fo4EitnOqxfxUZTJNBZu350qihmbOnws9z9rEzADKRbFVX7xRouPcskrw13PPvnoZ119JhYIXx7ZL_uf2ckYH_6tHy4IRhh8q5k59jfDbz4itjNBKaHA-86WRTfvFIkjOd06kFSh5yKK2rgBmimIJmyvVjB-yFSwrDYFBfsCEB0eG8nVaOfckoQp2bi71JTOLvyShZN9bPW5ppxvg6h"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+<div class="absolute top-3 right-3">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-black/70 backdrop-blur-md text-white font-data-mono-sm text-data-mono-sm border border-white/20">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              KDS Activo
+            </span>
+</div>
+</div>
+<!-- Floating Venue Information Card -->
+<div class="px-margin -mt-8 relative z-10">
+<div class="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container-highest shadow-sm">
+<div class="flex justify-between items-start gap-2">
+<div>
+<h1 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">BURGA Atelier Gastronómico</h1>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">Smash burgers artesanales · Fermentación lenta</p>
+</div>
+<div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center border border-surface-container-highest flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-[22px]" data-icon="table_restaurant">table_restaurant</span>
+</div>
+</div>
+<!-- Service Mode & Table Bar -->
+<div class="mt-space-md pt-space-sm border-t border-surface-container flex flex-wrap items-center justify-between gap-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface font-data-mono-sm text-data-mono-sm border border-surface-container-highest">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  Mesa 04 · Salón
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span> 15-25 min
+                </span>
+</div>
+<button class="font-body-sm text-body-sm text-primary hover:underline font-medium">
+                Cambiar opción
+              </button>
+</div>
+<div class="mt-2.5 bg-surface-container-low px-2.5 py-1.5 rounded border border-surface-container-highest flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px]" data-icon="sync_alt">sync_alt</span>
+<p class="font-label-caps text-label-caps text-secondary uppercase tracking-wider">
+                Atención directa a mesa · Comanda sincronizada al KDS
+              </p>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Search & Quick Dietary Filters -->
+<section class="px-margin mt-space-md">
+<!-- Search Input -->
+<div class="relative w-full">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary">
+<span class="material-symbols-outlined text-[18px]" data-icon="search">search</span>
+</div>
+<input class="w-full h-9 pl-9 pr-3 rounded-lg bg-surface-container-lowest border border-surface-container-highest font-body-sm text-body-sm text-on-surface placeholder:text-secondary focus:border-on-surface focus:ring-0 transition-colors" placeholder="Buscar en la carta (ej. trufa, smash, ipa)..." type="text"/>
+</div>
+<!-- Quick filter tags -->
+<div class="flex items-center gap-1.5 mt-space-sm overflow-x-auto no-scrollbar py-1">
+<button class="px-3 py-1 rounded bg-inverse-surface text-inverse-on-surface font-body-sm text-body-sm font-medium whitespace-nowrap active:scale-95 transition-transform">
+            Todos
+          </button>
+<button class="px-3 py-1 rounded bg-surface-container-lowest border border-surface-container-highest text-secondary hover:text-on-surface font-body-sm text-body-sm whitespace-nowrap active:scale-95 transition-transform">
+            🌱 Veggie
+          </button>
+<button class="px-3 py-1 rounded bg-surface-container-lowest border border-surface-container-highest text-secondary hover:text-on-surface font-body-sm text-body-sm whitespace-nowrap active:scale-95 transition-transform">
+            🌾 Sin TACC
+          </button>
+<button class="px-3 py-1 rounded bg-surface-container-lowest border border-surface-container-highest text-primary font-body-sm text-body-sm whitespace-nowrap active:scale-95 transition-transform">
+            🔥 Recomendados
+          </button>
+</div>
+</section>
+<!-- 4. Sticky Horizontal Category Navigation -->
+<nav class="sticky top-[49px] z-30 bg-surface/95 backdrop-blur-sm border-y border-surface-container-highest mt-space-md py-2 px-margin overflow-x-auto no-scrollbar flex items-center gap-2">
+<a class="px-3 py-1 rounded-lg bg-primary text-on-primary font-label-caps text-label-caps whitespace-nowrap uppercase tracking-wider flex items-center gap-1" href="#favoritos">
+<span>🔥</span> Favoritos
+        </a>
+<a class="px-3 py-1 rounded-lg bg-surface-container-low text-secondary hover:text-on-surface font-label-caps text-label-caps whitespace-nowrap uppercase tracking-wider border border-surface-container-highest" href="#burgers">
+          🍔 Smash Burgers
+        </a>
+<a class="px-3 py-1 rounded-lg bg-surface-container-low text-secondary hover:text-on-surface font-label-caps text-label-caps whitespace-nowrap uppercase tracking-wider border border-surface-container-highest" href="#sides">
+          🍟 Papas &amp; Sides
+        </a>
+<a class="px-3 py-1 rounded-lg bg-surface-container-low text-secondary hover:text-on-surface font-label-caps text-label-caps whitespace-nowrap uppercase tracking-wider border border-surface-container-highest" href="#bebidas">
+          🍺 Cervezas
+        </a>
+<a class="px-3 py-1 rounded-lg bg-surface-container-low text-secondary hover:text-on-surface font-label-caps text-label-caps whitespace-nowrap uppercase tracking-wider border border-surface-container-highest" href="#postres">
+          🍰 Postres
+        </a>
+</nav>
+<!-- 5. Food Item List (Cards Gastronómicas Mobile) -->
+<section class="px-margin mt-space-md flex flex-col gap-space-md" id="favoritos">
+<!-- Section Header -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-4 bg-primary rounded-full"></span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Los Favoritos &amp; Smash</h2>
+</div>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary">4 opciones</span>
+</div>
+<!-- Card 1: Doble Smash Atelier -->
+<article class="bg-surface-container-lowest rounded-xl border border-surface-container-highest p-3.5 flex gap-3 relative transition-all duration-150 hover:border-outline">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-1.5 py-0.5 rounded bg-primary-fixed text-on-primary-fixed font-data-mono-sm text-data-mono-sm font-semibold tracking-tight uppercase">
+                  TOP VENTAS
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary">Artesanal</span>
+</div>
+<h3 class="font-headline-sm text-body-lg text-on-surface font-medium">Doble Smash Atelier</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1 line-clamp-2 leading-snug">
+                Dos medallones 100g roast beef smash, doble cheddar madurado, panceta crocante y salsa secreta Atelier en pan brioche artesanal.
+              </p>
+</div>
+<div class="flex items-center justify-between mt-3">
+<span class="font-data-mono text-data-mono text-on-surface font-semibold">$8.900</span>
+<button aria-label="Agregar Doble Smash Atelier" class="w-9 h-9 rounded-lg bg-primary hover:bg-primary-container text-on-primary flex items-center justify-center active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Product Image -->
+<div class="w-24 h-24 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 relative border border-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Mouthwatering close up of a double smash beef burger with deep melted cheddar cheese, thick cut smoked crispy bacon on golden buttered brioche bun, studio restaurant photography with crisp focus and warm rich tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAh2m06ObBVwpWKiVhMFy9GgLdt1x8g_uiS520X9ha9vGIFErzPBe8WK18OOpnvhO20LTQI6GnkO_BLwuAIYdJyZYBT83DffecQZRKIc6qzZHCgzV3oP8ThAn2cEHoSVKdoyHlo0_pTILCPTcBJ8Na5ybI8C3zx3pZaKL5-cMNLub9QnaIvwqrhX5LcwG9HCKSam0J26sVXYTk9EiFIo_QMUAJlmsvWEk2dSsobqpsjquVeqAxnZSvT9K26MO7ArUyhkg0oPsQGuMn1"/>
+</div>
+</article>
+<!-- Card 2: Smash Trufada & Portobellos -->
+<article class="bg-surface-container-lowest rounded-xl border border-surface-container-highest p-3.5 flex gap-3 relative transition-all duration-150 hover:border-outline">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface font-data-mono-sm text-data-mono-sm font-medium tracking-tight uppercase">
+                  CHEF SELECTION
+                </span>
+</div>
+<h3 class="font-headline-sm text-body-lg text-on-surface font-medium">Smash Trufada &amp; Portobellos</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1 line-clamp-2 leading-snug">
+                Medallón smash de carne seleccionada, fondue de provolone hilado, portobellos frescos salteados al tomillo y emulsión de trufa negra.
+              </p>
+</div>
+<div class="flex items-center justify-between mt-3">
+<span class="font-data-mono text-data-mono text-on-surface font-semibold">$9.600</span>
+<button aria-label="Agregar Smash Trufada" class="w-9 h-9 rounded-lg bg-primary hover:bg-primary-container text-on-primary flex items-center justify-center active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Product Image -->
+<div class="w-24 h-24 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 relative border border-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Artisanal smash burger topped with molten provolone cheese fondue, sautéed dark portobello mushrooms with fresh thyme and black truffle aioli cream, gourmet culinary photography, warm soft contrast." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCczmg4nu1gC1l9vgwuuioUMLTD8ci5j7AcxvYFhllCOVu_O9n7R-CDeUo8ugeG3OLyWI4509UjEb9Y1hXUFQwmmAxvOzrRebndk5J6WNDmAviBz3uHgZ-9V8aNKdMTp_Pv1t83Cz6_MADgfBSCpbYLPN1hpVA7Uiy8uY9KRVWLYw4JZWFQTbKnJA2rYFPW1zDxCLoY5ZjSSPHHyXeOj6jojKVvnusLVdgoEuE1buZRpOaV4Z-kARfWT6vGr4ZYUiP4Vw4ymGZ3xXGh"/>
+</div>
+</article>
+<!-- Card 3: Papas Rústicas Trufadas -->
+<article class="bg-surface-container-lowest rounded-xl border border-surface-container-highest p-3.5 flex gap-3 relative transition-all duration-150 hover:border-outline">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface font-data-mono-sm text-data-mono-sm font-medium tracking-tight uppercase">
+                  PARA COMPARTIR
+                </span>
+</div>
+<h3 class="font-headline-sm text-body-lg text-on-surface font-medium">Papas Rústicas Trufadas</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1 line-clamp-2 leading-snug">
+                Papas cortadas a mano con piel crocante, lluvia abundante de parmesano reggiano rallado al momento, aceite de trufa blanca y dip de alioli.
+              </p>
+</div>
+<div class="flex items-center justify-between mt-3">
+<span class="font-data-mono text-data-mono text-on-surface font-semibold">$5.400</span>
+<button aria-label="Agregar Papas Rústicas" class="w-9 h-9 rounded-lg bg-primary hover:bg-primary-container text-on-primary flex items-center justify-center active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Product Image -->
+<div class="w-24 h-24 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 relative border border-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Golden crisp hand-cut rustic french fries tossed with freshly grated parmesan reggiano cheese, fine herbs, and a small ramekin of roasted garlic truffle aioli, overhead angled gourmet food shot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOBUb3R2FUvWK8yu682620i_aZYcZTXOOTz3_posOA_zXAMmXTHTZnl5DprA1hY2lE-zZ4r6mezp8OZSZFZ1K_dhLAel6TS0pKqwXCgQs4LBHY6VfG7Fqa60naQZhcEwx97uqxB7CXtyVlAlH33dyjhE4XPBBrEKw6hstyUp-9eJ3-_yP5UE77DsZpz6n-LGRTOth0mq62pfCo7eY2GUB-Sqc7ycZg4SOc6W-fgVWY_MmbD1GOLENFmY1C673uDKXVK5PcPW8OJmPL"/>
+</div>
+</article>
+<!-- Card 4: IPA Patagonia Tirada 500ml -->
+<article class="bg-surface-container-lowest rounded-xl border border-surface-container-highest p-3.5 flex gap-3 relative transition-all duration-150 hover:border-outline">
+<div class="flex-1 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-1.5 py-0.5 rounded bg-surface-container-high text-on-surface font-data-mono-sm text-data-mono-sm font-medium tracking-tight uppercase">
+                  BEBIDA DE LA CASA
+                </span>
+</div>
+<h3 class="font-headline-sm text-body-lg text-on-surface font-medium">IPA Patagonia Tirada 500ml</h3>
+<p class="font-body-sm text-body-sm text-secondary mt-1 line-clamp-2 leading-snug">
+                Cerveza artesanal rubia lupulada con aromas cítricos y amargor balanceado, servida en vaso helado con espuma densa.
+              </p>
+</div>
+<div class="flex items-center justify-between mt-3">
+<span class="font-data-mono text-data-mono text-on-surface font-semibold">$3.800</span>
+<button aria-label="Agregar IPA Patagonia" class="w-9 h-9 rounded-lg bg-primary hover:bg-primary-container text-on-primary flex items-center justify-center active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+</div>
+<!-- Product Image -->
+<div class="w-24 h-24 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 relative border border-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="Frosted glassware pint of golden hazy IPA craft beer with dense white creamy head and light condensation droplets on the glass, illuminated with subtle backlight on a neutral matte slate table." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuqmnMjUXNHrHy812-fk6nXIfTDAo12LNBrd0KeIievX3wdWxD3kSUkR2RY6u1FawmDj3-d_eDfPZdwSfXDuK6SxzVr0xmGlAHNpHhptaWXU7TPUUZWCj_lx7eGGSI8oFP0UrmIG4wUEjAOFK44K6j47U8jqlTolFSUtKgroOxOoOzP35mblnFeW-LIXofnj99T_Zx4iVMce7xWjUUuh3dG-vqvrGOqVtP3M8Nx0GFDgV7mvBZ4v5xT8280m_sPbdW2onoGC6iAukB"/>
+</div>
+</article>
+</section>
+<!-- 6. Customization / Dietary Note Banner -->
+<section class="px-margin mt-space-lg">
+<div class="p-space-md rounded-xl bg-surface-container-low border border-surface-container-highest flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0" data-icon="info">info</span>
+<div>
+<h4 class="font-headline-sm text-body-md font-medium text-on-surface">¿Alergias o puntos de cocción?</h4>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5 leading-relaxed">
+              Puedes agregar notas personalizadas a cada plato antes de enviar tu orden directamente a cocina.
+            </p>
+</div>
+</div>
+</section>
+</main>
+<!-- 7. Sticky Floating Cart Bar (Barra de Carrito Flotante Fija) -->
+<div class="fixed bottom-3 left-0 right-0 z-50 flex justify-center px-3 pointer-events-none">
+<div class="w-full max-w-[400px] pointer-events-auto bg-inverse-surface text-inverse-on-surface rounded-xl p-3 border border-surface-variant/30 shadow-2xl flex items-center justify-between gap-3">
+<!-- Cart Info Left -->
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-lg bg-surface-container/20 flex items-center justify-center relative">
+<span class="material-symbols-outlined text-inverse-on-surface text-[20px]" data-icon="shopping_bag">shopping_bag</span>
+<span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-on-primary font-data-mono-sm text-[10px] font-bold flex items-center justify-center">2</span>
+</div>
+<div>
+<div class="flex items-baseline gap-1.5">
+<span class="font-data-mono text-body-lg font-bold text-white tracking-tight">$14.300</span>
+<span class="font-data-mono-sm text-data-mono-sm text-surface-variant font-normal">Total</span>
+</div>
+<p class="font-data-mono-sm text-data-mono-sm text-surface-variant/80">Mesa 04 · Pago al mozo o QR</p>
+</div>
+</div>
+<!-- Action Button Right -->
+<button class="h-10 px-3.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-body-sm text-body-sm font-medium flex items-center gap-1.5 transition-all active:scale-95 flex-shrink-0 shadow-sm">
+<span>Enviar Comanda</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>
