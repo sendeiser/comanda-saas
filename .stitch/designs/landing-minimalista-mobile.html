@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>ComandaSaaS — Arquitectura Operativa Culinaria</title>
+<!-- Google Fonts: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with custom configuration -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed-variant": "#862201",
+            "surface-dim": "#dadad9",
+            "tertiary-container": "#67758e",
+            "inverse-on-surface": "#f1f1f0",
+            "error": "#ba1a1a",
+            "on-tertiary-fixed-variant": "#39475e",
+            "surface-container-low": "#f3f4f3",
+            "error-container": "#ffdad6",
+            "primary-container": "#c54f2c",
+            "surface-container-high": "#e8e8e7",
+            "on-error-container": "#93000a",
+            "primary-fixed-dim": "#ffb5a0",
+            "outline": "#8b716a",
+            "on-tertiary-fixed": "#0d1c31",
+            "surface-container-highest": "#e2e2e2",
+            "tertiary-fixed-dim": "#b9c7e3",
+            "on-primary-container": "#fffbff",
+            "secondary-fixed": "#dfe2ec",
+            "secondary-fixed-dim": "#c3c6d0",
+            "on-background": "#1a1c1c",
+            "primary-fixed": "#ffdbd1",
+            "surface-container": "#eeeeed",
+            "on-secondary-fixed": "#181c23",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#61646d",
+            "surface-variant": "#e2e2e2",
+            "primary": "#a43716",
+            "surface-container-lowest": "#ffffff",
+            "on-primary": "#ffffff",
+            "surface": "#f9f9f8",
+            "surface-tint": "#a73918",
+            "on-primary-fixed": "#3b0900",
+            "secondary-container": "#dfe2ec",
+            "on-secondary-fixed-variant": "#43474f",
+            "outline-variant": "#dfc0b7",
+            "on-tertiary-container": "#fefcff",
+            "on-tertiary": "#ffffff",
+            "inverse-surface": "#2f3130",
+            "on-surface-variant": "#58423c",
+            "secondary": "#5b5e67",
+            "inverse-primary": "#ffb5a0",
+            "surface-bright": "#f9f9f8",
+            "on-surface": "#1a1c1c",
+            "tertiary-fixed": "#d5e3ff",
+            "on-error": "#ffffff",
+            "tertiary": "#4f5d75",
+            "background": "#f9f9f8"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-desktop": "1.5rem",
+            "space-md": "0.75rem",
+            "space-xl": "2rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "margin-tablet": "1.5rem",
+            "margin": "1rem",
+            "space-lg": "1.25rem",
+            "margin-desktop": "2.5rem",
+            "space-2xl": "3rem",
+            "space-sm": "0.5rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Geist", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "data-mono-sm": ["JetBrains Mono", "monospace"],
+            "headline-sm": ["Geist", "sans-serif"],
+            "headline-xl": ["Geist", "sans-serif"],
+            "headline-md": ["Geist", "sans-serif"],
+            "label-caps": ["Geist", "sans-serif"],
+            "headline-xl-mobile": ["Geist", "sans-serif"],
+            "display-lg": ["Geist", "sans-serif"],
+            "data-mono": ["JetBrains Mono", "monospace"],
+            "body-sm": ["Geist", "sans-serif"],
+            "headline-lg": ["Geist", "sans-serif"],
+            "headline-lg-mobile": ["Geist", "sans-serif"]
+          },
+          "fontSize": {
+            "body-lg": ["1rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "data-mono-sm": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "label-caps": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "data-mono": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["1.375rem", { "lineHeight": "1.875rem", "letterSpacing": "-0.015em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Mobile container lock at 390px viewport styling */
+    body {
+      background-color: #f1f1ef;
+      font-family: 'Geist', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 1.125rem;
+      line-height: 1;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: #e2e2e2;
+      height: 4px;
+      border-radius: 2px;
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #1a1c1c;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="flex justify-center min-h-screen text-on-surface">
+<!-- Mobile Viewport Frame (Strict 390px baseline simulation & native mobile experience) -->
+<div class="w-full max-w-[390px] min-h-screen bg-background border-x border-surface-container-high relative flex flex-col shadow-xl">
+<!-- 1. Shared Component: TopAppBar -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-outline-variant dark:border-outline docked full-width top-0 sticky z-50 flex justify-between items-center w-full px-4 h-12 max-w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary dark:text-inverse-primary" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="text-headline-sm font-headline-sm tracking-tight text-on-surface dark:text-inverse-on-surface font-semibold">ComandaSaaS</span>
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-data-mono-sm font-data-mono-sm bg-surface-container text-secondary border border-surface-container-high">v2.4</span>
+</div>
+<div class="flex items-center gap-2">
+<a class="px-3 py-1.5 rounded-lg text-body-sm font-body-sm font-medium bg-on-surface text-surface-container-lowest hover:bg-surface-container-highest active:scale-[0.98] transition-all duration-150" href="#demo">
+          Acceso
+        </a>
+</div>
+</header>
+<!-- MAIN BODY -->
+<main class="flex-1 flex flex-col">
+<!-- 2. Hero Section -->
+<section class="px-4 pt-6 pb-6 border-b border-surface-container-high">
+<!-- Micro-etiqueta superior -->
+<div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-surface-container border border-surface-container-high mb-3.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-caps font-label-caps text-secondary tracking-widest uppercase">INFRAESTRUCTURA OPERATIVA GASTRONÓMICA</span>
+</div>
+<!-- Titular principal mobile -->
+<h1 class="text-headline-xl-mobile font-headline-xl-mobile tracking-tight text-on-surface mb-3">
+          La plataforma operativa diseñada para la <span class="text-primary underline decoration-outline-variant underline-offset-4 font-semibold">velocidad</span> de tu restaurante.
+        </h1>
+<!-- Subtítulo Mobile -->
+<p class="text-body-md font-body-md text-secondary mb-6 leading-relaxed">
+          Punto de venta táctil, comanderas de cocina en tiempo real, pedidos por WhatsApp automatizados y analíticas de caja. Sin comisiones por venta, arquitectura offline-first.
+        </p>
+<!-- CTAs en columna vertical ergonómica -->
+<div class="flex flex-col gap-2.5 mb-8">
+<a class="w-full h-11 flex items-center justify-center gap-2 bg-on-surface text-surface-container-lowest rounded-lg text-body-md font-body-md font-medium active:scale-[0.98] transition-all shadow-sm" href="#demo">
+<span>Empezar Demo Gratuita</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<a class="w-full h-11 flex items-center justify-center gap-2 bg-surface-container-lowest border border-surface-container-high text-on-surface rounded-lg text-body-md font-body-md font-medium hover:bg-surface-container active:scale-[0.98] transition-all" href="#kds-preview">
+<span class="material-symbols-outlined text-sm" data-icon="play_circle">play_circle</span>
+<span>Ver funcionamiento en vivo</span>
+</a>
+</div>
+<!-- Mockup Terminal Operativo Vertical Mobile -->
+<div class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-3.5 shadow-sm" id="kds-preview">
+<!-- Terminal Status Bar -->
+<div class="flex items-center justify-between pb-2.5 mb-3 border-b border-surface-container">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-data-mono-sm font-data-mono-sm font-medium text-on-surface">TERMINAL-SALÓN #01</span>
+</div>
+<div class="flex items-center gap-1 px-1.5 py-0.5 rounded bg-surface-container-low border border-surface-container-high text-data-mono-sm font-data-mono-sm text-secondary">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="sync">sync</span>
+<span>SYNC: LOCAL_FIRST_OK</span>
+</div>
+</div>
+<!-- 4 Métricas compactas en grid 2x2 -->
+<div class="grid grid-cols-2 gap-2 mb-3">
+<div class="p-2.5 bg-surface rounded border border-surface-container-high">
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase">Ventas Turno</p>
+<p class="text-headline-sm font-headline-sm font-semibold text-on-surface mt-0.5">$482.900</p>
+</div>
+<div class="p-2.5 bg-surface rounded border border-surface-container-high">
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase">Tiempo Prep</p>
+<p class="text-headline-sm font-headline-sm font-semibold text-primary mt-0.5">9m 42s</p>
+</div>
+<div class="p-2.5 bg-surface rounded border border-surface-container-high">
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase">Ticket Prom.</p>
+<p class="text-headline-sm font-headline-sm font-semibold text-on-surface mt-0.5">$14.200</p>
+</div>
+<div class="p-2.5 bg-surface rounded border border-surface-container-high">
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase">Comandas Act.</p>
+<p class="text-headline-sm font-headline-sm font-semibold text-on-surface mt-0.5">8 en curso</p>
+</div>
+</div>
+<!-- Comanda KDS en vivo Mobile Card -->
+<div class="bg-surface rounded-lg border border-surface-container-high p-3 mb-2.5">
+<div class="flex items-center justify-between mb-2 pb-1.5 border-b border-surface-container">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded bg-on-surface text-surface-container-lowest text-data-mono-sm font-data-mono-sm">MESA 12</span>
+<span class="text-body-sm font-body-sm text-secondary">Salón Principal</span>
+</div>
+<span class="text-data-mono-sm font-data-mono-sm text-primary font-medium bg-primary-fixed px-1.5 py-0.5 rounded">04:18m</span>
+</div>
+<div class="space-y-1.5 text-body-sm font-body-sm">
+<div class="flex justify-between items-baseline">
+<span class="text-on-surface font-medium">2× Bife de Chorizo Dry-Aged</span>
+<span class="text-data-mono-sm font-data-mono-sm text-secondary">Punto Jugoso</span>
+</div>
+<div class="flex justify-between items-baseline">
+<span class="text-on-surface font-medium">1× Risotto Hongos Silvestres</span>
+<span class="text-data-mono-sm font-data-mono-sm text-secondary">Sin manteca</span>
+</div>
+</div>
+</div>
+<!-- Ficha de Rendimiento & Mise-en-place activa -->
+<div class="p-2.5 bg-surface-container-low rounded border border-surface-container-high flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="scale">scale</span>
+<div>
+<p class="text-body-sm font-body-sm font-medium text-on-surface">Dry-Aged Lote #84</p>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary">Yield cost: $4.180/porc (Cost: 28%)</p>
+</div>
+</div>
+<span class="text-data-mono-sm font-data-mono-sm text-secondary bg-surface-container-lowest px-2 py-0.5 rounded border border-surface-container-high">EN STOCK</span>
+</div>
+</div>
+</section>
+<!-- 3. Franja de Métricas Clave en Grid 2x2 -->
+<section class="px-4 py-6 bg-surface-container-low border-b border-surface-container-high">
+<div class="grid grid-cols-2 gap-2.5">
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+<span class="text-headline-md font-headline-md font-semibold text-primary block">0%</span>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase mt-0.5">Comisiones por pedido</p>
+<p class="text-body-sm font-body-sm text-on-surface mt-1">Cero intermediación forzada.</p>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+<span class="text-headline-md font-headline-md font-semibold text-on-surface block">&lt; 12 seg</span>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase mt-0.5">Por comanda emitida</p>
+<p class="text-body-sm font-body-sm text-on-surface mt-1">Velocidad pura en salón.</p>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+<span class="text-headline-md font-headline-md font-semibold text-on-surface block">100%</span>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase mt-0.5">Operativo offline</p>
+<p class="text-body-sm font-body-sm text-on-surface mt-1">Si cae internet, la cocina no frena.</p>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+<span class="text-headline-md font-headline-md font-semibold text-on-surface block">RLS Strict</span>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary uppercase mt-0.5">Seguridad nativa</p>
+<p class="text-body-sm font-body-sm text-on-surface mt-1">Aislamiento por sucursal.</p>
+</div>
+</div>
+</section>
+<!-- 4. Módulos Construidos para la Exigencia del Despacho -->
+<section class="px-4 py-8 border-b border-surface-container-high">
+<div class="mb-5">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">ECOSISTEMA UNIFICADO</span>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile font-semibold text-on-surface mt-1">Módulos construidos para la exigencia del despacho</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Herramientas especializadas que reemplazan múltiples servicios fragmentados.</p>
+</div>
+<div class="space-y-3">
+<!-- POS -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high flex flex-col gap-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface border border-surface-container-high">
+<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Punto de Venta (POS)</h3>
+</div>
+<p class="text-body-sm font-body-sm text-secondary leading-normal">
+              Interfaz ultra rápida diseñada para pantallas táctiles. Admite cobros combinados inmediatos, división de cuentas y control de turnos ciegos.
+            </p>
+</div>
+<!-- KDS -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high flex flex-col gap-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface border border-surface-container-high">
+<span class="material-symbols-outlined" data-icon="kitchen">kitchen</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Pantalla de Cocina (KDS)</h3>
+</div>
+<p class="text-body-sm font-body-sm text-secondary leading-normal">
+              Cronómetros y semáforos por partida operativa (grill, ensaladas, postres). Despacho ordenado y erradicación definitiva de comanderas ruidosas.
+            </p>
+</div>
+<!-- WhatsApp Bot -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high flex flex-col gap-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface border border-surface-container-high">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Bot WhatsApp 24/7</h3>
+</div>
+<p class="text-body-sm font-body-sm text-secondary leading-normal">
+              Canal de venta directo al cliente sin pagar por marketplaces. Menú interactivo con validación de pago instantánea.
+            </p>
+</div>
+<!-- Carta Digital QR -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high flex flex-col gap-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface border border-surface-container-high">
+<span class="material-symbols-outlined" data-icon="qr_code_2">qr_code_2</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Carta Digital QR</h3>
+</div>
+<p class="text-body-sm font-body-sm text-secondary leading-normal">
+              Actualización inmediata de precios, etiquetas de alérgenos y fotos de alta resolución sin reimpresión física de cartas.
+            </p>
+</div>
+<!-- Stock & Recetas -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high flex flex-col gap-2">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface border border-surface-container-high">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+</div>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Control de Stock, Recetas &amp; Rendimiento</h3>
+</div>
+<p class="text-body-sm font-body-sm text-secondary leading-normal">
+              Mise-en-place de precisión. Fichas técnicas de platos con desglose gramo a gramo y costeo dinámico en función de variaciones de proveedores.
+            </p>
+</div>
+</div>
+</section>
+<!-- 5. Calculadora de Ahorro Directo (Transparencia Financiera) -->
+<section class="px-4 py-8 bg-surface-container-low border-b border-surface-container-high">
+<div class="mb-4">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">TRANSPARENCIA FINANCIERA</span>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile font-semibold text-on-surface mt-1">Calculadora de Ahorro Directo</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Descubrí cuánto capital retiene tu local al eliminar los porcentajes de intermediarios.</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-4 shadow-sm">
+<!-- Slider Label -->
+<div class="flex justify-between items-baseline mb-2">
+<span class="text-body-sm font-body-sm text-secondary">Venta mensual estimada:</span>
+<span class="text-headline-sm font-headline-sm font-semibold text-on-surface" id="slider-val-label">$5.000.000</span>
+</div>
+<!-- Slider Range -->
+<div class="mb-5">
+<input id="revenue-slider" max="25000000" min="1000000" step="500000" type="range" value="5000000"/>
+<div class="flex justify-between text-data-mono-sm font-data-mono-sm text-secondary mt-1">
+<span>$1.000.000</span>
+<span>$25.000.000</span>
+</div>
+</div>
+<!-- Desglose comparativo -->
+<div class="space-y-2 pb-4 mb-4 border-b border-surface-container-high text-body-sm font-body-sm">
+<div class="flex justify-between items-center">
+<span class="text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-error" data-icon="cancel">cancel</span>
+                Comisión apps tradicionales (22%):
+              </span>
+<span class="text-data-mono font-data-mono text-error font-medium" id="marketplace-fee">-$1.100.000</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="check_circle">check_circle</span>
+                Tarifa fija ComandaSaaS Pro:
+              </span>
+<span class="text-data-mono font-data-mono text-on-surface font-medium">$28.000</span>
+</div>
+</div>
+<!-- Highlight Resultado -->
+<div class="p-3.5 bg-surface rounded-lg border border-surface-container-high text-center">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest block">CAPITAL RETENIDO / MES</span>
+<span class="text-headline-xl font-headline-xl text-primary font-bold my-1 block" id="retained-capital">$1.072.000</span>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary mb-3">Fondos que permanecen 100% en tu negocio</p>
+<a class="w-full h-10 flex items-center justify-center gap-1.5 bg-on-surface text-surface-container-lowest rounded-lg text-body-sm font-body-sm font-medium active:scale-[0.98] transition-all" href="#demo">
+<span>Preservar mis ingresos</span>
+<span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- 6. Matriz de Planes y Precios -->
+<section class="px-4 py-8 border-b border-surface-container-high">
+<div class="mb-5 text-center">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">TARIFA PLANA Y PREDECIBLE</span>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile font-semibold text-on-surface mt-1">Planes diseñados para tu escala</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Sin cargos ocultos. Sin costo por transacción.</p>
+<!-- Selector Mensual / Anual -->
+<div class="inline-flex items-center p-1 bg-surface-container rounded-lg border border-surface-container-high mt-4">
+<button class="px-3 py-1 rounded text-body-sm font-body-sm font-medium bg-surface-container-lowest text-on-surface shadow-xs transition-all" id="billing-monthly">Mensual</button>
+<button class="px-3 py-1 rounded text-body-sm font-body-sm font-medium text-secondary hover:text-on-surface transition-all flex items-center gap-1" id="billing-annual">
+<span>Anual</span>
+<span class="text-data-mono-sm font-data-mono-sm px-1 rounded bg-primary-fixed text-primary font-semibold">2 MESES OFF</span>
+</button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- Plan 1: Inicial -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">INICIAL</span>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Mostrador &amp; Delivery</h3>
+<div class="my-3 flex items-baseline gap-1">
+<span class="text-headline-xl font-headline-xl font-bold text-on-surface">$18.000</span>
+<span class="text-body-sm font-body-sm text-secondary">/ mes</span>
+</div>
+<ul class="space-y-2 mb-4 text-body-sm font-body-sm text-secondary">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Punto de Venta Mostrador (1 caja)</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Carta QR autogestionable</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Cierre ciego y control de turnos</span>
+</li>
+</ul>
+<a class="w-full h-9 flex items-center justify-center border border-surface-container-high text-on-surface rounded-lg text-body-sm font-body-sm font-medium hover:bg-surface-container" href="#demo">Elegir Inicial</a>
+</div>
+<!-- Plan 2: Profesional (Featured / Highlight) -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border-2 border-on-surface relative shadow-sm">
+<div class="absolute -top-3 right-4 px-2 py-0.5 rounded bg-primary text-on-primary text-data-mono-sm font-data-mono-sm font-semibold tracking-wider uppercase">
+              MÁS ELEGIDO
+            </div>
+<span class="text-label-caps font-label-caps text-primary uppercase tracking-widest">PROFESIONAL</span>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Salón, Cocina KDS &amp; Bot</h3>
+<div class="my-3 flex items-baseline gap-1">
+<span class="text-headline-xl font-headline-xl font-bold text-on-surface">$28.000</span>
+<span class="text-body-sm font-body-sm text-secondary">/ mes</span>
+</div>
+<ul class="space-y-2 mb-5 text-body-sm font-body-sm text-on-surface">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Todo lo del plan Inicial</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span class="font-medium">KDS de Cocina en tiempo real ilimitado</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span class="font-medium">Bot WhatsApp con pago automático</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Gestión de mapa de mesas y mozos</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Control de recetas y mermas</span>
+</li>
+</ul>
+<a class="w-full h-10 flex items-center justify-center bg-on-surface text-surface-container-lowest rounded-lg text-body-sm font-body-sm font-medium active:scale-[0.98] transition-all" href="#demo">
+              Iniciar prueba Pro (14 días)
+            </a>
+</div>
+<!-- Plan 3: Corporativo -->
+<div class="p-4 bg-surface-container-lowest rounded-lg border border-surface-container-high">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">CORPORATIVO</span>
+<h3 class="text-headline-sm font-headline-sm font-medium text-on-surface">Franquicias &amp; Multi-Local</h3>
+<div class="my-3 flex items-baseline gap-1">
+<span class="text-headline-xl font-headline-xl font-bold text-on-surface">$38.000</span>
+<span class="text-body-sm font-body-sm text-secondary">/ mes por local</span>
+</div>
+<ul class="space-y-2 mb-4 text-body-sm font-body-sm text-secondary">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Centro de producción y compras consolidado</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>Métricas multi-sucursal en tiempo real</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="check">check</span>
+<span>SLA de Soporte prioritario 24/7 y API abierta</span>
+</li>
+</ul>
+<a class="w-full h-9 flex items-center justify-center border border-surface-container-high text-on-surface rounded-lg text-body-sm font-body-sm font-medium hover:bg-surface-container" href="#demo">Contactar Ventas</a>
+</div>
+</div>
+</section>
+<!-- 7. Arquitectura Técnica & Seguridad -->
+<section class="px-4 py-8 bg-surface-container-low border-b border-surface-container-high">
+<div class="mb-4">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">INGENIERÍA ROBUSTA</span>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile font-semibold text-on-surface mt-1">Seguridad y tolerancia a fallos en servicio</h2>
+<p class="text-body-sm font-body-sm text-secondary mt-1">Garantía de disponibilidad operacional en horas pico.</p>
+</div>
+<!-- Micro-snippet de código JSON estilizado -->
+<div class="rounded-lg bg-inverse-surface text-inverse-on-surface p-3 font-data-mono-sm text-data-mono-sm mb-4 border border-outline">
+<div class="flex items-center justify-between pb-2 mb-2 border-b border-surface-variant/20 text-secondary-fixed">
+<span>// ARCHITECTURE_SPEC.json</span>
+<span class="text-[10px] text-primary-fixed">VERIFIED</span>
+</div>
+<pre class="overflow-x-auto text-xs leading-relaxed text-surface-container-lowest"><code>{
+  "sync_protocol": "CRDTs + SQLite Local",
+  "partition_tolerance": "100% Offline-ready",
+  "security": "Strict Row-Level Security (RLS)",
+  "latency_p99": "&lt; 14ms internal network",
+  "audit_trail": "Immutable log hash"
+}</code></pre>
+</div>
+<div class="space-y-2.5">
+<div class="p-3 bg-surface-container-lowest rounded border border-surface-container-high flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary mt-0.5" data-icon="cloud_off">cloud_off</span>
+<div>
+<h4 class="text-body-sm font-body-sm font-medium text-on-surface">Motor Offline SQLite Sync</h4>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary mt-0.5">Las comandas siguen imprimiéndose y enviándose a cocina aunque el proveedor de fibra sufra cortes completos.</p>
+</div>
+</div>
+<div class="p-3 bg-surface-container-lowest rounded border border-surface-container-high flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary mt-0.5" data-icon="lock">lock</span>
+<div>
+<h4 class="text-body-sm font-body-sm font-medium text-on-surface">Row Level Security (RLS)</h4>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary mt-0.5">Aislamiento criptográfico y permisos estrictos por rol: mozos no acceden a balances ni compras mayores.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 8. Preguntas Frecuentes (FAQ) Mobile Accordion -->
+<section class="px-4 py-8 border-b border-surface-container-high">
+<div class="mb-4">
+<span class="text-label-caps font-label-caps text-secondary uppercase tracking-widest">RESOLUCIÓN DE DUDAS</span>
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile font-semibold text-on-surface mt-1">Preguntas Frecuentes</h2>
+</div>
+<div class="space-y-2" id="faq-container">
+<!-- FAQ 1 -->
+<div class="border border-surface-container-high rounded-lg overflow-hidden bg-surface-container-lowest">
+<button class="w-full p-3.5 text-left flex justify-between items-center text-body-sm font-body-sm font-medium text-on-surface faq-trigger">
+<span>¿Qué ocurre si se corta la conexión a internet en pleno despacho?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-3.5 pb-3.5 text-body-sm font-body-sm text-secondary hidden faq-content">
+              El sistema continúa funcionando sin interrupción. La base de datos local almacena cada pedido, imprime en comandera y actualiza el KDS. Al restaurarse la red, sincroniza automáticamente con la nube en segundo plano.
+            </div>
+</div>
+<!-- FAQ 2 -->
+<div class="border border-surface-container-high rounded-lg overflow-hidden bg-surface-container-lowest">
+<button class="w-full p-3.5 text-left flex justify-between items-center text-body-sm font-body-sm font-medium text-on-surface faq-trigger">
+<span>¿Necesito comprar impresoras o hardware propietario costoso?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-3.5 pb-3.5 text-body-sm font-body-sm text-secondary hidden faq-content">
+              No. ComandaSaaS es compatible con cualquier tablet (Android, iPad), computadora Windows/Mac o impresoras térmicas ESC/POS (USB, Red o Bluetooth) estándar del mercado.
+            </div>
+</div>
+<!-- FAQ 3 -->
+<div class="border border-surface-container-high rounded-lg overflow-hidden bg-surface-container-lowest">
+<button class="w-full p-3.5 text-left flex justify-between items-center text-body-sm font-body-sm font-medium text-on-surface faq-trigger">
+<span>¿Cobran comisiones por ventas o pedidos de WhatsApp?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-3.5 pb-3.5 text-body-sm font-body-sm text-secondary hidden faq-content">
+              Absolutamente 0%. Solo pagás la suscripción plana mensual o anual elegida. Tus ingresos netos son 100% de tu restaurante.
+            </div>
+</div>
+<!-- FAQ 4 -->
+<div class="border border-surface-container-high rounded-lg overflow-hidden bg-surface-container-lowest">
+<button class="w-full p-3.5 text-left flex justify-between items-center text-body-sm font-body-sm font-medium text-on-surface faq-trigger">
+<span>¿Puedo migrar mi menú y recetas desde otro software?</span>
+<span class="material-symbols-outlined text-secondary transition-transform duration-200" data-icon="expand_more">expand_more</span>
+</button>
+<div class="px-3.5 pb-3.5 text-body-sm font-body-sm text-secondary hidden faq-content">
+              Sí. Nuestro equipo de onboarding realiza la importación guiada de tus productos, categorías y fichas técnicas vía Excel o CSV en menos de 24 horas hábiles.
+            </div>
+</div>
+</div>
+</section>
+<!-- 9. Banner de Conversión Final & Lead Capture -->
+<section class="px-4 py-8 bg-surface-container-lowest" id="demo">
+<div class="p-5 rounded-xl bg-surface border border-surface-container-high text-center">
+<span class="text-label-caps font-label-caps text-primary uppercase tracking-widest block mb-1">MIGRACIÓN SENCILLA</span>
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile font-semibold text-on-surface mb-2">
+            Elevá la velocidad de despacho de tu salón hoy.
+          </h3>
+<p class="text-body-sm font-body-sm text-secondary mb-4">
+            Probá ComandaSaaS durante 14 días sin ingresar tarjeta de crédito. Configuración asistida en 30 minutos.
+          </p>
+<form class="flex flex-col gap-2" onsubmit="event.preventDefault(); alert('Solicitud recibida. Un consultor se contactará en breve.');">
+<input class="w-full h-10 px-3 bg-surface-container-lowest border border-surface-container-high rounded text-body-md font-body-md focus:border-on-surface focus:ring-0 outline-none placeholder:text-secondary" placeholder="tu@restaurante.com" required="" type="email"/>
+<button class="w-full h-10 flex items-center justify-center gap-1.5 bg-primary text-on-primary rounded text-body-sm font-body-sm font-medium hover:bg-primary-container active:scale-[0.98] transition-all" type="submit">
+<span>Solicitar Demo Guiada</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<p class="text-data-mono-sm font-data-mono-sm text-secondary mt-2.5">Soporte técnico culinario en vivo 24/7</p>
+</div>
+</section>
+</main>
+<!-- 10. Shared Component: Footer -->
+<footer class="bg-surface-container-low dark:bg-inverse-surface border-t border-outline-variant dark:border-outline docked full-width bottom flex flex-col gap-6 w-full px-4 py-8 max-w-full text-center">
+<div class="flex flex-col items-center gap-1">
+<span class="text-headline-sm font-headline-sm text-on-surface dark:text-inverse-on-surface font-semibold">ComandaSaaS</span>
+<span class="text-data-mono-sm font-data-mono-sm text-secondary">ATELIER GASTRONOMY OS</span>
+</div>
+<nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-body-sm font-body-sm">
+<a class="text-secondary dark:text-secondary-fixed hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150" href="#modulos">Módulos</a>
+<a class="text-secondary dark:text-secondary-fixed hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150" href="#kds-preview">KDS Offline</a>
+<a class="text-secondary dark:text-secondary-fixed hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150" href="#precios">Precios</a>
+<a class="text-secondary dark:text-secondary-fixed hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150" href="#soporte">Soporte Técnico</a>
+<a class="text-secondary dark:text-secondary-fixed hover:text-primary dark:hover:text-inverse-primary transition-colors duration-150" href="#privacidad">Privacidad</a>
+</nav>
+<p class="text-body-sm font-body-sm text-secondary max-w-xs mx-auto">
+        © 2025 ComandaSaaS. Arquitectura culinaria de alta precisión. Todos los derechos reservados.
+      </p>
+</footer>
+</div>
+<!-- Inline Lightweight Micro-Interactions -->
+<script>
+    // Calculadora dinámica de ahorro
+    const slider = document.getElementById('revenue-slider');
+    const label = document.getElementById('slider-val-label');
+    const marketplaceFeeEl = document.getElementById('marketplace-fee');
+    const retainedCapitalEl = document.getElementById('retained-capital');
+    const fixedFee = 28000;
+
+    function formatCurrency(val) {
+      return '$' + val.toLocaleString('es-AR');
+    }
+
+    if (slider) {
+      slider.addEventListener('input', function() {
+        const val = parseInt(this.value, 10);
+        label.innerText = formatCurrency(val);
+        const marketplace = Math.round(val * 0.22);
+        marketplaceFeeEl.innerText = '-' + formatCurrency(marketplace);
+        const retained = marketplace - fixedFee;
+        retainedCapitalEl.innerText = formatCurrency(retained > 0 ? retained : 0);
+      });
+    }
+
+    // Toggle de FAQ acordeón
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const content = trigger.nextElementSibling;
+        const icon = trigger.querySelector('.material-symbols-outlined');
+        const isOpen = !content.classList.contains('hidden');
+        
+        // Cierra otros acordeones para una experiencia móvil limpia
+        document.querySelectorAll('.faq-content').forEach(c => c.classList.add('hidden'));
+        document.querySelectorAll('.faq-trigger .material-symbols-outlined').forEach(i => i.style.transform = 'rotate(0deg)');
+        
+        if (!isOpen) {
+          content.classList.remove('hidden');
+          icon.style.transform = 'rotate(180deg)';
+        }
+      });
+    });
+
+    // Selector mensual/anual micro-interacción
+    const btnMonthly = document.getElementById('billing-monthly');
+    const btnAnnual = document.getElementById('billing-annual');
+    if (btnMonthly && btnAnnual) {
+      btnMonthly.addEventListener('click', () => {
+        btnMonthly.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-xs');
+        btnMonthly.classList.remove('text-secondary');
+        btnAnnual.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-xs');
+        btnAnnual.classList.add('text-secondary');
+      });
+      btnAnnual.addEventListener('click', () => {
+        btnAnnual.classList.add('bg-surface-container-lowest', 'text-on-surface', 'shadow-xs');
+        btnAnnual.classList.remove('text-secondary');
+        btnMonthly.classList.remove('bg-surface-container-lowest', 'text-on-surface', 'shadow-xs');
+        btnMonthly.classList.add('text-secondary');
+      });
+    }
+  </script>
+</body></html>

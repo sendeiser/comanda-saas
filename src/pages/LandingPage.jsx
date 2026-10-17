@@ -1,42 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { sanitizeSlug, DEFAULT_DEMO_STORE } from '../services/storeService.js';
-import { DEFAULT_SAAS_PLANS } from '../services/saasCrmService.js';
 import '../styles/landing.css';
 
 // ============================================================================
-// COHESIVE SVG ICON SYSTEM (Strictly zero emojis per Impeccable / Taste-Design)
+// COHESIVE SVG ICONS (Offline-first & pixel-perfect vector rendering)
 // ============================================================================
-function IconBolt({ className = '', size = 20 }) {
+function IconGridView({ size = 16, className = '' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  );
-}
-
-function IconMonitor({ className = '', size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
-
-function IconChef({ className = '', size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M6 13.8a4.5 4.5 0 1 1 3.5-7.3 5 5 0 0 1 9 0A4.5 4.5 0 1 1 18 13.8" />
-      <path d="M6 14h12v4a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2v-4z" />
-      <line x1="6" y1="17" x2="18" y2="17" />
-    </svg>
-  );
-}
-
-function IconLayoutGrid({ className = '', size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <rect x="3" y="3" width="7" height="7" rx="1.5" />
       <rect x="14" y="3" width="7" height="7" rx="1.5" />
       <rect x="14" y="14" width="7" height="7" rx="1.5" />
@@ -45,39 +16,84 @@ function IconLayoutGrid({ className = '', size = 20 }) {
   );
 }
 
-function IconMessageCircle({ className = '', size = 20 }) {
+function IconArrowRight({ size = 16, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
+
+function IconPlayCircle({ size = 16, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="10" />
+      <polygon points="10 8 16 12 10 16 10 8" />
+    </svg>
+  );
+}
+
+function IconPointOfSale({ size = 20, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="2" y="3" width="20" height="14" rx="2" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
+      <path d="M6 8h4" />
+      <path d="M6 11h2" />
+      <circle cx="16" cy="9.5" r="1.5" />
+    </svg>
+  );
+}
+
+function IconSoupKitchen({ size = 20, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M4 11h16a1 1 0 0 1 1 1 8 8 0 0 1-8 8 8 8 0 0 1-8-8 1 1 0 0 1 1-1z" />
+      <line x1="4" y1="21" x2="20" y2="21" />
+      <path d="M6 7c0-1.5 1-2.5 1-4" />
+      <path d="M12 7c0-1.5 1-2.5 1-4" />
+      <path d="M18 7c0-1.5 1-2.5 1-4" />
+    </svg>
+  );
+}
+
+function IconChat({ size = 20, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
     </svg>
   );
 }
 
-function IconQrCode({ className = '', size = 20 }) {
+function IconQrScanner({ size = 20, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-      <path d="M14 14h3v3h-3z" />
-      <path d="M20 14v3h-3" />
-      <path d="M14 20h7" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+      <rect x="7" y="7" width="3" height="3" />
+      <rect x="14" y="7" width="3" height="3" />
+      <rect x="7" y="14" width="3" height="3" />
+      <line x1="14" y1="14" x2="17" y2="14" />
+      <line x1="14" y1="17" x2="17" y2="17" />
     </svg>
   );
 }
 
-function IconUsers({ className = '', size = 20 }) {
+function IconInventory({ size = 20, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+      <path d="m3.3 7 8.7 5 8.7-5" />
+      <path d="M12 22V12" />
     </svg>
   );
 }
 
-function IconCheck({ className = '', size = 16 }) {
+function IconCheck({ size = 16, className = '' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
@@ -85,66 +101,18 @@ function IconCheck({ className = '', size = 16 }) {
   );
 }
 
-function IconX({ className = '', size = 18 }) {
+function IconLock({ size = 18, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   );
 }
 
-function IconStore({ className = '', size = 18 }) {
+function IconWifiOff({ size = 18, className = '' }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
-
-function IconRocket({ className = '', size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-      <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
-      <path d="M9 12H4s.55-3.03 2-4.5c1.62-1.63 5-2 5-2" />
-      <path d="M15 9V4s3.03.55 4.5 2c1.63 1.62 2 5 2 5" />
-    </svg>
-  );
-}
-
-function IconSettings({ className = '', size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <circle cx="12" cy="12" r="3" />
-      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-    </svg>
-  );
-}
-
-function IconShieldCheck({ className = '', size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <path d="M9 12l2 2 4-4" />
-    </svg>
-  );
-}
-
-function IconPercent({ className = '', size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <line x1="19" y1="5" x2="5" y2="19" />
-      <circle cx="6.5" cy="6.5" r="2.5" />
-      <circle cx="17.5" cy="17.5" r="2.5" />
-    </svg>
-  );
-}
-
-function IconWifiOff({ className = '', size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <line x1="1" y1="1" x2="23" y2="23" />
       <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
       <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
@@ -156,43 +124,7 @@ function IconWifiOff({ className = '', size = 18 }) {
   );
 }
 
-function IconPrinter({ className = '', size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <polyline points="6 9 6 2 18 2 18 9" />
-      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-      <rect x="6" y="14" width="12" height="8" />
-    </svg>
-  );
-}
-
-function IconCalculator({ className = '', size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="4" y="2" width="16" height="20" rx="2" />
-      <line x1="8" y1="6" x2="16" y2="6" />
-      <line x1="16" y1="14" x2="16" y2="18" />
-      <path d="M16 10h.01" />
-      <path d="M12 10h.01" />
-      <path d="M8 10h.01" />
-      <path d="M12 14h.01" />
-      <path d="M8 14h.01" />
-      <path d="M12 18h.01" />
-      <path d="M8 18h.01" />
-    </svg>
-  );
-}
-
-function IconArrowRight({ className = '', size = 16 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <line x1="5" y1="12" x2="19" y2="12" />
-      <polyline points="12 5 19 12 12 19" />
-    </svg>
-  );
-}
-
-function IconChevronDown({ className = '', size = 18 }) {
+function IconChevronDown({ size = 18, className = '' }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <polyline points="6 9 12 15 18 9" />
@@ -200,8 +132,35 @@ function IconChevronDown({ className = '', size = 18 }) {
   );
 }
 
+function IconClose({ size = 18, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  );
+}
+
+function IconStore({ size = 18, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
+    </svg>
+  );
+}
+
+function IconSettings({ size = 18, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  );
+}
+
 // ============================================================================
-// MAIN COMPONENT: LANDING PAGE
+// MAIN COMPONENT: LANDING PAGE (Google Stitch Minimalist & Professional)
 // ============================================================================
 export default function LandingPage({
   onEnterStore,
@@ -209,20 +168,25 @@ export default function LandingPage({
   onOpenSaas,
   onOpenCatalog
 }) {
-  const [activeModuleTab, setActiveModuleTab] = useState('pos');
+  // Modal State
   const [isStoreModalOpen, setIsStoreModalOpen] = useState(false);
   const [storeInputSlug, setStoreInputSlug] = useState('');
   const [storeInputError, setStoreInputError] = useState('');
-  const [openFaqIndex, setOpenFaqIndex] = useState(null);
-  
-  // Billing cycle toggle: 'monthly' | 'annual' (20% off / 2 months free)
-  const [billingCycle, setBillingCycle] = useState('monthly');
 
   // Interactive ROI Calculator State
-  const [calcSales, setCalcSales] = useState(2500000); // 2.5 millones mensuales de venta estimada
-  const [calcCommissionRate, setCalcCommissionRate] = useState(22); // 22% apps tradicionales
+  const [calcSales, setCalcSales] = useState(5000000); // 5 millones mensuales
 
-  // Keyboard accessibility: ESC key to close modal
+  // Billing cycle toggle: 'monthly' | 'annual'
+  const [billingCycle, setBillingCycle] = useState('monthly');
+
+  // FAQ Accordion State
+  const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+  // Fast email lead capture
+  const [leadEmail, setLeadEmail] = useState('');
+  const [leadStatus, setLeadStatus] = useState('');
+
+  // Keyboard accessibility: ESC to close modal
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && isStoreModalOpen) {
@@ -233,220 +197,22 @@ export default function LandingPage({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isStoreModalOpen]);
 
-  // Modules definition with clean SVG icons
-  const modules = [
-    {
-      id: 'pos',
-      Icon: IconMonitor,
-      name: 'Punto de Venta (POS)',
-      tagline: 'Despacho táctil de alta velocidad en 3 toques',
-      description: 'Construido específicamente para el ritmo de mostrador y delivery. Emisión inmediata de comandas térmicas (58mm y 80mm), cálculo de vuelto en efectivo, validación de transferencias y funcionamiento offline continuo.',
-      bullets: [
-        'Carga instantánea de comandas por mostrador, salón o delivery en segundos',
-        'Cálculo de cambio en efectivo y validación de transferencias con alias directo',
-        'Impresión térmica configurable (58mm / 80mm) con corte de papel',
-        'Arquitectura 100% offline: si se corta internet, sigues cobrando y emitiendo tickets'
-      ],
-      previewBadge: 'Mostrador & Delivery',
-      previewHeadline: 'Ventas a la Velocidad de la Luz',
-      mockStats: [
-        { label: 'Tiempo por pedido', val: '< 15 seg' },
-        { label: 'Métodos de cobro', val: 'Efectivo, Transferencia, Fiado' },
-        { label: 'Soporte offline', val: '100% Activo' }
-      ]
-    },
-    {
-      id: 'kds',
-      Icon: IconChef,
-      name: 'Pantalla de Cocina (KDS)',
-      tagline: 'Cero gritos y comandas de papel perdidas',
-      description: 'Comandera digital en tiempo real para cocineros y despachadores. Los pedidos ingresan con campanada sonora, cronómetro de espera por comanda y organización cronológica por orden de llegada.',
-      bullets: [
-        'Alerta sonora al recibir nuevos pedidos o modificaciones del salón',
-        'Control visual de estados: Pendiente, En Cocina, Listo para Entrega y Despachado',
-        'Modo Zen Pantalla Completa optimizado para tablets y televisores de cocina',
-        'Filtro por canal: Salón, Mostrador o Delivery'
-      ],
-      previewBadge: 'Cocina & Despacho',
-      previewHeadline: 'Sincronización Total con el Salón',
-      mockStats: [
-        { label: 'Alertas sonoras', val: 'Instantáneas' },
-        { label: 'Tiempo promedio', val: '8 min' },
-        { label: 'Modo Zen', val: 'Pantalla Completa' }
-      ]
-    },
-    {
-      id: 'salon',
-      Icon: IconLayoutGrid,
-      name: 'Salón & Mapa de Mesas',
-      tagline: 'Distribución física interactiva y adición en vivo',
-      description: 'Dibuja el plano exacto de tu restaurante. Visualiza en vivo qué mesas están libres, ocupadas o pidiendo la cuenta. Asigna mozos y realiza cierres de mesa directo al punto de venta.',
-      bullets: [
-        'Editor visual de distribución física de mesas (cuadradas, redondas, barras)',
-        'Indicadores en vivo de estado de mesa (Verde = Libre, Rojo = Ocupada, Ámbar = Por cobrar)',
-        'Cierre de mesa y adición directa al Punto de Venta sin retrasos',
-        'Soporte para múltiples sectores (Salón interior, Terraza, Barra)'
-      ],
-      previewBadge: 'Gestión de Salón',
-      previewHeadline: 'Control Visual de cada Comensal',
-      mockStats: [
-        { label: 'Distribución', val: 'Arrastrar & Soltar' },
-        { label: 'Estados de mesa', val: 'En tiempo real' },
-        { label: 'Capacidad', val: 'Ilimitada' }
-      ]
-    },
-    {
-      id: 'whatsapp',
-      Icon: IconMessageCircle,
-      name: 'Bot WhatsApp 24/7',
-      tagline: 'Pedidos automatizados en tu propio número con $0 de API',
-      description: 'Atención automática con el WhatsApp de tu negocio escaneando un código QR. El bot saluda al cliente, envía tu carta interactiva y carga el pedido directo en tu cocina sin pagar comisiones por mensaje a Meta.',
-      bullets: [
-        'Corre directamente en tu servidor local sin pagar costos por mensaje a Meta',
-        'Envío automático de carta interactiva y promociones del día',
-        'Recepción de comprobantes de transferencia y pedidos confirmados',
-        'Modo híbrido: el bot atiende automáticamente y puedes intervenir en cualquier momento'
-      ],
-      previewBadge: 'WhatsApp Local',
-      previewHeadline: 'Tu Negocio Abierto las 24 Horas',
-      mockStats: [
-        { label: 'Costo por mensaje', val: '$0 (Sin API paga)' },
-        { label: 'Disponibilidad', val: '24/7/365' },
-        { label: 'Integración', val: 'Inyección directa al KDS' }
-      ]
-    },
-    {
-      id: 'carta',
-      Icon: IconQrCode,
-      name: 'Carta Digital QR',
-      tagline: 'Menú web liviano con 7 identidades visuales',
-      description: 'Menú web ultraliviano para teléfonos móviles. Los clientes escanean el código QR en la mesa o desde Instagram y arman su pedido. Elige entre 7 temas visuales gastronómicos configurables desde el POS.',
-      bullets: [
-        'URL propia por comercio: tudominio.com/carta/tunegocio',
-        '7 temas visuales gastronómicos (Retro Burger, Trattoria, Neon Cyber, Bistro, etc.)',
-        'Envío de pedidos directo al WhatsApp del local o a la comanda de mostrador',
-        'Modo mesa: el comensal especifica su número de mesa para servicio rápido'
-      ],
-      previewBadge: 'Menú Web QR',
-      previewHeadline: 'Menú Siempre Actualizado sin Re-impresiones',
-      mockStats: [
-        { label: 'Tiempo de carga', val: '< 0.5 seg' },
-        { label: 'Temas visuales', val: '7 estilos' },
-        { label: 'Modo Mesa', val: 'QR individual' }
-      ]
-    },
-    {
-      id: 'crm',
-      Icon: IconUsers,
-      name: 'CRM & Cuentas Corrientes',
-      tagline: 'Control de clientes frecuentes y libreta de fiados',
-      description: 'Administra tus clientes habituales y ventas a crédito. Vende a cuenta corriente con saldo transparente y envía recordatorios de deuda personalizados por WhatsApp con un solo clic.',
-      bullets: [
-        'Ficha completa de cliente con historial de consumos y límite de confianza',
-        'Método de cobro "A Cuenta / Fiado" integrado en la comanda del mostrador',
-        'Historial de cargos y abonos con fecha y número de comanda auditada',
-        'Botón de cobranza WhatsApp con plantilla de cortesía prearmada'
-      ],
-      previewBadge: 'Finanzas & Fidelización',
-      previewHeadline: 'Cuentas Claras y Cobranzas sin Vergüenza',
-      mockStats: [
-        { label: 'Cobranzas', val: 'Recordatorio WhatsApp 1 clic' },
-        { label: 'Auditoría', val: 'Historial de cargos y pagos' },
-        { label: 'Fidelización', val: 'Base de clientes propia' }
-      ]
-    }
-  ];
+  // Calculator computations
+  const appCommission = useMemo(() => {
+    return Math.round(calcSales * 0.22);
+  }, [calcSales]);
 
-  // Pricing plans definition
-  const plansData = [
-    {
-      id: 'basico',
-      name: 'Plan Básico',
-      badge: 'Para Empezar',
-      isPopular: false,
-      monthlyPrice: 18000,
-      annualPrice: 14400,
-      description: 'Ideal para carritos, venta en mostrador, delivery inicial y locales pequeños.',
-      features: [
-        'Punto de Venta Táctil Mostrador ultrarrápido',
-        'Carta Digital Web QR por Local (7 temas)',
-        'Control de Caja & Arqueo Ciego',
-        'Tickets Térmicos 58mm y 80mm',
-        'Base de Datos Segura en la Nube con RLS',
-        'Soporte Estándar por WhatsApp'
-      ],
-      ctaText: 'Elegir Plan Básico',
-      whatsappMessage: (cycle) => `Hola! Quiero contratar el Plan Básico (${cycle === 'annual' ? '$14.400/mes anual' : '$18.000/mes'}) para mi local gastronómico.`
-    },
-    {
-      id: 'pro',
-      name: 'Plan Pro Gastronómico',
-      badge: 'MÁS ELEGIDO',
-      isPopular: true,
-      monthlyPrice: 28000,
-      annualPrice: 22400,
-      description: 'La solución definitiva para hamburgueserías, pizzerías, bares y restaurantes con salón.',
-      features: [
-        'Todo lo incluido en el Plan Básico',
-        'Módulo de Salón & Mapa de Mesas interactivo',
-        'Pantalla de Cocina KDS con sonido en vivo',
-        'Bot de WhatsApp Local 24/7 sin APIs costosas',
-        'Sincronización en tiempo real de múltiples dispositivos',
-        'Soporte Técnico Asistido & Configuración de Carta'
-      ],
-      ctaText: 'Comenzar con Plan Pro',
-      whatsappMessage: (cycle) => `Hola! Quiero probar y contratar el Plan Pro Gastronómico (${cycle === 'annual' ? '$22.400/mes anual' : '$28.000/mes'}) para mi local.`
-    },
-    {
-      id: 'full',
-      name: 'Plan Full Franquicia',
-      badge: 'VIP COMPLETO',
-      isPopular: false,
-      monthlyPrice: 38000,
-      annualPrice: 30400,
-      description: 'Para negocios consolidados, múltiples cajeros, franquicias y gestión de clientes.',
-      features: [
-        'Todo lo incluido en el Plan Pro Gastronómico',
-        'CRM de Clientes & Libreta de Fiados (Cuentas corrientes)',
-        'Cobranzas automatizadas por WhatsApp en 1 clic',
-        'Múltiples Cajas y Roles de Cajero/Mozo independientes',
-        'Reportes avanzados de rentabilidad y ticket promedio',
-        'Soporte Prioritario VIP 24/7 con guardia telefónica'
-      ],
-      ctaText: 'Contratar Plan Full',
-      whatsappMessage: (cycle) => `Hola! Quiero contratar el Plan Full Franquicia (${cycle === 'annual' ? '$30.400/mes anual' : '$38.000/mes'}) para mi negocio.`
-    }
-  ];
+  const comandaProCost = 28000;
+  const netRetained = useMemo(() => {
+    return Math.max(0, appCommission - comandaProCost);
+  }, [appCommission]);
 
-  // FAQ items
-  const faqs = [
-    {
-      q: '¿Todos los negocios comparten la misma base de datos o cada uno tiene una separada?',
-      a: 'Todos los locales se gestionan sobre una arquitectura centralizada en Supabase de última generación con seguridad estricta a nivel de fila (Row Level Security - RLS). Esto garantiza que la información de cada negocio (pedidos, productos, clientes, cajas) está 100% aislada e inaccesible para los demás, con la enorme ventaja de contar con backups centralizados, velocidad instantánea y costos de infraestructura optimizados.'
-    },
-    {
-      q: '¿Cobran algún porcentaje o comisión sobre mis ventas?',
-      a: 'No. Cero comisiones (0%). Solo abonas la suscripción fija mensual de tu plan. El 100% del dinero cobrado en efectivo, transferencia o tarjetas va directo a tu cuenta bancaria o caja sin ningún descuento.'
-    },
-    {
-      q: '¿Qué equipamiento o computadoras necesito para usarlo?',
-      a: 'El sistema funciona directo en el navegador web (Google Chrome, Safari, Edge, Firefox). Puedes usarlo en computadoras de escritorio, notebooks, tablets Android, iPads o incluso teléfonos celulares. Es compatible con cualquier impresora térmica común (USB, Bluetooth o de red).'
-    },
-    {
-      q: '¿Qué sucede si se corta internet en mi local?',
-      a: 'Comanda SaaS cuenta con arquitectura offline-first. Puedes seguir tomando pedidos en mostrador y emitiendo tickets en papel normalmente. Tan pronto como vuelva la conexión, el sistema sincroniza automáticamente todo con la nube.'
-    },
-    {
-      q: '¿Cómo funciona el Bot de WhatsApp sin pagar APIs caras?',
-      a: 'Integramos un conector local que corre directamente con tu propio número de WhatsApp (escaneando un código QR similar a WhatsApp Web). De este modo, no tienes que pagar cuotas mensuales por conversación a Meta ni depender de servicios costosos de terceros.'
-    }
-  ];
-
+  // Handle store login submission
   const handleStoreSubmit = (e) => {
     e.preventDefault();
     const clean = sanitizeSlug(storeInputSlug);
     if (!clean) {
-      setStoreInputError('Por favor escribe el nombre o identificador de tu comercio.');
+      setStoreInputError('Por favor escribe el identificador de tu comercio.');
       return;
     }
     setStoreInputError('');
@@ -459,763 +225,1021 @@ export default function LandingPage({
     }
   };
 
-  const openWhatsAppContact = (text) => {
-    const encoded = encodeURIComponent(text || 'Hola! Me interesa conocer más sobre Comanda SaaS.');
-    window.open(`https://wa.me/5491122334455?text=${encoded}`, '_blank');
+  const handleLeadSubmit = (e) => {
+    e.preventDefault();
+    if (!leadEmail.trim()) {
+      if (typeof onOpenDemo === 'function') onOpenDemo();
+      return;
+    }
+    setLeadStatus('¡Solicitud recibida! Abriendo entorno de demostración...');
+    setTimeout(() => {
+      if (typeof onOpenDemo === 'function') onOpenDemo();
+    }, 700);
   };
 
-  // Calculations for Commission Savings
-  const estimatedAppCommission = useMemo(() => {
-    return Math.round(calcSales * (calcCommissionRate / 100));
-  }, [calcSales, calcCommissionRate]);
-
-  const comandaSaasCost = 28000; // Plan Pro
-  const monthlySavings = useMemo(() => {
-    return Math.max(0, estimatedAppCommission - comandaSaasCost);
-  }, [estimatedAppCommission]);
-
-  const annualSavings = useMemo(() => {
-    return monthlySavings * 12;
-  }, [monthlySavings]);
-
-  const selectedModule = modules.find(m => m.id === activeModuleTab) || modules[0];
-
   return (
-    <div className="landing-saas-root">
+    <div className="landing-page">
       {/* ==================================================================== */}
-      {/* NAVBAR                                                               */}
+      {/* 1. TOP APP BAR                                                      */}
       {/* ==================================================================== */}
-      <header className="landing-navbar">
-        <div className="landing-container landing-nav-inner">
-          <div className="landing-brand" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="landing-brand-icon">
-              <IconBolt size={22} />
+      <header className="st-header">
+        <div className="st-container st-header-inner">
+          {/* Brand Logo */}
+          <a 
+            href="#" 
+            className="st-logo"
+            onClick={(e) => {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            <div className="st-logo-icon">
+              <IconGridView size={14} />
             </div>
-            <div className="landing-brand-text">
-              <span className="brand-title">Comanda<span className="brand-accent">SaaS</span></span>
-              <span className="brand-badge">Gastronomía Operativa</span>
-            </div>
-          </div>
+            <span className="st-logo-text">ComandaSaaS</span>
+          </a>
 
-          <nav className="landing-nav-links" aria-label="Navegación principal">
-            <a href="#modulos">Módulos</a>
-            <a href="#ahorro">Calculadora 0%</a>
-            <a href="#planes">Planes & Suscripciones</a>
-            <a href="#arquitectura">Seguridad</a>
-            <a href="#faq">Preguntas</a>
+          {/* Desktop Navigation Links */}
+          <nav className="st-nav-links" aria-label="Navegación principal">
+            <a className="st-nav-link" href="#modulos">Product</a>
+            <a className="st-nav-link" href="#calculadora">Mise-en-Place</a>
+            <a className="st-nav-link" href="#seguridad">Architecture</a>
+            <a className="st-nav-link" href="#precios">Pricing</a>
           </nav>
 
-          <div className="landing-nav-actions">
+          {/* Actions */}
+          <div className="st-header-actions">
             <button 
-              type="button"
-              className="btn-store-login"
+              type="button" 
+              className="st-btn-ghost"
               onClick={() => setIsStoreModalOpen(true)}
             >
-              <IconStore size={16} />
-              <span>Ingresar a mi Local</span>
+              Sign In
             </button>
             <button 
               type="button" 
-              className="btn-demo-primary"
+              className="st-btn-primary"
               onClick={onOpenDemo}
             >
-              <IconRocket size={16} />
-              <span>Probar Demo en Vivo</span>
+              Request Access
             </button>
-            <button
-              type="button"
-              className="btn-saas-link"
-              title="Portal Super-Admin"
-              aria-label="Acceso al portal Super-Admin"
-              onClick={onOpenSaas}
-            >
-              <IconSettings size={18} />
-            </button>
+            {typeof onOpenSaas === 'function' && (
+              <button
+                type="button"
+                className="st-btn-ghost"
+                style={{ padding: '6px 8px' }}
+                title="Super-Admin Portal"
+                aria-label="Super-Admin Portal"
+                onClick={onOpenSaas}
+              >
+                <IconSettings size={15} />
+              </button>
+            )}
           </div>
         </div>
       </header>
 
-      {/* ==================================================================== */}
-      {/* HERO SECTION                                                         */}
-      {/* ==================================================================== */}
-      <section className="landing-hero">
-        <div className="landing-container landing-hero-grid">
-          <div className="landing-hero-content">
-            <div className="hero-pill">
-              <span className="pill-dot"></span>
-              Plataforma Multi-Comercio Todo-en-Uno
+      <main>
+        {/* ==================================================================== */}
+        {/* 2. HERO SECTION                                                     */}
+        {/* ==================================================================== */}
+        <section className="st-hero">
+          <div className="st-container">
+            {/* Micro-Badge */}
+            <div className="st-micro-badge">
+              <span className="st-dot"></span>
+              <span>INFRAESTRUCTURA OPERATIVA PARA GASTRONOMÍA</span>
             </div>
 
-            <h1 className="hero-title">
-              El Sistema Operativo Gastronómico que Acelera tus Ventas y Elimina el Caos
+            {/* Headline */}
+            <h1 className="st-hero-title">
+              La plataforma operativa diseñada para la velocidad de tu restaurante
             </h1>
 
-            <p className="hero-subtitle">
-              Punto de Venta ultrarrápido, Comandera KDS para cocina, Mapa interactivo de Salón, Bot de WhatsApp 24/7 sin costos por mensaje y Carta Digital con 7 temas visuales. 
-              <strong> 100% en la nube, con arquitectura offline-first y 0% de comisiones sobre tus ventas.</strong>
+            {/* Subtitle */}
+            <p className="st-hero-subtitle">
+              Punto de venta táctil, comanderas de cocina en tiempo real, pedidos por WhatsApp automatizados y analíticas de caja. Sin comisiones por venta, arquitectura offline-first.
             </p>
 
-            <div className="hero-cta-group">
+            {/* CTAs */}
+            <div className="st-hero-ctas">
               <button 
                 type="button" 
-                className="btn-hero-cta"
+                className="st-btn-dark"
                 onClick={onOpenDemo}
               >
-                <div className="btn-cta-text-wrap">
-                  <span className="btn-cta-title">
-                    <IconBolt size={18} />
-                    <span>Probar Demo en Vivo Gratis</span>
-                  </span>
-                  <span className="btn-cta-caption">Sin registro previo ni tarjeta</span>
-                </div>
-                <IconArrowRight size={18} />
+                <span>Empezar Demo</span>
+                <IconArrowRight size={16} />
               </button>
-
               <button 
                 type="button" 
-                className="btn-hero-secondary"
+                className="st-btn-outline"
+                onClick={() => {
+                  const el = document.getElementById('preview');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                <IconPlayCircle size={16} />
+                <span>Ver funcionamiento en vivo</span>
+              </button>
+              <button 
+                type="button" 
+                className="st-btn-outline"
                 onClick={() => setIsStoreModalOpen(true)}
               >
-                <IconStore size={18} />
+                <IconStore size={16} />
                 <span>Ingresar a mi Local</span>
               </button>
             </div>
 
-            <div className="hero-badges-row">
-              <div className="hero-badge-item">
-                <IconPercent size={18} className="badge-svg" />
-                <span><strong>0%</strong> Comisiones</span>
+            {/* SAAS INTERFACE PREVIEW (Surgical Bento / Split Dashboard Mockup) */}
+            <div className="st-preview-card" id="preview">
+              {/* Window Bar */}
+              <div className="st-window-bar">
+                <div className="st-window-dots">
+                  <div className="st-w-dot"></div>
+                  <div className="st-w-dot"></div>
+                  <div className="st-w-dot"></div>
+                  <span className="st-window-tag">app.comanda.internal / terminal-01 [ACTIVE_SERVICE]</span>
+                </div>
+                <div>
+                  <span className="st-sync-badge">
+                    <span className="st-sync-dot"></span>
+                    SYNC: LOCAL_FIRST_OK
+                  </span>
+                </div>
               </div>
-              <div className="hero-badge-item">
-                <IconWifiOff size={18} className="badge-svg" />
-                <span><strong>100%</strong> Offline-First</span>
-              </div>
-              <div className="hero-badge-item">
-                <IconPrinter size={18} className="badge-svg" />
-                <span>Tickets <strong>58 / 80mm</strong></span>
-              </div>
-              <div className="hero-badge-item">
-                <IconShieldCheck size={18} className="badge-svg" />
-                <span>Datos <strong>Aislados RLS</strong></span>
+
+              {/* Dashboard Body */}
+              <div className="st-preview-body">
+                {/* Metric Top Bar */}
+                <div className="st-metrics-top-bar">
+                  <div className="st-preview-stat">
+                    <div className="st-stat-label">VENTAS DE TURNO</div>
+                    <div className="st-stat-value">$482.900</div>
+                    <div className="st-stat-sub">+14.2% vs. ayer</div>
+                  </div>
+                  <div className="st-preview-stat">
+                    <div className="st-stat-label">TIEMPO PROMEDIO PREP</div>
+                    <div className="st-stat-value">9m 42s</div>
+                    <div className="st-stat-sub" style={{ color: 'var(--st-primary)' }}>-1m 10s objetivo</div>
+                  </div>
+                  <div className="st-preview-stat">
+                    <div className="st-stat-label">TICKET PROMEDIO</div>
+                    <div className="st-stat-value">$14.200</div>
+                    <div className="st-stat-sub">34 mesas cerradas</div>
+                  </div>
+                  <div className="st-preview-stat">
+                    <div className="st-stat-label">COMANDAS ACTIVAS</div>
+                    <div className="st-stat-value">8 en curso</div>
+                    <div className="st-stat-sub">5 Salón / 3 WhatsApp</div>
+                  </div>
+                </div>
+
+                {/* Split Working Pane (KDS & Live Orders) */}
+                <div className="st-split-pane">
+                  {/* Left: Live Orders Feed */}
+                  <div>
+                    <div className="st-pane-header">
+                      <span className="st-stat-label" style={{ color: 'var(--st-text-main)' }}>COLA DE COCINA (KDS LIVE STREAM)</span>
+                      <span className="st-stat-sub">4 PARTIDAS DESPACHANDO</span>
+                    </div>
+
+                    {/* Order Card 1 */}
+                    <div className="st-order-card">
+                      <div className="st-order-head">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <strong style={{ color: 'var(--st-text-main)' }}>MESA 12</strong>
+                          <span className="st-badge-tag">SALÓN</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-primary)', fontWeight: 600, fontSize: '0.75rem' }}>06:14</span>
+                          <span className="st-badge-tag" style={{ background: 'var(--st-primary-light)', color: 'var(--st-primary)', fontWeight: 700 }}>MARCHANDO</span>
+                        </div>
+                      </div>
+                      <div className="st-order-items">
+                        <div className="st-order-item-row">
+                          <span>2× Bife de Chorizo Dry-Aged (Punto medio)</span>
+                          <span className="st-badge-tag">GRILL</span>
+                        </div>
+                        <div className="st-order-item-row">
+                          <span>1× Risotto de Hongos Silvestres</span>
+                          <span className="st-badge-tag">PASTA</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Order Card 2 */}
+                    <div className="st-order-card">
+                      <div className="st-order-head">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <strong style={{ color: 'var(--st-text-main)' }}>#WA-4921</strong>
+                          <span className="st-badge-tag" style={{ background: '#dfe2ec', color: '#181c23' }}>WHATSAPP DIRECTO</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-text-muted)', fontSize: '0.75rem' }}>02:40</span>
+                          <span className="st-badge-tag">ENTRANTE</span>
+                        </div>
+                      </div>
+                      <div className="st-order-items">
+                        <div className="st-order-item-row">
+                          <span>1× Smash Burger Doble Bacon + Papas Trufadas</span>
+                          <span className="st-badge-tag">DELIVERY</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Stock & Cost Ratios */}
+                  <div className="st-cost-panel">
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '10px', borderBottom: '1px solid var(--st-border)' }}>
+                        <span className="st-stat-label" style={{ color: 'var(--st-text-main)' }}>RENDIMIENTO &amp; RECETA ACTIVA</span>
+                        <span className="st-stat-sub">COSTEO DINÁMICO</span>
+                      </div>
+                      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.82rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--st-text-muted)' }}>
+                            <span>Costo Insumos Teórico</span>
+                            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-text-main)', fontWeight: 600 }}>26.4%</span>
+                          </div>
+                          <div className="st-progress-bar-bg">
+                            <div className="st-progress-bar-fill" style={{ width: '26.4%', background: 'var(--st-text-main)' }}></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--st-text-muted)' }}>
+                            <span>Margen de Contribución</span>
+                            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-text-main)', fontWeight: 600 }}>73.6%</span>
+                          </div>
+                          <div className="st-progress-bar-bg">
+                            <div className="st-progress-bar-fill" style={{ width: '73.6%', background: 'var(--st-primary)' }}></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ paddingTop: '12px', borderTop: '1px solid var(--st-border)', marginTop: '1rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--st-text-muted)' }}>
+                        <span>OFFLINE BUFFER: 0 PENDIENTES</span>
+                        <span style={{ color: 'var(--st-text-main)', fontWeight: 600 }}>REPLICACIÓN: 4ms</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* HERO INTERACTIVE COCKPIT MOCKUP */}
-          <div className="landing-hero-card">
-            <div className="mockup-frame">
-              <div className="mockup-header">
-                <div className="mockup-dots">
-                  <span className="dot red"></span>
-                  <span className="dot yellow"></span>
-                  <span className="dot green"></span>
+        {/* ==================================================================== */}
+        {/* 3. TRUST METRICS ROW                                                */}
+        {/* ==================================================================== */}
+        <section className="st-trust-row">
+          <div className="st-container">
+            <div className="st-trust-grid">
+              <div className="st-trust-col">
+                <div className="st-trust-metric">0%</div>
+                <div className="st-trust-desc">Comisiones por pedido</div>
+              </div>
+              <div className="st-trust-col">
+                <div className="st-trust-metric">&lt; 12 seg</div>
+                <div className="st-trust-desc">Por comanda emitida</div>
+              </div>
+              <div className="st-trust-col">
+                <div className="st-trust-metric">100%</div>
+                <div className="st-trust-desc">Operativo offline-first</div>
+              </div>
+              <div className="st-trust-col">
+                <div className="st-trust-metric">RLS Strict</div>
+                <div className="st-trust-desc">Aislamiento de bases de datos</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ==================================================================== */}
+        {/* 4. SUITE DE MÓDULOS                                                 */}
+        {/* ==================================================================== */}
+        <section className="st-section" id="modulos">
+          <div className="st-container">
+            <div className="st-section-head">
+              <span className="st-section-tag">SUITE INTEGRAL</span>
+              <h2 className="st-section-title">Módulos construidos para la exigencia del despacho</h2>
+              <p className="st-section-subtitle">Herramientas especializadas que reemplazan múltiples servicios fragmentados.</p>
+            </div>
+
+            <div className="st-modules-grid">
+              {/* Card 1: POS */}
+              <div className="st-module-card">
+                <div>
+                  <div className="st-module-icon-wrap">
+                    <IconPointOfSale size={20} />
+                  </div>
+                  <h3 className="st-module-title">Punto de Venta (POS)</h3>
+                  <p className="st-module-desc">
+                    Interfaz ultra rápida diseñada para pantallas táctiles. Admite cobros combinados inmediatos, división de cuentas por comensal y control de turnos ciegos para prevenir desvíos de caja.
+                  </p>
                 </div>
-                <div className="mockup-address">
-                  <span className="address-lock">🔒</span>
-                  <span>comandasaas.app · Panel Operativo Gastronómico</span>
-                </div>
-                <div className="mockup-status">
-                  <span className="status-live-pulse"></span>
-                  <span>En vivo</span>
+                <div className="st-module-footer">
+                  <IconCheck size={14} />
+                  <span>Sub-segundo en procesamiento</span>
                 </div>
               </div>
 
-              <div className="mockup-body">
-                {/* Stats Bar with tabular numbers */}
-                <div className="mockup-stats-bar">
-                  <div className="m-stat">
-                    <span className="m-stat-title">Ventas del Turno</span>
-                    <span className="m-stat-val font-mono">$184.500</span>
+              {/* Card 2: KDS */}
+              <div className="st-module-card">
+                <div>
+                  <div className="st-module-icon-wrap">
+                    <IconSoupKitchen size={20} />
                   </div>
-                  <div className="m-stat">
-                    <span className="m-stat-title">Comandas Activas</span>
-                    <span className="m-stat-val font-mono">14 en marcha</span>
-                  </div>
-                  <div className="m-stat">
-                    <span className="m-stat-title">Mesas en Salón</span>
-                    <span className="m-stat-val font-mono">8 ocupadas</span>
-                  </div>
+                  <h3 className="st-module-title">Pantalla de Cocina (KDS)</h3>
+                  <p className="st-module-desc">
+                    Cronómetros y semáforos por partida operativa (grill, ensaladas, postres). Despacho ordenado, control auditado de demoras y erradicación definitiva de comanderas ruidosas de papel.
+                  </p>
                 </div>
-
-                {/* Real Gastro Orders Simulation */}
-                <div className="mockup-order-cards">
-                  <div className="m-order-card urgent">
-                    <div className="m-order-head">
-                      <div className="m-order-title-wrap">
-                        <span className="m-order-id font-mono">#104</span>
-                        <span className="m-order-table">Salón · Mesa 4</span>
-                      </div>
-                      <span className="m-badge-prep">Cocina · 4m</span>
-                    </div>
-                    <div className="m-order-items">
-                      <div className="m-item-line">
-                        <span className="m-qty font-mono">2x</span>
-                        <span className="m-name">Smash Burger Doble Cheddar</span>
-                      </div>
-                      <div className="m-item-line">
-                        <span className="m-qty font-mono">1x</span>
-                        <span className="m-name">Papas Rústicas con Panceta</span>
-                      </div>
-                      <div className="m-item-line">
-                        <span className="m-qty font-mono">2x</span>
-                        <span className="m-name">Cerveza Artesanal IPA 500ml</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="m-order-card whatsapp">
-                    <div className="m-order-head">
-                      <div className="m-order-title-wrap">
-                        <span className="m-order-id font-mono">#105</span>
-                        <span className="m-order-channel">WhatsApp Bot 24/7</span>
-                      </div>
-                      <span className="m-badge-wa">Delivery</span>
-                    </div>
-                    <div className="m-order-items">
-                      <div className="m-item-line">
-                        <span className="m-qty font-mono">1x</span>
-                        <span className="m-name">Pizza Napolitana Familiar + Fainá</span>
-                      </div>
-                      <div className="m-item-sub font-mono">
-                        Transferencia MP · Alias verificado · $14.200
-                      </div>
-                    </div>
-                  </div>
+                <div className="st-module-footer">
+                  <IconCheck size={14} />
+                  <span>Ruteo automático a estaciones</span>
                 </div>
+              </div>
 
-                <div className="mockup-actions-footer">
-                  <button 
-                    type="button" 
-                    className="btn-mockup-test"
-                    onClick={onOpenDemo}
-                  >
-                    <span>Explorar Sistema Completo en Vivo</span>
-                    <IconArrowRight size={16} />
-                  </button>
+              {/* Card 3: WhatsApp Bot */}
+              <div className="st-module-card">
+                <div>
+                  <div className="st-module-icon-wrap">
+                    <IconChat size={20} />
+                  </div>
+                  <h3 className="st-module-title">Bot WhatsApp 24/7</h3>
+                  <p className="st-module-desc">
+                    Canal de venta directo al cliente sin pasar por marketplaces. Menú interactivo con checkout automatizado, validación de pago y sincronización instantánea con el KDS.
+                  </p>
+                </div>
+                <div className="st-module-footer">
+                  <IconCheck size={14} />
+                  <span>0% de comisiones por venta</span>
+                </div>
+              </div>
+
+              {/* Card 4: QR Menu */}
+              <div className="st-module-card">
+                <div>
+                  <div className="st-module-icon-wrap">
+                    <IconQrScanner size={20} />
+                  </div>
+                  <h3 className="st-module-title">Carta Digital QR</h3>
+                  <p className="st-module-desc">
+                    Actualización inmediata de precios, etiquetas de alérgenos y fotografías de alta resolución. Ocultación automática de platos según existencias reales en stock.
+                  </p>
+                </div>
+                <div className="st-module-footer">
+                  <IconCheck size={14} />
+                  <span>Cero retraso en propagación CDN</span>
+                </div>
+              </div>
+
+              {/* Card 5: Inventory & Recipes */}
+              <div className="st-module-card" style={{ gridColumn: 'span 2' }}>
+                <div>
+                  <div className="st-module-icon-wrap">
+                    <IconInventory size={20} />
+                  </div>
+                  <h3 className="st-module-title">Control de Stock, Recetas &amp; Rendimiento</h3>
+                  <p className="st-module-desc" style={{ maxWidth: '640px' }}>
+                    Mise-en-place de precisión. Fichas técnicas de platos con desglose gramo a gramo, costeo dinámico según facturas de proveedores y disparo de alertas automáticas ante mermas no autorizadas.
+                  </p>
+                </div>
+                <div className="st-module-footer" style={{ gap: '1.25rem', flexWrap: 'wrap' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--st-primary)' }}></span>
+                    Costeo en tiempo real
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--st-text-main)' }}></span>
+                    Subrecetas ilimitadas
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--st-text-muted)' }}></span>
+                    Alerta de merma operativa
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ==================================================================== */}
-      {/* MODULOS / SYSTEM ARSENAL (Tabs and Deep Dive)                         */}
-      {/* ==================================================================== */}
-      <section id="modulos" className="landing-modules">
-        <div className="landing-container">
-          <div className="section-head text-center">
-            <h2 className="section-title">Todo lo que Necesita tu Local en una Sola Plataforma</h2>
-            <p className="section-desc">
-              Diseñado junto a gastronómicos, cocineros y mozos para responder a la máxima presión en momentos de salón lleno.
-            </p>
-          </div>
+        {/* ==================================================================== */}
+        {/* 5. CALCULADORA DE AHORRO REAL                                       */}
+        {/* ==================================================================== */}
+        <section className="st-calc-section" id="calculadora">
+          <div className="st-container">
+            <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
+              <span className="st-section-tag">TRANSPARENCIA FINANCIERA</span>
+              <h2 className="st-section-title">Calculadora de Ahorro Directo</h2>
+              <p className="st-section-subtitle">Descubrí cuánto capital retiene tu local al eliminar los porcentajes de intermediarios.</p>
+            </div>
 
-          <div className="module-tabs-nav" role="tablist">
-            {modules.map(mod => {
-              const TabIcon = mod.Icon;
-              const isActive = activeModuleTab === mod.id;
-              return (
-                <button
-                  key={mod.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  className={`module-tab-btn ${isActive ? 'active' : ''}`}
-                  onClick={() => setActiveModuleTab(mod.id)}
-                >
-                  <TabIcon size={18} className="module-tab-icon" />
-                  <span className="module-tab-text">{mod.name}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="module-showcase-card">
-            <div className="module-showcase-info">
-              <span className="showcase-badge">{selectedModule.previewBadge}</span>
-              <h3 className="showcase-title">{selectedModule.name}</h3>
-              <p className="showcase-tagline">{selectedModule.tagline}</p>
-              <p className="showcase-description">{selectedModule.description}</p>
-
-              <ul className="showcase-bullets">
-                {selectedModule.bullets.map((b, i) => (
-                  <li key={i}>
-                    <span className="bullet-check">
-                      <IconCheck size={14} />
+            <div className="st-calc-box">
+              <div className="st-calc-grid">
+                {/* Inputs */}
+                <div className="st-slider-wrap">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <label style={{ fontSize: '0.84rem', fontWeight: 500, color: 'var(--st-text-main)' }}>
+                      Venta mensual estimada en delivery / mostrador
+                    </label>
+                    <span style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--st-text-main)' }}>
+                      ${calcSales.toLocaleString('es-AR')}
                     </span>
-                    <span>{b}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="showcase-action">
-                <button 
-                  type="button" 
-                  className="btn-showcase-demo"
-                  onClick={onOpenDemo}
-                >
-                  <span>Probar {selectedModule.name} en vivo</span>
-                  <IconArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-
-            <div className="module-showcase-visual">
-              <div className="visual-card-inner">
-                <div className="visual-header">
-                  <div className="visual-icon-wrap">
-                    <selectedModule.Icon size={22} />
                   </div>
-                  <span className="visual-title">{selectedModule.previewHeadline}</span>
-                </div>
 
-                <div className="visual-stats-grid">
-                  {selectedModule.mockStats.map((st, i) => (
-                    <div key={i} className="visual-stat-box">
-                      <span className="v-label">{st.label}</span>
-                      <strong className="v-value font-mono">{st.val}</strong>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="visual-action-hint">
-                  <IconMonitor size={16} />
-                  <span>Optimizado para pantallas táctiles de cualquier tamaño (móviles, tablets, all-in-one).</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================================================================== */}
-      {/* CALCULADORA DE AHORRO EN COMISIONES (0% vs Delivery Apps)            */}
-      {/* ==================================================================== */}
-      <section id="ahorro" className="landing-calculator-section">
-        <div className="landing-container">
-          <div className="calc-card-container">
-            <div className="calc-intro">
-              <div className="calc-badge">
-                <IconCalculator size={18} />
-                <span>Calculadora de Rentabilidad</span>
-              </div>
-              <h2 className="calc-title">¿Cuánto Dinero Pierdes Hoy Pagando Comisiones?</h2>
-              <p className="calc-subtitle">
-                Las apps tradicionales de delivery cobran entre un <strong>18% y un 30%</strong> por cada pedido. Con ComandaSaaS pagas una suscripción fija plana y el <strong>100% de tus ventas es tuyo</strong>.
-              </p>
-
-              <div className="calc-controls">
-                <div className="calc-field">
-                  <div className="calc-label-row">
-                    <label htmlFor="salesRange">Venta estimada mensual de tu local:</label>
-                    <span className="calc-val-highlight font-mono">${Number(calcSales).toLocaleString('es-AR')}</span>
-                  </div>
                   <input 
-                    id="salesRange"
-                    type="range" 
-                    min="500000" 
-                    max="10000000" 
-                    step="250000"
+                    type="range"
+                    min="1000000"
+                    max="25000000"
+                    step="500000"
                     value={calcSales}
                     onChange={(e) => setCalcSales(Number(e.target.value))}
-                    className="calc-range-slider"
+                    aria-label="Venta mensual estimada"
                   />
-                  <div className="calc-ticks font-mono">
-                    <span>$500k</span>
-                    <span>$2.5M</span>
-                    <span>$5M</span>
-                    <span>$10M</span>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--st-text-muted)', marginTop: '6px' }}>
+                    <span>$1.000.000</span>
+                    <span>$25.000.000</span>
+                  </div>
+
+                  <div style={{ marginTop: '1.5rem', padding: '14px', border: '1px solid var(--st-border)', borderRadius: '6px', background: 'var(--st-bg)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: 'var(--st-text-muted)', marginBottom: '8px' }}>
+                      <span>Comisión promedio apps tradicionales (22%)</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-error)', fontWeight: 600 }}>
+                        ${appCommission.toLocaleString('es-AR')}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: 'var(--st-text-muted)' }}>
+                      <span>Tarifa plana fija ComandaSaaS Pro</span>
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-text-main)', fontWeight: 600 }}>
+                        ${comandaProCost.toLocaleString('es-AR')}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="calc-field">
-                  <div className="calc-label-row">
-                    <label htmlFor="commRange">Comisión promedio de apps que pagas hoy:</label>
-                    <span className="calc-val-highlight font-mono">{calcCommissionRate}%</span>
+                {/* Result Card */}
+                <div className="st-calc-summary-card">
+                  <span className="st-stat-label">CAPITAL RETENIDO / MES</span>
+                  <div className="st-calc-retention">
+                    ${netRetained.toLocaleString('es-AR')}
                   </div>
-                  <input 
-                    id="commRange"
-                    type="range" 
-                    min="15" 
-                    max="32" 
-                    step="1"
-                    value={calcCommissionRate}
-                    onChange={(e) => setCalcCommissionRate(Number(e.target.value))}
-                    className="calc-range-slider"
-                  />
+                  <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', marginTop: '8px', lineHeight: 1.5 }}>
+                    Dinero que permanece en la caja de tu cocina mes a mes, sin deducciones imprevistas.
+                  </p>
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <button 
+                      type="button" 
+                      className="st-btn-dark"
+                      style={{ width: '100%' }}
+                      onClick={onOpenDemo}
+                    >
+                      Preservar mis ingresos
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="calc-results-box">
-              <div className="calc-metric-row">
-                <div className="calc-metric-item danger">
-                  <span className="calc-metric-label">Comisiones perdidas al mes:</span>
-                  <span className="calc-metric-number font-mono">-${estimatedAppCommission.toLocaleString('es-AR')}</span>
-                  <small className="calc-metric-note">Con apps tradicionales ({calcCommissionRate}%)</small>
-                </div>
-
-                <div className="calc-metric-item safe">
-                  <span className="calc-metric-label">Costo mensual ComandaSaaS:</span>
-                  <span className="calc-metric-number font-mono">${comandaSaasCost.toLocaleString('es-AR')}</span>
-                  <small className="calc-metric-note">Plan Pro Gastronómico fijo</small>
-                </div>
-              </div>
-
-              <div className="calc-total-banner">
-                <span className="calc-savings-title">Ahorro Neto Directo para tu Negocio:</span>
-                <div className="calc-savings-amount font-mono">
-                  +${monthlySavings.toLocaleString('es-AR')} <span className="savings-period">/ mes</span>
-                </div>
-                <div className="calc-annual-callout font-mono">
-                  Equivale a un ahorro de <strong>+${annualSavings.toLocaleString('es-AR')} al año</strong> en tu bolsillo.
-                </div>
-              </div>
-
-              <button 
-                type="button" 
-                className="btn-calc-cta"
-                onClick={onOpenDemo}
-              >
-                <span>Empezar a Ahorrar con ComandaSaaS</span>
-                <IconArrowRight size={18} />
-              </button>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ==================================================================== */}
-      {/* PLANES & SUSCRIPCIONES                                               */}
-      {/* ==================================================================== */}
-      <section id="planes" className="landing-pricing">
-        <div className="landing-container">
-          <div className="section-head text-center">
-            <h2 className="section-title">Elige el Plan Perfecto para tu Negocio</h2>
-            <p className="section-desc">
-              Sin contratos forzosos. Cancela o cambia de plan en cualquier momento. 0% de comisiones sobre tus ventas.
-            </p>
+        {/* ==================================================================== */}
+        {/* 6. PRECIOS Y PLANES                                                 */}
+        {/* ==================================================================== */}
+        <section className="st-section" id="precios">
+          <div className="st-container">
+            <div style={{ textAlign: 'center', maxWidth: '640px', margin: '0 auto 2.5rem' }}>
+              <span className="st-section-tag">TARIFA PLANA Y FIJA</span>
+              <h2 className="st-section-title">Planes diseñados para tu escala</h2>
+              <p className="st-section-subtitle">Sin letra chica ni costos variables por volumen facturado.</p>
 
-            {/* Billing Toggle (Monthly / Annual with 20% discount) */}
-            <div className="billing-toggle-wrap">
-              <div className="billing-toggle-pill">
+              {/* Billing Cycle Toggle */}
+              <div className="st-pricing-toggle">
                 <button
                   type="button"
-                  className={`billing-btn ${billingCycle === 'monthly' ? 'active' : ''}`}
+                  className={`st-toggle-btn ${billingCycle === 'monthly' ? 'active' : ''}`}
                   onClick={() => setBillingCycle('monthly')}
                 >
-                  Facturación Mensual
+                  Mensual
                 </button>
                 <button
                   type="button"
-                  className={`billing-btn ${billingCycle === 'annual' ? 'active' : ''}`}
+                  className={`st-toggle-btn ${billingCycle === 'annual' ? 'active' : ''}`}
                   onClick={() => setBillingCycle('annual')}
                 >
-                  <span>Facturación Anual</span>
-                  <span className="discount-chip">2 meses gratis</span>
+                  <span>Anual</span>
+                  <span className="st-badge-discount">2 MESES OFF</span>
                 </button>
               </div>
             </div>
-          </div>
 
-          <div className="pricing-grid">
-            {plansData.map(plan => {
-              const currentPrice = billingCycle === 'annual' ? plan.annualPrice : plan.monthlyPrice;
-              const formattedPrice = `$${currentPrice.toLocaleString('es-AR')}`;
-              
-              return (
-                <div 
-                  key={plan.id} 
-                  className={`pricing-card ${plan.isPopular ? 'popular-card' : ''}`}
-                >
-                  {plan.badge && (
-                    <div className={`pricing-badge ${plan.isPopular ? 'popular-badge' : ''}`}>
-                      {plan.badge}
-                    </div>
-                  )}
-
-                  <div className="pricing-header">
-                    <h3 className="plan-name">{plan.name}</h3>
-                    <p className="plan-desc">{plan.description}</p>
-                    
-                    <div className="plan-price-wrap">
-                      <span className="plan-price font-mono">{formattedPrice}</span>
-                      <span className="plan-period">/ mes</span>
-                    </div>
-
-                    {billingCycle === 'annual' && (
-                      <div className="plan-billed-note font-mono">
-                        Facturado anualmente (${(currentPrice * 12).toLocaleString('es-AR')}/año)
-                      </div>
-                    )}
+            <div className="st-plans-grid">
+              {/* Plan 1 */}
+              <div className="st-plan-card">
+                <div>
+                  <span className="st-stat-label">INICIAL</span>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--st-text-main)', marginTop: '4px' }}>Mostrador &amp; Delivery</h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', marginTop: '6px' }}>
+                    Para locales de despacho ágil, cafeterías de especialidad y dark kitchens.
+                  </p>
+                  <div style={{ margin: '1.25rem 0' }}>
+                    <span className="st-plan-price-num">
+                      {billingCycle === 'annual' ? '$15.000' : '$18.000'}
+                    </span>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)' }}>/mes</span>
                   </div>
-
-                  <div className="plan-divider"></div>
-
-                  <ul className="plan-features">
-                    {plan.features.map((feat, idx) => (
-                      <li key={idx}>
-                        <span className="feat-check">
-                          <IconCheck size={14} />
-                        </span>
-                        <span>{feat}</span>
-                      </li>
-                    ))}
+                  <ul className="st-plan-bullets">
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>POS táctil de mostrador ilimitado</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Gestión de delivery propio y caja</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Carta QR estándar con actualización</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Modo offline-first continuo</span>
+                    </li>
                   </ul>
-
-                  <div className="pricing-footer">
-                    <button
-                      type="button"
-                      className={`btn-plan-cta ${plan.isPopular ? 'btn-plan-popular' : ''}`}
-                      onClick={() => openWhatsAppContact(plan.whatsappMessage(billingCycle))}
-                    >
-                      <span>{plan.ctaText}</span>
-                      <IconArrowRight size={16} />
-                    </button>
-                    <small className="plan-guarantee">Activación inmediata sin costos ocultos</small>
-                  </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Franchise / Chains Custom Banner */}
-          <div className="pricing-custom-banner">
-            <div className="banner-content">
-              <h4>¿Tienes una cadena de locales o franquicia con más de 3 sucursales?</h4>
-              <p>Ofrecemos planes corporativos a medida con base de datos dedicada, analíticas consolidadas y soporte presencial.</p>
-            </div>
-            <button 
-              type="button" 
-              className="btn-banner-cta"
-              onClick={() => openWhatsAppContact('Hola! Quiero consultar por un plan corporativo para franquicias y múltiples sucursales.')}
-            >
-              <span>Consultar Plan Franquicias</span>
-              <IconArrowRight size={16} />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================================================================== */}
-      {/* ARQUITECTURA & SEGURIDAD MULTI-TENANT                                */}
-      {/* ==================================================================== */}
-      <section id="arquitectura" className="landing-security">
-        <div className="landing-container">
-          <div className="security-box">
-            <div className="security-icon">
-              <IconShieldCheck size={36} />
-            </div>
-            <div className="security-text">
-              <h3>Arquitectura Multi-Comercio Segura & Centralizada</h3>
-              <p>
-                Todos los locales operan bajo una base de datos centralizada de alta disponibilidad con 
-                <strong> Row Level Security (RLS)</strong>. Ningún comercio puede acceder a los datos de otro. 
-                Tus precios, clientes, ventas y configuraciones están 100% protegidos, con copias de seguridad automáticas 
-                y velocidad instantánea garantizada.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ==================================================================== */}
-      {/* PREGUNTAS FRECUENTES (FAQ)                                           */}
-      {/* ==================================================================== */}
-      <section id="faq" className="landing-faq">
-        <div className="landing-container">
-          <div className="section-head text-center">
-            <h2 className="section-title">Preguntas Frecuentes</h2>
-            <p className="section-desc">Resolvemos las consultas técnicas y comerciales más habituales.</p>
-          </div>
-
-          <div className="faq-list">
-            {faqs.map((faq, index) => {
-              const isOpen = openFaqIndex === index;
-              return (
-                <div key={index} className={`faq-item ${isOpen ? 'open' : ''}`}>
+                <div style={{ marginTop: '2rem' }}>
                   <button 
                     type="button" 
-                    className="faq-question"
-                    aria-expanded={isOpen}
-                    onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                    className="st-btn-outline" 
+                    style={{ width: '100%' }}
+                    onClick={onOpenDemo}
                   >
-                    <span>{faq.q}</span>
-                    <span className={`faq-toggle-icon ${isOpen ? 'rotate' : ''}`}>
-                      <IconChevronDown size={20} />
-                    </span>
+                    Elegir Inicial
                   </button>
-                  {isOpen && (
-                    <div className="faq-answer">
-                      <p>{faq.a}</p>
-                    </div>
-                  )}
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ==================================================================== */}
-      {/* FOOTER                                                               */}
-      {/* ==================================================================== */}
-      <footer className="landing-footer">
-        <div className="landing-container landing-footer-grid">
-          <div className="footer-col brand-col">
-            <div className="landing-brand">
-              <div className="landing-brand-icon">
-                <IconBolt size={20} />
               </div>
-              <div className="landing-brand-text">
-                <span className="brand-title">Comanda<span className="brand-accent">SaaS</span></span>
+
+              {/* Plan 2 (Featured Pro) */}
+              <div className="st-plan-card featured">
+                <div className="st-plan-badge-top">MÁS ELEGIDO</div>
+                <div>
+                  <span className="st-stat-label">PROFESIONAL</span>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--st-text-main)', marginTop: '4px' }}>Salón, Cocina KDS &amp; Bot</h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', marginTop: '6px' }}>
+                    La estación completa para restaurantes de servicio completo con salón.
+                  </p>
+                  <div style={{ margin: '1.25rem 0' }}>
+                    <span className="st-plan-price-num">
+                      {billingCycle === 'annual' ? '$23.300' : '$28.000'}
+                    </span>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)' }}>/mes</span>
+                  </div>
+                  <ul className="st-plan-bullets">
+                    <li className="st-plan-bullet-item" style={{ color: 'var(--st-text-main)', fontWeight: 500 }}>
+                      <IconCheck size={14} style={{ color: 'var(--st-primary)' }} />
+                      <span>Todo lo incluido en Plan Inicial</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Pantalla KDS multi-partida ilimitada</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Bot de pedidos por WhatsApp 24/7</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Mapa de salón interactivo por mozo</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Escandallo de recetas e inventario</span>
+                    </li>
+                  </ul>
+                </div>
+                <div style={{ marginTop: '2rem' }}>
+                  <button 
+                    type="button" 
+                    className="st-btn-dark" 
+                    style={{ width: '100%' }}
+                    onClick={onOpenDemo}
+                  >
+                    Iniciar prueba Pro
+                  </button>
+                </div>
+              </div>
+
+              {/* Plan 3 */}
+              <div className="st-plan-card">
+                <div>
+                  <span className="st-stat-label">CORPORATIVO</span>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--st-text-main)', marginTop: '4px' }}>Franquicias &amp; Grupos</h3>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', marginTop: '6px' }}>
+                    Visión consolidada multi-sucursal con permisos segregados y centros de costos.
+                  </p>
+                  <div style={{ margin: '1.25rem 0' }}>
+                    <span className="st-plan-price-num">
+                      {billingCycle === 'annual' ? '$31.500' : '$38.000'}
+                    </span>
+                    <span style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)' }}>/mes por sucursal</span>
+                  </div>
+                  <ul className="st-plan-bullets">
+                    <li className="st-plan-bullet-item" style={{ color: 'var(--st-text-main)', fontWeight: 500 }}>
+                      <IconCheck size={14} style={{ color: 'var(--st-primary)' }} />
+                      <span>Todo lo incluido en Plan Pro</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Panel consolidado de métricas multi-local</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Gestión centralizada de cartas y recetas</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>API de integración contable &amp; ERP</span>
+                    </li>
+                    <li className="st-plan-bullet-item">
+                      <IconCheck size={14} />
+                      <span>Soporte prioritario con SLA 99.9%</span>
+                    </li>
+                  </ul>
+                </div>
+                <div style={{ marginTop: '2rem' }}>
+                  <button 
+                    type="button" 
+                    className="st-btn-outline" 
+                    style={{ width: '100%' }}
+                    onClick={onOpenDemo}
+                  >
+                    Contactar Ventas
+                  </button>
+                </div>
               </div>
             </div>
-            <p className="footer-text">
-              La plataforma integral para locales gastronómicos que buscan máxima velocidad en mostrador, control de cocina y cero comisiones.
-            </p>
-            <div className="footer-status-pill">
-              <span className="status-dot"></span>
-              <span>Sistemas Operativos 100% Online</span>
+          </div>
+        </section>
+
+        {/* ==================================================================== */}
+        {/* 7. SEGURIDAD Y ARQUITECTURA TÉCNICA                                */}
+        {/* ==================================================================== */}
+        <section className="st-calc-section" id="seguridad">
+          <div className="st-container">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+              <div>
+                <span className="st-section-tag">ESTÁNDARES DE INGENIERÍA</span>
+                <h2 className="st-section-title">Seguridad y tolerancia a fallos en servicio</h2>
+                <p className="st-section-subtitle" style={{ lineHeight: 1.6, marginTop: '8px' }}>
+                  Durante un despacho un segundo de demora es inadmisible. Nuestra base de datos utiliza Row Level Security (RLS) estricto y un motor de sincronización local que previene caídas si la conexión a internet del salón se interrumpe.
+                </p>
+
+                <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div style={{ color: 'var(--st-primary)', marginTop: '2px' }}>
+                      <IconLock size={18} />
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--st-text-main)', margin: 0 }}>Row Level Security (RLS)</h4>
+                      <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', margin: '2px 0 0' }}>
+                        Aislamiento criptográfico y estructural de datos entre organizaciones.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                    <div style={{ color: 'var(--st-primary)', marginTop: '2px' }}>
+                      <IconWifiOff size={18} />
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--st-text-main)', margin: 0 }}>Motor Offline SQLite Sync</h4>
+                      <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', margin: '2px 0 0' }}>
+                        El salón y la cocina continúan facturando sin internet y sincronizan al reconectar.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Spec Box */}
+              <div className="st-spec-box">
+                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: '1px solid var(--st-border)', color: 'var(--st-text-muted)', fontSize: '0.72rem' }}>
+                  <span>// ARCHITECTURE_SECURITY_SPEC.json</span>
+                  <span>TLS 1.3 / AES-256-GCM</span>
+                </div>
+                <pre>
+{`{
+  "system_runtime": "edge_native_offline_capable",
+  "data_isolation": "tenant_level_strict_rls",
+  "local_buffer": {
+    "persistence": "IndexedDB + SQLite Edge Engine",
+    "conflict_resolution": "state_based_crdt",
+    "network_drop_handling": "uninterrupted_printing"
+  },
+  "compliance": {
+    "audit_trail": "immutable_service_event_logs",
+    "uptime_historical_sla": "99.98%"
+  }
+}`}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ==================================================================== */}
+        {/* 8. PREGUNTAS FRECUENTES (FAQ)                                       */}
+        {/* ==================================================================== */}
+        <section className="st-section" id="faq">
+          <div className="st-container" style={{ maxWidth: '800px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+              <span className="st-section-tag">RESOLUCIÓN DE DUDAS</span>
+              <h2 className="st-section-title">Preguntas Frecuentes</h2>
+            </div>
+
+            <div className="st-faq-wrap">
+              {/* FAQ 1 */}
+              <div className="st-faq-item">
+                <div 
+                  className="st-faq-question"
+                  onClick={() => setOpenFaqIndex(openFaqIndex === 0 ? null : 0)}
+                >
+                  <span>¿Qué ocurre si se corta la conexión a internet durante el servicio?</span>
+                  <div style={{ transform: openFaqIndex === 0 ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', color: 'var(--st-text-muted)' }}>
+                    <IconChevronDown size={18} />
+                  </div>
+                </div>
+                {openFaqIndex === 0 && (
+                  <p className="st-faq-answer">
+                    Absolutamente nada se interrumpe. ComandaSaaS fue concebido bajo arquitectura offline-first. Las comandas siguen saliendo a cocina, las mesas se pueden abrir y cerrar, y los tickets fiscales se guardan en la memoria local del terminal hasta que vuelva la conectividad para sincronizarse con la nube.
+                  </p>
+                )}
+              </div>
+
+              {/* FAQ 2 */}
+              <div className="st-faq-item">
+                <div 
+                  className="st-faq-question"
+                  onClick={() => setOpenFaqIndex(openFaqIndex === 1 ? null : 1)}
+                >
+                  <span>¿Necesito comprar hardware o terminales especiales?</span>
+                  <div style={{ transform: openFaqIndex === 1 ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', color: 'var(--st-text-muted)' }}>
+                    <IconChevronDown size={18} />
+                  </div>
+                </div>
+                {openFaqIndex === 1 && (
+                  <p className="st-faq-answer">
+                    No. ComandaSaaS funciona en navegadores web modernos y es compatible con tablets iPad o Android, pantallas táctiles all-in-one, computadoras con Windows/Mac/Linux y comandatarios móviles de cualquier marca. Además, se integra con impresoras térmicas estándar USB, Ethernet y Bluetooth.
+                  </p>
+                )}
+              </div>
+
+              {/* FAQ 3 */}
+              <div className="st-faq-item">
+                <div 
+                  className="st-faq-question"
+                  onClick={() => setOpenFaqIndex(openFaqIndex === 2 ? null : 2)}
+                >
+                  <span>¿Cobran algún porcentaje sobre los pedidos de WhatsApp o salón?</span>
+                  <div style={{ transform: openFaqIndex === 2 ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', color: 'var(--st-text-muted)' }}>
+                    <IconChevronDown size={18} />
+                  </div>
+                </div>
+                {openFaqIndex === 2 && (
+                  <p className="st-faq-answer">
+                    No. Mantenemos una política estricta de 0% comisiones. El cobro es una suscripción mensual fija sin importar si facturas cien mil pesos o cien millones de pesos al mes.
+                  </p>
+                )}
+              </div>
+
+              {/* FAQ 4 */}
+              <div className="st-faq-item">
+                <div 
+                  className="st-faq-question"
+                  onClick={() => setOpenFaqIndex(openFaqIndex === 3 ? null : 3)}
+                >
+                  <span>¿Cuánto tiempo toma migrar desde otro software gastronómico?</span>
+                  <div style={{ transform: openFaqIndex === 3 ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease', color: 'var(--st-text-muted)' }}>
+                    <IconChevronDown size={18} />
+                  </div>
+                </div>
+                {openFaqIndex === 3 && (
+                  <p className="st-faq-answer">
+                    Nuestro equipo de onboarding importa tu carta, stock y recetas en menos de 48 horas mediante plantillas estructuradas o conexión API directa, capacitando a mozos y cocina en una sola sesión de 45 minutos.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ==================================================================== */}
+        {/* 9. FINAL CTA STRIP                                                  */}
+        {/* ==================================================================== */}
+        <section className="st-final-cta" id="demo">
+          <div className="st-container">
+            <div className="st-final-cta-inner">
+              <div>
+                <span className="st-stat-label" style={{ color: '#a0a0a0' }}>DESPLIEGUE RÁPIDO</span>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: 600, color: '#ffffff', margin: '4px 0 6px' }}>
+                  Llevá la precisión operativa a tu cocina hoy
+                </h2>
+                <p style={{ fontSize: '0.84rem', color: '#c0c0c0', margin: 0 }}>
+                  Sin contratos forzados. Activación en 24 horas.
+                </p>
+                {leadStatus && (
+                  <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#4ade80' }}>
+                    {leadStatus}
+                  </div>
+                )}
+              </div>
+
+              <form className="st-final-cta-input-group" onSubmit={handleLeadSubmit}>
+                <input 
+                  type="email"
+                  className="st-final-cta-input"
+                  placeholder="tu@restaurante.com"
+                  value={leadEmail}
+                  onChange={(e) => setLeadEmail(e.target.value)}
+                />
+                <button type="submit" className="st-btn-primary" style={{ whiteSpace: 'nowrap', padding: '9px 16px' }}>
+                  Solicitar Demo
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ==================================================================== */}
+      {/* 10. FOOTER                                                          */}
+      {/* ==================================================================== */}
+      <footer className="st-footer">
+        <div className="st-container">
+          <div className="st-footer-grid">
+            {/* Brand Col */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                <div className="st-logo-icon" style={{ width: '22px', height: '22px' }}>
+                  <IconGridView size={12} />
+                </div>
+                <span className="st-logo-text" style={{ fontSize: '1rem' }}>ComandaSaaS</span>
+              </div>
+              <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', lineHeight: 1.6, maxWidth: '280px', marginBottom: '14px' }}>
+                High-velocity culinary engineering. Infraestructura digital para restaurantes, dark kitchens y franquicias gastronómicas.
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--st-text-muted)' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--st-emerald)' }}></span>
+                <span>System Status: Operational</span>
+              </div>
+            </div>
+
+            {/* Links 1 */}
+            <div>
+              <div className="st-footer-col-title">Arquitectura</div>
+              <ul className="st-footer-list">
+                <li><a href="#modulos">Platform Architecture</a></li>
+                <li><a href="#modulos">Recipe Engineering</a></li>
+                <li><a href="#calculadora">Yield Precision</a></li>
+                <li><a href="#seguridad">Enterprise Security</a></li>
+              </ul>
+            </div>
+
+            {/* Links 2 */}
+            <div>
+              <div className="st-footer-col-title">Recursos</div>
+              <ul className="st-footer-list">
+                <li><a href="#" onClick={(e) => { e.preventDefault(); onOpenDemo(); }}>API Documentation</a></li>
+                <li><a href="#seguridad">Guía de Hardware POS</a></li>
+                <li><a href="#calculadora">Calculadora ROI</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); onOpenDemo(); }}>Changelog</a></li>
+              </ul>
+            </div>
+
+            {/* Links 3 */}
+            <div>
+              <div className="st-footer-col-title">Legal &amp; Control</div>
+              <ul className="st-footer-list">
+                <li><a href="#" onClick={(e) => e.preventDefault()}>Privacy Policy</a></li>
+                <li><a href="#" onClick={(e) => e.preventDefault()}>Terms of Service</a></li>
+                <li><a href="#" onClick={(e) => e.preventDefault()}>Acuerdo de Confidencialidad</a></li>
+                <li><a href="#" onClick={(e) => { e.preventDefault(); setIsStoreModalOpen(true); }}>Contacto Corporativo</a></li>
+              </ul>
             </div>
           </div>
 
-          <div className="footer-col">
-            <h5>Navegación</h5>
-            <ul>
-              <li><a href="#modulos">Módulos del Sistema</a></li>
-              <li><a href="#ahorro">Calculadora de Ahorro</a></li>
-              <li><a href="#planes">Planes de Suscripción</a></li>
-              <li><a href="#faq">Preguntas Frecuentes</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h5>Acceso Clientes</h5>
-            <ul>
-              <li><button type="button" className="footer-link-btn" onClick={() => setIsStoreModalOpen(true)}>Ingresar a mi Local</button></li>
-              <li><button type="button" className="footer-link-btn" onClick={onOpenDemo}>Probar Demo en Vivo</button></li>
-              <li><button type="button" className="footer-link-btn" onClick={onOpenSaas}>Portal Super-Admin</button></li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h5>Contacto Directo</h5>
-            <p className="footer-contact-p">
-              ¿Dudas técnicas o comerciales? Escríbenos directamente a nuestro WhatsApp:
-            </p>
-            <button 
-              type="button" 
-              className="btn-footer-whatsapp"
-              onClick={() => openWhatsAppContact()}
-            >
-              <IconMessageCircle size={18} />
-              <span>WhatsApp de Soporte</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <div className="landing-container footer-bottom-inner">
-            <p>© 2026 Comanda SaaS Gastronomía. Todos los derechos reservados.</p>
-            <p className="footer-credits">Desarrollado para alta velocidad operativa y confiabilidad total.</p>
+          {/* Copyright bar */}
+          <div style={{ paddingTop: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', fontSize: '0.78rem', color: 'var(--st-text-muted)' }}>
+            <div>
+              © 2025 ComandaSaaS Inc. High-velocity culinary engineering. All rights reserved.
+            </div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem' }}>
+              DEPLOYED: VER_4.18.2 / REGION_SA_EAST
+            </div>
           </div>
         </div>
       </footer>
 
       {/* ==================================================================== */}
-      {/* MODAL: INGRESO A MI COMERCIO                                         */}
+      {/* 11. STORE ACCESS MODAL                                               */}
       {/* ==================================================================== */}
       {isStoreModalOpen && (
         <div 
-          className="landing-modal-overlay" 
-          onClick={() => setIsStoreModalOpen(false)}
+          className="st-modal-backdrop" 
           role="dialog"
           aria-modal="true"
-          aria-labelledby="modalStoreTitle"
+          aria-labelledby="st-modal-title"
+          onClick={() => setIsStoreModalOpen(false)}
         >
-          <div className="landing-modal-card" onClick={e => e.stopPropagation()}>
-            <div className="landing-modal-head">
-              <div className="modal-title-group">
-                <IconStore size={22} className="modal-title-icon" />
-                <h3 id="modalStoreTitle">Ingresar a mi Local</h3>
-              </div>
+          <div 
+            className="st-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="st-modal-header">
+              <h3 id="st-modal-title" className="st-modal-title">
+                Acceso a Terminal de Comercio
+              </h3>
               <button 
                 type="button" 
-                className="btn-close-modal"
-                aria-label="Cerrar modal"
+                className="st-modal-close-btn"
                 onClick={() => setIsStoreModalOpen(false)}
+                aria-label="Cerrar modal"
               >
-                <IconX size={20} />
+                <IconClose size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleStoreSubmit} className="landing-modal-body">
-              <p className="modal-instruction">
-                Ingresa el nombre o identificador (slug) de tu comercio para acceder a tu panel de ventas y cocina:
-              </p>
+            <p style={{ fontSize: '0.84rem', color: 'var(--st-text-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+              Ingresa el identificador único o slug de tu restaurante para abrir el terminal POS y panel de cocina.
+            </p>
 
-              <div className="input-group">
-                <label htmlFor="storeSlugInput">Identificador de tu Local</label>
-                <div className="input-prefix-wrap">
-                  <span className="input-prefix font-mono">app/</span>
-                  <input 
-                    id="storeSlugInput"
-                    type="text" 
-                    placeholder="ej: fastburga, don-tito, mibar"
-                    value={storeInputSlug}
-                    onChange={e => {
-                      setStoreInputSlug(e.target.value);
-                      if (storeInputError) setStoreInputError('');
-                    }}
-                    autoFocus
-                  />
-                </div>
+            <form onSubmit={handleStoreSubmit}>
+              <div className="st-form-group">
+                <label htmlFor="store-slug-input" className="st-form-label">
+                  Identificador de Comercio (Slug)
+                </label>
+                <input 
+                  id="store-slug-input"
+                  type="text"
+                  className="st-form-input"
+                  placeholder="ej. fast-burger, demo"
+                  value={storeInputSlug}
+                  onChange={(e) => {
+                    setStoreInputSlug(e.target.value);
+                    if (storeInputError) setStoreInputError('');
+                  }}
+                  autoFocus
+                />
                 {storeInputError && (
-                  <span className="input-error-msg" role="alert">{storeInputError}</span>
+                  <div className="st-form-error">{storeInputError}</div>
                 )}
               </div>
 
-              <div className="quick-access-suggestions">
-                <span className="quick-label">Locales de prueba rápida:</span>
-                <div className="quick-buttons">
-                  <button 
-                    type="button" 
-                    className="quick-chip font-mono"
-                    onClick={() => {
-                      setIsStoreModalOpen(false);
-                      onOpenDemo();
-                    }}
-                  >
-                    comanda-demo
-                  </button>
-                  <button 
-                    type="button" 
-                    className="quick-chip font-mono"
-                    onClick={() => {
-                      setStoreInputSlug('fastburga');
-                    }}
-                  >
-                    fastburga
-                  </button>
-                </div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--st-text-muted)', marginBottom: '6px' }}>
+                Locales de prueba rápida:
+              </div>
+              <div className="st-modal-presets">
+                <button
+                  type="button"
+                  className="st-preset-chip"
+                  onClick={() => setStoreInputSlug(DEFAULT_DEMO_STORE || 'demo')}
+                >
+                  ⚡ demo
+                </button>
+                <button
+                  type="button"
+                  className="st-preset-chip"
+                  onClick={() => setStoreInputSlug('fast-burger')}
+                >
+                  🍔 fast-burger
+                </button>
+                <button
+                  type="button"
+                  className="st-preset-chip"
+                  onClick={() => setStoreInputSlug('la-trattoria')}
+                >
+                  🍕 la-trattoria
+                </button>
               </div>
 
-              <div className="landing-modal-actions">
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                 <button 
                   type="button" 
-                  className="btn-modal-cancel"
+                  className="st-btn-ghost"
                   onClick={() => setIsStoreModalOpen(false)}
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
-                  className="btn-modal-submit"
+                  className="st-btn-primary"
                 >
-                  <span>Entrar al Sistema</span>
-                  <IconArrowRight size={16} />
+                  Ingresar al Local
                 </button>
               </div>
             </form>
