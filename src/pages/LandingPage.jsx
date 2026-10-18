@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { sanitizeSlug, DEFAULT_DEMO_STORE } from '../services/storeService.js';
 import '../styles/landing.css';
 
@@ -111,28 +111,7 @@ function IconCheck({ size = 16, className = '' }) {
   );
 }
 
-function IconLock({ size = 18, className = '' }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
 
-function IconWifiOff({ size = 18, className = '' }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      <line x1="1" y1="1" x2="23" y2="23" />
-      <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
-      <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
-      <path d="M10.71 5.05A16 16 0 0 1 22.58 9" />
-      <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
-      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-      <line x1="12" y1="20" x2="12.01" y2="20" />
-    </svg>
-  );
-}
 
 function IconChevronDown({ size = 18, className = '' }) {
   return (
@@ -183,9 +162,6 @@ export default function LandingPage({
   const [storeInputSlug, setStoreInputSlug] = useState('');
   const [storeInputError, setStoreInputError] = useState('');
 
-  // Interactive ROI Calculator State
-  const [calcSales, setCalcSales] = useState(5000000); // 5 millones mensuales
-
   // Billing cycle toggle: 'monthly' | 'annual'
   const [billingCycle, setBillingCycle] = useState('monthly');
 
@@ -210,16 +186,6 @@ export default function LandingPage({
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isStoreModalOpen, isMobileMenuOpen]);
-
-  // Calculator computations
-  const appCommission = useMemo(() => {
-    return Math.round(calcSales * 0.22);
-  }, [calcSales]);
-
-  const comandaProCost = 28000;
-  const netRetained = useMemo(() => {
-    return Math.max(0, appCommission - comandaProCost);
-  }, [appCommission]);
 
   // Handle store login submission
   const handleStoreSubmit = (e) => {
@@ -277,9 +243,8 @@ export default function LandingPage({
           {/* Desktop Navigation Links */}
           <nav className="st-nav-links" aria-label="Navegación principal">
             <a className="st-nav-link" href="#modulos">Product</a>
-            <a className="st-nav-link" href="#calculadora">Mise-en-Place</a>
-            <a className="st-nav-link" href="#seguridad">Architecture</a>
             <a className="st-nav-link" href="#precios">Pricing</a>
+            <a className="st-nav-link" href="#faq">FAQ</a>
           </nav>
 
           {/* Actions */}
@@ -327,14 +292,6 @@ export default function LandingPage({
           <div className="st-mobile-drawer open">
             <a className="st-mobile-nav-link" href="#modulos" onClick={() => setIsMobileMenuOpen(false)}>
               <span>Product (Módulos)</span>
-              <IconArrowRight size={14} />
-            </a>
-            <a className="st-mobile-nav-link" href="#calculadora" onClick={() => setIsMobileMenuOpen(false)}>
-              <span>Mise-en-Place (Calculadora)</span>
-              <IconArrowRight size={14} />
-            </a>
-            <a className="st-mobile-nav-link" href="#seguridad" onClick={() => setIsMobileMenuOpen(false)}>
-              <span>Architecture (Seguridad)</span>
               <IconArrowRight size={14} />
             </a>
             <a className="st-mobile-nav-link" href="#precios" onClick={() => setIsMobileMenuOpen(false)}>
@@ -720,85 +677,7 @@ export default function LandingPage({
           </div>
         </section>
 
-        {/* ==================================================================== */}
-        {/* 5. CALCULADORA DE AHORRO REAL                                       */}
-        {/* ==================================================================== */}
-        <section className="st-calc-section" id="calculadora">
-          <div className="st-container">
-            <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 2.5rem' }}>
-              <span className="st-section-tag">TRANSPARENCIA FINANCIERA</span>
-              <h2 className="st-section-title">Calculadora de Ahorro Directo</h2>
-              <p className="st-section-subtitle">Descubrí cuánto capital retiene tu local al eliminar los porcentajes de intermediarios.</p>
-            </div>
 
-            <div className="st-calc-box">
-              <div className="st-calc-grid">
-                {/* Inputs */}
-                <div className="st-slider-wrap">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <label style={{ fontSize: '0.84rem', fontWeight: 500, color: 'var(--st-text-main)' }}>
-                      Venta mensual estimada en delivery / mostrador
-                    </label>
-                    <span style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--st-text-main)' }}>
-                      ${calcSales.toLocaleString('es-AR')}
-                    </span>
-                  </div>
-
-                  <input 
-                    type="range"
-                    min="1000000"
-                    max="25000000"
-                    step="500000"
-                    value={calcSales}
-                    onChange={(e) => setCalcSales(Number(e.target.value))}
-                    aria-label="Venta mensual estimada"
-                  />
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontFamily: 'var(--font-mono)', color: 'var(--st-text-muted)', marginTop: '6px' }}>
-                    <span>$1.000.000</span>
-                    <span>$25.000.000</span>
-                  </div>
-
-                  <div style={{ marginTop: '1.5rem', padding: '14px', border: '1px solid var(--st-border)', borderRadius: '6px', background: 'var(--st-bg)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: 'var(--st-text-muted)', marginBottom: '8px' }}>
-                      <span>Comisión promedio apps tradicionales (22%)</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-error)', fontWeight: 600 }}>
-                        ${appCommission.toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.84rem', color: 'var(--st-text-muted)' }}>
-                      <span>Tarifa plana fija ComandaSaaS Pro</span>
-                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--st-text-main)', fontWeight: 600 }}>
-                        ${comandaProCost.toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Result Card */}
-                <div className="st-calc-summary-card">
-                  <span className="st-stat-label">CAPITAL RETENIDO / MES</span>
-                  <div className="st-calc-retention">
-                    ${netRetained.toLocaleString('es-AR')}
-                  </div>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', marginTop: '8px', lineHeight: 1.5 }}>
-                    Dinero que permanece en la caja de tu cocina mes a mes, sin deducciones imprevistas.
-                  </p>
-                  <div style={{ marginTop: '1.5rem' }}>
-                    <button 
-                      type="button" 
-                      className="st-btn-dark"
-                      style={{ width: '100%' }}
-                      onClick={onOpenDemo}
-                    >
-                      Preservar mis ingresos
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ==================================================================== */}
         {/* 6. PRECIOS Y PLANES                                                 */}
@@ -978,71 +857,6 @@ export default function LandingPage({
           </div>
         </section>
 
-        {/* ==================================================================== */}
-        {/* 7. SEGURIDAD Y ARQUITECTURA TÉCNICA                                */}
-        {/* ==================================================================== */}
-        <section className="st-calc-section" id="seguridad">
-          <div className="st-container">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
-              <div>
-                <span className="st-section-tag">ESTÁNDARES DE INGENIERÍA</span>
-                <h2 className="st-section-title">Seguridad y tolerancia a fallos en servicio</h2>
-                <p className="st-section-subtitle" style={{ lineHeight: 1.6, marginTop: '8px' }}>
-                  Durante un despacho un segundo de demora es inadmisible. Nuestra base de datos utiliza Row Level Security (RLS) estricto y un motor de sincronización local que previene caídas si la conexión a internet del salón se interrumpe.
-                </p>
-
-                <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                    <div style={{ color: 'var(--st-primary)', marginTop: '2px' }}>
-                      <IconLock size={18} />
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--st-text-main)', margin: 0 }}>Row Level Security (RLS)</h4>
-                      <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', margin: '2px 0 0' }}>
-                        Aislamiento criptográfico y estructural de datos entre organizaciones.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                    <div style={{ color: 'var(--st-primary)', marginTop: '2px' }}>
-                      <IconWifiOff size={18} />
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--st-text-main)', margin: 0 }}>Motor Offline SQLite Sync</h4>
-                      <p style={{ fontSize: '0.82rem', color: 'var(--st-text-muted)', margin: '2px 0 0' }}>
-                        El salón y la cocina continúan facturando sin internet y sincronizan al reconectar.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Spec Box */}
-              <div className="st-spec-box">
-                <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: '1px solid var(--st-border)', color: 'var(--st-text-muted)', fontSize: '0.72rem' }}>
-                  <span>// ARCHITECTURE_SECURITY_SPEC.json</span>
-                  <span>TLS 1.3 / AES-256-GCM</span>
-                </div>
-                <pre>
-{`{
-  "system_runtime": "edge_native_offline_capable",
-  "data_isolation": "tenant_level_strict_rls",
-  "local_buffer": {
-    "persistence": "IndexedDB + SQLite Edge Engine",
-    "conflict_resolution": "state_based_crdt",
-    "network_drop_handling": "uninterrupted_printing"
-  },
-  "compliance": {
-    "audit_trail": "immutable_service_event_logs",
-    "uptime_historical_sla": "99.98%"
-  }
-}`}
-                </pre>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ==================================================================== */}
         {/* 8. PREGUNTAS FRECUENTES (FAQ)                                       */}
@@ -1197,8 +1011,8 @@ export default function LandingPage({
               <ul className="st-footer-list">
                 <li><a href="#modulos">Platform Architecture</a></li>
                 <li><a href="#modulos">Recipe Engineering</a></li>
-                <li><a href="#calculadora">Yield Precision</a></li>
-                <li><a href="#seguridad">Enterprise Security</a></li>
+                <li><a href="#precios">Planes y Precios</a></li>
+                <li><a href="#faq">Preguntas Frecuentes</a></li>
               </ul>
             </div>
 
@@ -1207,8 +1021,8 @@ export default function LandingPage({
               <div className="st-footer-col-title">Recursos</div>
               <ul className="st-footer-list">
                 <li><a href="#" onClick={(e) => { e.preventDefault(); onOpenDemo(); }}>API Documentation</a></li>
-                <li><a href="#seguridad">Guía de Hardware POS</a></li>
-                <li><a href="#calculadora">Calculadora ROI</a></li>
+                <li><a href="#precios">Tarifas y Escala</a></li>
+                <li><a href="#faq">Centro de Ayuda</a></li>
                 <li><a href="#" onClick={(e) => { e.preventDefault(); onOpenDemo(); }}>Changelog</a></li>
               </ul>
             </div>

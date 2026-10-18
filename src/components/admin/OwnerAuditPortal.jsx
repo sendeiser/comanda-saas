@@ -2,7 +2,8 @@ import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { 
   ShieldCheck, Bot, BarChart3, DollarSign, ShieldAlert, Sparkles, LogOut, 
   ArrowLeft, Download, Calendar, Printer, Database, Smartphone,
-  ChevronLeft, ChevronRight, ChevronDown, Check, Sun, Moon, RefreshCw
+  ChevronLeft, ChevronRight, ChevronDown, Check, Sun, Moon, RefreshCw,
+  Store, Plus, Menu, X, Building2
 } from 'lucide-react';
 import AuditKpisTab from './AuditKpisTab';
 import AuditCashShiftsTab from './AuditCashShiftsTab';
@@ -12,7 +13,6 @@ import AuditSecuritySettings from './AuditSecuritySettings';
 import AdminWhatsAppBot from './bot/AdminWhatsAppBot';
 import AdminDatabaseTablesTab from './database/AdminDatabaseTablesTab';
 import StoreOnboardingWizard from './onboarding/StoreOnboardingWizard.jsx';
-import { Store, Plus, Building2 } from 'lucide-react';
 import { auditService } from '../../services/auditService';
 import { storageService } from '../../services/storageService';
 import { supabaseSync } from '../../services/supabaseClient';
@@ -110,21 +110,38 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
     };
   }, []);
 
-  // Quick escape back to POS
+  const activeStore = useMemo(() => {
+    try {
+      return getActiveStore() || { name: 'ComandaFast', slug: 'demo' };
+    } catch (_) {
+      return { name: 'ComandaFast', slug: 'demo' };
+    }
+  }, []);
+
+  // Keyboard accessibility: ESC to return to POS, Ctrl+B / Cmd+B to toggle sidebar collapse
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && onBackToPos) {
-        // Only if no modal input is active
-        const tag = document.activeElement?.tagName?.toLowerCase();
-        if (tag !== 'input' && tag !== 'textarea') {
-          e.preventDefault();
-          onBackToPos();
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleSidebar();
+      }
+      if (e.key === 'Escape') {
+        if (isMobileAccordionOpen) {
+          setIsMobileAccordionOpen(false);
+          return;
+        }
+        if (onBackToPos) {
+          const tag = document.activeElement?.tagName?.toLowerCase();
+          if (tag !== 'input' && tag !== 'textarea') {
+            e.preventDefault();
+            onBackToPos();
+          }
         }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onBackToPos]);
+  }, [onBackToPos, isMobileAccordionOpen]);
 
   const handleRefreshSystem = async () => {
     if (isRefreshing) return;
@@ -198,6 +215,7 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
       id: 'kpis',
       label: 'Métricas Financieras',
       shortLabel: 'Métricas',
+      group: 'operaciones',
       icon: BarChart3,
       badge: null,
       badgeColor: null
@@ -206,6 +224,7 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
       id: 'shifts',
       label: 'Auditoría de Cajas',
       shortLabel: 'Cajas',
+      group: 'operaciones',
       icon: DollarSign,
       badge: shifts.length > 0 ? shifts.length : null,
       badgeColor: 'var(--accent-amber)'
@@ -214,6 +233,7 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
       id: 'security',
       label: 'Control Antifraude',
       shortLabel: 'Antifraude',
+      group: 'operaciones',
       icon: ShieldAlert,
       badge: cancelledOrders.length > 0 ? cancelledOrders.length : null,
       badgeColor: cancelledOrders.length > 0 ? 'var(--accent-rose)' : null
@@ -222,30 +242,34 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
       id: 'menu',
       label: 'Ranking de Menú',
       shortLabel: 'Menú',
+      group: 'operaciones',
       icon: Sparkles,
       badge: null,
       badgeColor: null
     },
     {
       id: 'bot',
-      label: 'Bot WhatsApp',
+      label: 'WhatsApp Bot IA',
       shortLabel: 'Bot WA',
+      group: 'herramientas',
       icon: Bot,
       badge: 'IA',
       badgeColor: 'var(--accent-emerald)'
     },
     {
       id: 'database',
-      label: 'Tablas BD',
+      label: 'Tablas de BD',
       shortLabel: 'Tablas',
+      group: 'herramientas',
       icon: Database,
       badge: null,
       badgeColor: null
     },
     {
       id: 'settings',
-      label: 'Seguridad Dueño',
+      label: 'Seguridad & Acceso',
       shortLabel: 'Seguridad',
+      group: 'herramientas',
       icon: ShieldCheck,
       badge: null,
       badgeColor: null
@@ -258,538 +282,311 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
 
   const CurrentNavIcon = currentNavItem.icon;
 
-  return (
-    <div ref={portalRef} className="admin-portal-wrapper" style={{ overflowY: 'auto', paddingRight: '2px' }}>
-      {/* EXECUTIVE HEADER */}
-      <div 
-        className="executive-header tactile-card"
-        style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '1rem 1.25rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '0.85rem',
-          boxShadow: 'var(--shadow-md)'
+  const renderNavButton = (item) => {
+    const Icon = item.icon;
+    const isActive = activeTab === item.id;
+    return (
+      <button
+        key={item.id}
+        type="button"
+        className={`admin-crm-nav-item tactile-btn ${isActive ? 'active' : ''}`}
+        onClick={() => {
+          setActiveTab(item.id);
+          setIsMobileAccordionOpen(false);
         }}
+        title={isSidebarCollapsed ? item.label : undefined}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '46px',
-            height: '46px',
-            borderRadius: '12px',
-            background: 'rgba(245, 158, 11, 0.15)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1.5px solid var(--accent-amber)',
-            boxShadow: '0 0 16px var(--accent-amber-glow)',
-            flexShrink: 0
-          }}>
-            <ShieldCheck size={26} style={{ color: 'var(--accent-amber)' }} />
-          </div>
-
-          <div>
-            <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <span>Panel de Auditoría & Control del Dueño</span>
-              <span style={{ 
-                fontSize: '0.68rem', 
-                background: 'rgba(16, 185, 129, 0.18)', 
-                color: 'var(--accent-emerald)', 
-                border: '1px solid var(--border-emerald-highlight)',
-                padding: '2px 8px', 
-                borderRadius: 'var(--radius-full)', 
-                fontWeight: 900,
-                letterSpacing: '0.5px'
-              }}>
-                SESIÓN ACTIVA
-              </span>
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-              Titular: <strong style={{ color: 'var(--text-primary)' }}>{user?.user || 'Dueño'}</strong> • Centro Financiero & Auditoría
-            </div>
-          </div>
+        <div className="admin-crm-item-icon-wrap">
+          <Icon size={18} />
+          {isSidebarCollapsed && item.badge !== null && (
+            <span 
+              className="admin-crm-dot-badge" 
+              style={{ background: item.badgeColor || 'var(--accent-amber)' }}
+              title={`${item.label}: ${item.badge}`}
+            />
+          )}
         </div>
 
-        {/* Right side of header: Clean CRM Dock Toggle Button & Active Module Pill */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        {!isSidebarCollapsed && (
+          <span className="admin-crm-item-label">{item.label}</span>
+        )}
+
+        {!isSidebarCollapsed && item.badge !== null && (
+          <span 
+            className="admin-crm-badge-pill"
+            style={{ 
+              backgroundColor: item.badgeColor ? `${item.badgeColor}22` : 'rgba(245, 158, 11, 0.15)',
+              color: item.badgeColor || 'var(--accent-amber)',
+              borderColor: item.badgeColor ? `${item.badgeColor}44` : 'rgba(245, 158, 11, 0.3)'
+            }}
+          >
+            {item.badge}
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  return (
+    <div ref={portalRef} className="admin-crm-container">
+      {/* MOBILE BACKDROP OVERLAY */}
+      {isMobileAccordionOpen && (
+        <div 
+          className="admin-crm-mobile-backdrop" 
+          onClick={() => setIsMobileAccordionOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* CRM DOCKED LEFT SIDEBAR (Full height 100vh, collapsible to icon rail) */}
+      <aside 
+        className={`admin-crm-sidebar ${isSidebarCollapsed ? 'collapsed' : 'expanded'} ${isMobileAccordionOpen ? 'mobile-open' : ''}`}
+        aria-label="Menú de Navegación CRM"
+      >
+        {/* 1. Header / Store Brand */}
+        <div className="admin-crm-sidebar-header">
+          <div className="admin-crm-brand">
+            <div className="admin-crm-brand-icon">
+              <ShieldCheck size={22} style={{ color: 'var(--accent-amber)' }} />
+            </div>
+            {!isSidebarCollapsed && (
+              <div className="admin-crm-brand-info">
+                <span className="admin-crm-brand-title">ComandaFast</span>
+                <span className="admin-crm-brand-badge">CRM DUEÑO</span>
+              </div>
+            )}
+          </div>
+
           <button
             type="button"
-            className="admin-header-crm-badge tactile-btn"
+            className="admin-crm-collapse-btn tactile-btn"
             onClick={toggleSidebar}
-            title={isSidebarCollapsed ? "Expandir menú CRM" : "Compactar menú CRM"}
+            title={isSidebarCollapsed ? "Expandir menú (Ctrl+B)" : "Minimizar menú (Ctrl+B)"}
+            aria-label={isSidebarCollapsed ? "Expandir menú" : "Minimizar menú"}
           >
-            <CurrentNavIcon size={16} />
-            <span>Módulo: <strong>{currentNavItem.shortLabel || currentNavItem.label}</strong></span>
-            {isSidebarCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+            {isSidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
           </button>
         </div>
-      </div>
 
-      {/* ADMIN PORTAL MAIN BODY */}
-      <div className="admin-portal-layout">
-        {/* DESKTOP COLLAPSIBLE CRM SIDEBAR (DOCK LEFT) */}
-        <aside className={`admin-sidebar ${isSidebarCollapsed ? 'collapsed' : 'expanded'}`}>
-          <div className="admin-sidebar-header">
-            {!isSidebarCollapsed && (
-              <span className="admin-sidebar-header-title">MENÚ CRM</span>
-            )}
-            <button
-              type="button"
-              className="admin-sidebar-toggle-btn tactile-btn"
-              onClick={toggleSidebar}
-              title={isSidebarCollapsed ? "Expandir menú CRM" : "Compactar menú CRM"}
-              aria-label={isSidebarCollapsed ? "Expandir menú CRM" : "Compactar menú CRM"}
-            >
-              {isSidebarCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-            </button>
-          </div>
-
-          {/* Módulos */}
-          {!isSidebarCollapsed && (
-            <span className="admin-sidebar-section-title">Módulos</span>
-          )}
-
-          <nav className="admin-sidebar-nav">
-            {navItems.map(item => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`admin-sidebar-item tactile-btn ${isActive ? 'active' : ''}`}
-                  onClick={() => setActiveTab(item.id)}
-                  title={isSidebarCollapsed ? item.label : undefined}
-                >
-                  <div className="admin-sidebar-item-icon-wrap">
-                    <Icon size={18} />
-                    {isSidebarCollapsed && item.badge !== null && (
-                      <span 
-                        className="admin-sidebar-dot-badge" 
-                        style={{ background: item.badgeColor || 'var(--accent-amber)' }}
-                        title={`${item.label}: ${item.badge}`}
-                      />
-                    )}
-                  </div>
-
-                  {!isSidebarCollapsed && (
-                    <span className="admin-sidebar-item-label">{item.label}</span>
-                  )}
-
-                  {!isSidebarCollapsed && item.badge !== null && (
-                    <span 
-                      className="admin-nav-item-badge"
-                      style={{ 
-                        backgroundColor: item.badgeColor ? `${item.badgeColor}22` : 'rgba(245, 158, 11, 0.15)',
-                        color: item.badgeColor || 'var(--accent-amber)',
-                        borderColor: item.badgeColor ? `${item.badgeColor}44` : 'rgba(245, 158, 11, 0.3)'
-                      }}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Acciones de Local */}
-          <div className="admin-sidebar-section-divider" />
-          {!isSidebarCollapsed && (
-            <span className="admin-sidebar-section-title">Acciones</span>
-          )}
-
-          <button
-            type="button"
-            className="admin-sidebar-action-btn tactile-btn"
-            onClick={() => setShowOnboarding(true)}
-            title={isSidebarCollapsed ? "Nuevo Comercio (+)" : undefined}
-          >
-            <div className="admin-sidebar-item-icon-wrap">
-              <Plus size={17} style={{ color: 'var(--accent-amber)' }} />
+        {/* 2. Active Store Context Card */}
+        {!isSidebarCollapsed && (
+          <div className="admin-crm-store-card">
+            <div className="admin-crm-store-avatar">
+              <Store size={15} style={{ color: 'var(--accent-amber)' }} />
             </div>
-            {!isSidebarCollapsed && (
-              <span className="admin-sidebar-item-label">+ Nuevo Comercio</span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            className="admin-sidebar-action-btn tactile-btn"
-            onClick={handleRefreshSystem}
-            disabled={isRefreshing}
-            title={isSidebarCollapsed ? "Actualizar BD y Sincronizar" : undefined}
-          >
-            <div className="admin-sidebar-item-icon-wrap">
-              {refreshSuccess ? (
-                <Check size={17} style={{ color: 'var(--accent-emerald)' }} />
-              ) : (
-                <RefreshCw size={17} className={isRefreshing ? 'cf-spin' : ''} style={{ color: 'var(--accent-emerald)' }} />
-              )}
-            </div>
-            {!isSidebarCollapsed && (
-              <span className="admin-sidebar-item-label">
-                {isRefreshing ? 'Actualizando...' : refreshSuccess ? '¡Actualizado!' : 'Actualizar BD'}
+            <div className="admin-crm-store-meta">
+              <span className="admin-crm-store-name">{activeStore?.name || 'Local Principal'}</span>
+              <span className="admin-crm-store-status">
+                <span className="admin-crm-live-dot" /> RLS Activo
               </span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            className="admin-sidebar-action-btn tactile-btn"
-            onClick={() => handleOpenBot('connection')}
-            title={isSidebarCollapsed ? "Conexión WhatsApp Bot" : undefined}
-          >
-            <div className="admin-sidebar-item-icon-wrap">
-              <Bot size={17} style={{ color: 'var(--accent-emerald)' }} />
-            </div>
-            {!isSidebarCollapsed && (
-              <span className="admin-sidebar-item-label">Conexión Bot</span>
-            )}
-          </button>
-
-          <button
-            type="button"
-            className="admin-sidebar-action-btn tactile-btn"
-            onClick={() => handleOpenBot('security')}
-            title={isSidebarCollapsed ? "Seguridad & Anti-Spam WA" : undefined}
-          >
-            <div className="admin-sidebar-item-icon-wrap">
-              <ShieldAlert size={17} style={{ color: 'var(--accent-amber)' }} />
-            </div>
-            {!isSidebarCollapsed && (
-              <span className="admin-sidebar-item-label">Anti-Spam WA</span>
-            )}
-          </button>
-
-          {/* Sistema & Sesión */}
-          <div className="admin-sidebar-section-divider" />
-          {!isSidebarCollapsed && (
-            <span className="admin-sidebar-section-title">Sistema</span>
-          )}
-
-          {onToggleTheme && (
-            <button
-              type="button"
-              className="admin-sidebar-action-btn tactile-btn"
-              onClick={onToggleTheme}
-              title={isSidebarCollapsed ? (theme === 'dark' ? "Modo Claro" : "Modo Oscuro") : undefined}
-            >
-              <div className="admin-sidebar-item-icon-wrap">
-                {theme === 'dark' ? (
-                  <Sun size={17} style={{ color: 'var(--accent-amber)' }} />
-                ) : (
-                  <Moon size={17} style={{ color: 'var(--accent-amber)' }} />
-                )}
-              </div>
-              {!isSidebarCollapsed && (
-                <span className="admin-sidebar-item-label">
-                  {theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
-                </span>
-              )}
-            </button>
-          )}
-
-          {onBackToPos && (
-            <button
-              type="button"
-              className="admin-sidebar-action-btn tactile-btn"
-              onClick={onBackToPos}
-              title={isSidebarCollapsed ? "Volver al POS (Esc)" : undefined}
-            >
-              <div className="admin-sidebar-item-icon-wrap">
-                <ArrowLeft size={17} />
-              </div>
-              {!isSidebarCollapsed && (
-                <span className="admin-sidebar-item-label">Volver al POS</span>
-              )}
-            </button>
-          )}
-
-          {onLogout && (
-            <button
-              type="button"
-              className="admin-sidebar-action-btn btn-danger tactile-btn"
-              onClick={onLogout}
-              title={isSidebarCollapsed ? "Cerrar Sesión" : undefined}
-            >
-              <div className="admin-sidebar-item-icon-wrap">
-                <LogOut size={17} style={{ color: 'var(--accent-rose)' }} />
-              </div>
-              {!isSidebarCollapsed && (
-                <span className="admin-sidebar-item-label" style={{ color: 'var(--accent-rose)' }}>
-                  Cerrar Sesión
-                </span>
-              )}
-            </button>
-          )}
-
-          {!isSidebarCollapsed && (
-            <div className="admin-sidebar-footer">
-              <span className="admin-sidebar-footer-text">ComandaFast CRM v2.0</span>
-            </div>
-          )}
-        </aside>
-
-        {/* MAIN VIEWPORT (RIGHT) */}
-        <div className="admin-main-viewport">
-          {/* MOBILE COUPLED ACCORDION NAVIGATION */}
-          <div className="admin-mobile-accordion-container">
-            <button
-              type="button"
-              className={`admin-mobile-accordion-trigger tactile-btn ${isMobileAccordionOpen ? 'active' : ''}`}
-              onClick={() => setIsMobileAccordionOpen(prev => !prev)}
-              aria-expanded={isMobileAccordionOpen}
-            >
-              <div className="admin-accordion-trigger-left">
-                <div className="admin-accordion-icon-box">
-                  <CurrentNavIcon size={18} style={{ color: 'var(--accent-amber)' }} />
-                </div>
-                <div className="admin-accordion-meta">
-                  <span className="admin-accordion-subtitle">Módulo activo</span>
-                  <div className="admin-accordion-title-wrap">
-                    <span className="admin-accordion-title">{currentNavItem.label}</span>
-                    {currentNavItem.badge !== null && (
-                      <span 
-                        className="admin-nav-item-badge"
-                        style={{ 
-                          fontSize: '0.68rem',
-                          padding: '1px 6px',
-                          backgroundColor: currentNavItem.badgeColor ? `${currentNavItem.badgeColor}22` : 'rgba(245, 158, 11, 0.15)',
-                          color: currentNavItem.badgeColor || 'var(--accent-amber)',
-                          borderColor: currentNavItem.badgeColor ? `${currentNavItem.badgeColor}44` : 'rgba(245, 158, 11, 0.3)'
-                        }}
-                      >
-                        {currentNavItem.badge}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="admin-accordion-trigger-right">
-                <span className="admin-accordion-hint">Navegar</span>
-                <ChevronDown 
-                  size={18} 
-                  className={`admin-accordion-chevron ${isMobileAccordionOpen ? 'rotated' : ''}`} 
-                />
-              </div>
-            </button>
-
-            {/* Accordion Unfolded Menu (Coupled) */}
-            <div className={`admin-mobile-accordion-content ${isMobileAccordionOpen ? 'expanded' : ''}`}>
-              <div className="admin-mobile-accordion-list">
-                {navItems.map(item => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className={`admin-accordion-item-btn tactile-btn ${isActive ? 'active' : ''}`}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setIsMobileAccordionOpen(false);
-                      }}
-                    >
-                      <div className="admin-accordion-item-main">
-                        <Icon size={18} className="admin-accordion-item-icon" />
-                        <span className="admin-accordion-item-text">{item.label}</span>
-                      </div>
-
-                      <div className="admin-accordion-item-end">
-                        {item.badge !== null && (
-                          <span 
-                            className="admin-nav-item-badge"
-                            style={{ 
-                              fontSize: '0.68rem',
-                              padding: '1px 6px',
-                              backgroundColor: item.badgeColor ? `${item.badgeColor}22` : 'rgba(245, 158, 11, 0.15)',
-                              color: item.badgeColor || 'var(--accent-amber)',
-                              borderColor: item.badgeColor ? `${item.badgeColor}44` : 'rgba(245, 158, 11, 0.3)'
-                            }}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                        {isActive && (
-                          <Check size={16} style={{ color: 'var(--accent-amber)' }} />
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
-
-                {/* Mobile Acciones de Local */}
-                <div className="admin-sidebar-section-divider" style={{ margin: '0.5rem 0 0.25rem' }} />
-                <span className="admin-sidebar-section-title">Acciones de Local</span>
-
-                <button
-                  type="button"
-                  className="admin-sidebar-action-btn tactile-btn"
-                  onClick={() => {
-                    setShowOnboarding(true);
-                    setIsMobileAccordionOpen(false);
-                  }}
-                >
-                  <Plus size={16} style={{ color: 'var(--accent-amber)' }} />
-                  <span>+ Nuevo Comercio</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="admin-sidebar-action-btn tactile-btn"
-                  onClick={() => {
-                    handleRefreshSystem();
-                    setIsMobileAccordionOpen(false);
-                  }}
-                  disabled={isRefreshing}
-                >
-                  {refreshSuccess ? (
-                    <Check size={16} style={{ color: 'var(--accent-emerald)' }} />
-                  ) : (
-                    <RefreshCw size={16} className={isRefreshing ? 'cf-spin' : ''} style={{ color: 'var(--accent-emerald)' }} />
-                  )}
-                  <span>{isRefreshing ? 'Actualizando...' : refreshSuccess ? '¡BD Actualizada!' : 'Actualizar BD'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="admin-sidebar-action-btn tactile-btn"
-                  onClick={() => handleOpenBot('connection')}
-                >
-                  <Bot size={16} style={{ color: 'var(--accent-emerald)' }} />
-                  <span>Conexión Bot</span>
-                </button>
-
-                <button
-                  type="button"
-                  className="admin-sidebar-action-btn tactile-btn"
-                  onClick={() => handleOpenBot('security')}
-                >
-                  <ShieldAlert size={16} style={{ color: 'var(--accent-amber)' }} />
-                  <span>Anti-Spam WA</span>
-                </button>
-
-                {/* Mobile Sistema & Sesión */}
-                <div className="admin-sidebar-section-divider" style={{ margin: '0.5rem 0 0.25rem' }} />
-                <span className="admin-sidebar-section-title">Sistema</span>
-
-                {onToggleTheme && (
-                  <button
-                    type="button"
-                    className="admin-sidebar-action-btn tactile-btn"
-                    onClick={() => {
-                      onToggleTheme();
-                      setIsMobileAccordionOpen(false);
-                    }}
-                  >
-                    {theme === 'dark' ? <Sun size={16} style={{ color: 'var(--accent-amber)' }} /> : <Moon size={16} style={{ color: 'var(--accent-amber)' }} />}
-                    <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>
-                  </button>
-                )}
-
-                {onBackToPos && (
-                  <button
-                    type="button"
-                    className="admin-sidebar-action-btn tactile-btn"
-                    onClick={() => {
-                      setIsMobileAccordionOpen(false);
-                      onBackToPos();
-                    }}
-                  >
-                    <ArrowLeft size={16} />
-                    <span>Volver al POS</span>
-                  </button>
-                )}
-
-                {onLogout && (
-                  <button
-                    type="button"
-                    className="admin-sidebar-action-btn btn-danger tactile-btn"
-                    onClick={() => {
-                      setIsMobileAccordionOpen(false);
-                      onLogout();
-                    }}
-                  >
-                    <LogOut size={16} style={{ color: 'var(--accent-rose)' }} />
-                    <span style={{ color: 'var(--accent-rose)' }}>Cerrar Sesión</span>
-                  </button>
-                )}
-              </div>
             </div>
           </div>
+        )}
 
-          {/* TOOLBAR: DATE FILTER & EXPORT BUTTONS (Para módulos de Auditoría de Cajas, Seguridad y Menú) */}
-          {activeTab !== 'bot' && activeTab !== 'database' && activeTab !== 'kpis' && (
-            <div 
-              className="admin-period-bar tactile-card"
-              style={{
-                background: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '0.75rem 1rem',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                gap: '0.75rem'
-              }}
-            >
-              {/* Date Filter Pills */}
-              <div 
-                className="scrollable-tabs-bar" 
-                style={{ 
-                  alignItems: 'center', 
-                  gap: '0.4rem', 
-                  flex: 1, 
-                  minWidth: 0,
-                  overflowX: 'auto',
-                  WebkitOverflowScrolling: 'touch',
-                  scrollbarWidth: 'none'
-                }}
-              >
-                <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-secondary)', marginRight: '4px', display: 'flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
-                  <Calendar size={15} style={{ color: 'var(--accent-amber)' }} /> Período:
-                </span>
-                {[
-                  { id: 'today', label: 'Hoy' },
-                  { id: 'yesterday', label: 'Ayer' },
-                  { id: 'week', label: 'Últimos 7 Días' },
-                  { id: 'month', label: 'Este Mes' },
-                  { id: 'all', label: 'Histórico' }
-                ].map(r => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    className={`cat-pill-btn tactile-btn ${rangeType === r.id ? 'active' : ''}`}
-                    style={{ fontSize: '0.78rem', height: '32px', padding: '0.35rem 0.75rem', flexShrink: 0, whiteSpace: 'nowrap' }}
-                    onClick={() => setRangeType(r.id)}
-                  >
-                    <span>{r.label}</span>
-                  </button>
-                ))}
-              </div>
+        {/* 3. Navigation Sections (Scrollable) */}
+        <div className="admin-crm-nav-scroll">
+          {/* Group 1: Finanzas & Operaciones */}
+          <div className="admin-crm-nav-group">
+            {!isSidebarCollapsed && (
+              <span className="admin-crm-group-title">Finanzas & Operación</span>
+            )}
+            <nav className="admin-crm-nav-list" aria-label="Finanzas y Operación">
+              {navItems.filter(item => item.group === 'operaciones').map(item => renderNavButton(item))}
+            </nav>
+          </div>
 
-              {/* CSV Export Button */}
+          {/* Group 2: Herramientas & IA */}
+          <div className="admin-crm-nav-group">
+            {!isSidebarCollapsed && (
+              <span className="admin-crm-group-title">Herramientas & IA</span>
+            )}
+            <nav className="admin-crm-nav-list" aria-label="Herramientas e Inteligencia Artificial">
+              {navItems.filter(item => item.group === 'herramientas').map(item => renderNavButton(item))}
+            </nav>
+          </div>
+
+          {/* Group 3: Gestión de Negocio */}
+          <div className="admin-crm-nav-group">
+            {!isSidebarCollapsed && (
+              <span className="admin-crm-group-title">Gestión de Negocio</span>
+            )}
+            <div className="admin-crm-actions-list">
+
+
               <button
                 type="button"
-                className="btn-confirm-order tactile-btn"
-                style={{ width: 'auto', height: '36px', fontSize: '0.85rem', padding: '0 1rem', gap: '6px', flexShrink: 0 }}
-                onClick={handleExportOrders}
+                className="admin-crm-action-item tactile-btn"
+                onClick={handleRefreshSystem}
+                disabled={isRefreshing}
+                title={isSidebarCollapsed ? "Sincronizar y Actualizar BD" : undefined}
               >
-                <Download size={15} />
-                <span>Exportar Ventas ({filteredOrders.length})</span>
+                <div className="admin-crm-item-icon-wrap">
+                  {refreshSuccess ? (
+                    <Check size={17} style={{ color: 'var(--accent-emerald)' }} />
+                  ) : (
+                    <RefreshCw size={17} className={isRefreshing ? 'cf-spin' : ''} style={{ color: 'var(--accent-emerald)' }} />
+                  )}
+                </div>
+                {!isSidebarCollapsed && (
+                  <span className="admin-crm-item-label">
+                    {isRefreshing ? 'Actualizando...' : refreshSuccess ? '¡BD Al Día!' : 'Sincronizar BD'}
+                  </span>
+                )}
               </button>
             </div>
-          )}
+          </div>
+        </div>
 
+        {/* 4. Sidebar Bottom / User Profile Footer */}
+        <div className="admin-crm-sidebar-footer">
+          <div className="admin-crm-footer-quick">
+            {onToggleTheme && (
+              <button
+                type="button"
+                className="admin-crm-footer-btn tactile-btn"
+                onClick={onToggleTheme}
+                title={theme === 'dark' ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
+              >
+                <div className="admin-crm-item-icon-wrap">
+                  {theme === 'dark' ? <Sun size={16} style={{ color: 'var(--accent-amber)' }} /> : <Moon size={16} style={{ color: 'var(--accent-amber)' }} />}
+                </div>
+                {!isSidebarCollapsed && <span>{theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}</span>}
+              </button>
+            )}
+
+            {onBackToPos && (
+              <button
+                type="button"
+                className="admin-crm-footer-btn tactile-btn btn-pos-switch"
+                onClick={onBackToPos}
+                title="Volver al Punto de Venta (Esc)"
+              >
+                <div className="admin-crm-item-icon-wrap">
+                  <ArrowLeft size={16} />
+                </div>
+                {!isSidebarCollapsed && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                    <span>Punto de Venta</span>
+                    <span className="admin-crm-kbd">Esc</span>
+                  </div>
+                )}
+              </button>
+            )}
+          </div>
+
+          <div className="admin-crm-user-profile">
+            <div className="admin-crm-user-avatar">
+              <span>{user?.user ? user.user[0].toUpperCase() : 'D'}</span>
+            </div>
+            {!isSidebarCollapsed && (
+              <div className="admin-crm-user-details">
+                <span className="admin-crm-user-name">{user?.user || 'Dueño'}</span>
+                <span className="admin-crm-user-role">Administrador Total</span>
+              </div>
+            )}
+            {onLogout && (
+              <button
+                type="button"
+                className="admin-crm-logout-btn tactile-btn"
+                onClick={onLogout}
+                title="Cerrar Sesión"
+                aria-label="Cerrar Sesión"
+              >
+                <LogOut size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* RIGHT MAIN VIEWPORT */}
+      <main className="admin-crm-main">
+        {/* Executive Topbar */}
+        <header className="admin-crm-topbar">
+          <div className="admin-crm-topbar-left">
+            {/* Mobile drawer toggle */}
+            <button
+              type="button"
+              className="admin-crm-mobile-menu-btn tactile-btn"
+              onClick={() => setIsMobileAccordionOpen(prev => !prev)}
+              aria-label="Abrir menú de navegación"
+            >
+              <Menu size={20} />
+            </button>
+
+            {/* Active Module Breadcrumb & Meta */}
+            <div className="admin-crm-topbar-breadcrumb">
+              <div className="admin-crm-topbar-icon">
+                <CurrentNavIcon size={19} style={{ color: 'var(--accent-amber)' }} />
+              </div>
+              <div className="admin-crm-topbar-titles">
+                <div className="admin-crm-topbar-main-title">
+                  <h2>{currentNavItem.label}</h2>
+                  {currentNavItem.badge !== null && (
+                    <span 
+                      className="admin-crm-badge-pill" 
+                      style={{ 
+                        background: currentNavItem.badgeColor ? `${currentNavItem.badgeColor}20` : 'rgba(245, 158, 11, 0.15)', 
+                        color: currentNavItem.badgeColor || 'var(--accent-amber)', 
+                        borderColor: currentNavItem.badgeColor ? `${currentNavItem.badgeColor}40` : 'rgba(245, 158, 11, 0.3)' 
+                      }}
+                    >
+                      {currentNavItem.badge}
+                    </span>
+                  )}
+                </div>
+                <span className="admin-crm-topbar-sub">
+                  {activeTab === 'kpis' && 'Métricas financieras en tiempo real y rendimiento de comandas'}
+                  {activeTab === 'shifts' && 'Auditoría de aperturas, cierres de turno y conciliación de caja'}
+                  {activeTab === 'security' && 'Control de pedidos cancelados, auditoría de mozos y motivos'}
+                  {activeTab === 'menu' && 'Platos más vendidos, rentabilidad y distribución horaria'}
+                  {activeTab === 'bot' && 'Asistente de WhatsApp con IA, flujos y catálogo interactivo'}
+                  {activeTab === 'database' && 'Explorador y edición directa de tablas Supabase / SQLite'}
+                  {activeTab === 'settings' && 'Credenciales de acceso, pines de mozos y políticas de seguridad'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="admin-crm-topbar-right">
+            {/* Cloud Status Pill */}
+            <div className="admin-crm-status-pill">
+              <span className="admin-crm-status-dot" />
+              <span className="admin-crm-status-text">Sistema En Línea • RLS</span>
+            </div>
+
+            {/* Quick CSV Export button (when in relevant tabs) */}
+            {(activeTab === 'shifts' || activeTab === 'kpis') && (
+              <button
+                type="button"
+                className="admin-crm-topbar-action-btn tactile-btn"
+                onClick={activeTab === 'shifts' ? handleExportShifts : handleExportOrders}
+                title="Exportar datos a CSV"
+              >
+                <Download size={14} />
+                <span className="hide-on-mobile">Exportar CSV</span>
+              </button>
+            )}
+
+            {/* Quick Return to POS button */}
+            {onBackToPos && (
+              <button
+                type="button"
+                className="admin-crm-topbar-btn-pos tactile-btn"
+                onClick={onBackToPos}
+                title="Ir al Punto de Venta (Esc)"
+              >
+                <ArrowLeft size={14} />
+                <span>Punto de Venta</span>
+              </button>
+            )}
+          </div>
+        </header>
+
+        {/* Scrollable Canvas Viewport */}
+        <div className="admin-crm-canvas">
           {/* TAB CONTENTS */}
-          <div className="admin-tab-content-container" style={{ flex: 1 }}>
+          <div className="admin-tab-content-container" style={{ flex: 1, minWidth: 0 }}>
             {activeTab === 'kpis' && (
               <AuditKpisTab 
                 kpis={kpis} 
@@ -816,13 +613,23 @@ export default function OwnerAuditPortal({ orders = [], onBackToPos, onLogout, t
             {activeTab === 'settings' && <AuditSecuritySettings />}
           </div>
         </div>
-      </div>
+      </main>
 
       {showOnboarding && (
         <StoreOnboardingWizard
           isOpen={showOnboarding}
-          onClose={() => setShowOnboarding(false)}
+          onClose={() => {
+            try {
+              const active = getActiveStore();
+              localStorage.setItem('cf_onboarding_completed_' + (active.id || active.slug), 'true');
+            } catch (_) {}
+            setShowOnboarding(false);
+          }}
           onStoreCreated={() => {
+            try {
+              const active = getActiveStore();
+              localStorage.setItem('cf_onboarding_completed_' + (active.id || active.slug), 'true');
+            } catch (_) {}
             setShowOnboarding(false);
             if (onRefreshSystem) onRefreshSystem();
           }}

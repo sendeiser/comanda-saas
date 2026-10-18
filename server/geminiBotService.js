@@ -14,7 +14,7 @@ dotenv.config();
 const DATA_DIR = path.join(process.cwd(), 'data');
 const AI_CONFIG_FILE = path.join(DATA_DIR, 'ai_config.json');
 
-const DEFAULT_GEMINI_KEY_1 = Buffer.from('QVEuQWI4Uk42S1pNWmJTTENxMDhNNVVXbVVJdXp3RWdWZkxadVFMdHJJeFJOMnRYdXNCeEE=', 'base64').toString('utf8');
+const DEFAULT_GEMINI_KEY_1 = '';
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -104,7 +104,7 @@ export class GeminiBotService {
       enabled: parsed.enabled ?? true,
       mode: parsed.mode || 'only_groq', // Groq Cloud activado por defecto
       groqApiKey: parsed.groqApiKey || process.env.GROQ_API_KEY || '',
-      geminiApiKey: parsed.geminiApiKey || parsed.apiKey || process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY_1,
+      geminiApiKey: parsed.geminiApiKey || parsed.apiKey || process.env.GEMINI_API_KEY || '',
       deepseekApiKey: parsed.deepseekApiKey || process.env.DEEPSEEK_API_KEY || '',
       model: parsed.model || 'gemini-2.0-flash',
       groqModel: parsed.groqModel || 'qwen/qwen3.8-27b',
@@ -154,7 +154,7 @@ export class GeminiBotService {
 
     return {
       enabled: this.config.enabled ?? true,
-      mode: this.config.mode || 'cascade',
+      mode: this.config.mode || 'only_groq',
       hasGroq: !!groqKey,
       groqApiKeyMasked: this.maskApiKey(groqKey),
       hasGemini: !!geminiKey,
@@ -162,9 +162,9 @@ export class GeminiBotService {
       hasDeepSeek: !!deepseekKey,
       deepseekApiKeyMasked: this.maskApiKey(deepseekKey),
       model: this.config.model || 'gemini-2.0-flash',
-      groqModel: this.config.groqModel || 'llama-3.3-70b-versatile',
+      groqModel: this.config.groqModel || 'qwen/qwen3.8-27b',
       deepseekModel: this.config.deepseekModel || 'deepseek-chat',
-      activeProviderInUse: this.activeProviderInUse || 'Groq (Llama 3.3)',
+      activeProviderInUse: this.activeProviderInUse || 'Groq Cloud (Exclusivo)',
       systemPrompt: this.config.systemPrompt || ''
     };
   }
@@ -184,8 +184,7 @@ export class GeminiBotService {
       model,
       'qwen/qwen3.8-27b',
       'openai/gpt-oss-120b',
-      'llama-3.3-70b-versatile',
-      'llama-3.1-8b-instant',
+      'openai/gpt-oss-20b',
       'allam-2-7b'
     ].filter(Boolean);
     const uniqueModels = [...new Set(candidateModels)];
@@ -418,8 +417,8 @@ Reglas estrictas:
       }
     }
 
-    // 2. Fallback a Gemini si Groq no responde
-    if (geminiKey) {
+    // 2. Fallback a Gemini si Groq no responde (omitido si es modo exclusivo only_groq)
+    if (this.config.mode !== 'only_groq' && geminiKey) {
       try {
         const rawGem = await this.callGemini(
           geminiKey,
@@ -575,7 +574,7 @@ Cliente: ${context.customerName || 'Cliente'}
 
     // Ejecutores individuales
     const execGroq = async () => {
-      const activeGroqKey = groqKey || DEFAULT_GROQ_KEY_1;
+      const activeGroqKey = groqKey || process.env.GROQ_API_KEY;
       if (!activeGroqKey) return null;
       const reply = await this.callGroq(activeGroqKey, this.config.groqModel || 'qwen/qwen3.8-27b', systemPrompt, userMessage);
       if (reply) {

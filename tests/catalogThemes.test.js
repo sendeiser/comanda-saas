@@ -44,4 +44,20 @@ describe('Catalog Themes Engine', () => {
     assert.strictEqual(lightTheme.isLight, true);
     assert.strictEqual(getCatalogTheme('retro-burger').isLight, false);
   });
+
+  it('adapts surfaces for dark theme when target element has data-theme="light"', () => {
+    const props = {};
+    const mockEl = {
+      getAttribute: (attr) => (attr === 'data-theme' ? 'light' : null),
+      style: {
+        setProperty: (key, val) => { props[key] = val; }
+      }
+    };
+    applyCatalogTheme('retro-burger', mockEl);
+    assert.strictEqual(props['--cat-bg'], '#f9f9f8');
+    assert.strictEqual(props['--cat-surface'], '#ffffff');
+    assert.strictEqual(props['--cat-text'], '#0f172a');
+    assert.strictEqual(props['--cat-red'], '#dc2626'); // Brand primary preserved
+  });
 });
+

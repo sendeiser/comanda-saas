@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Écrin Atelier // Live Cockpit - Auditoría &amp; Histórico de Ventas</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Outfit:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-fixed-variant": "#802a05",
+            "secondary": "#e2c291",
+            "on-background": "#e1e2e8",
+            "background": "#111418",
+            "surface-container-high": "#272a2e",
+            "surface-variant": "#323539",
+            "secondary-fixed-dim": "#e2c291",
+            "error": "#ffb4ab",
+            "surface-container-lowest": "#0b0e12",
+            "secondary-fixed": "#ffdead",
+            "surface-container-low": "#191c20",
+            "surface-container": "#1d2024",
+            "primary-container": "#e07148",
+            "on-surface": "#e1e2e8",
+            "surface": "#111418",
+            "on-primary-fixed": "#390c00",
+            "primary": "#ffb59c",
+            "inverse-primary": "#a0401c",
+            "on-secondary-container": "#d3b484",
+            "primary-fixed-dim": "#ffb59c",
+            "on-secondary-fixed-variant": "#59431d",
+            "secondary-container": "#5c451f",
+            "error-container": "#93000a",
+            "surface-tint": "#ffb59c",
+            "on-error": "#690005",
+            "tertiary-container": "#00a574",
+            "tertiary-fixed-dim": "#45dfa4",
+            "surface-container-highest": "#323539",
+            "on-tertiary-fixed": "#002114",
+            "on-secondary-fixed": "#281900",
+            "outline": "#a58b83",
+            "on-primary": "#5c1900",
+            "inverse-on-surface": "#2e3135",
+            "surface-dim": "#111418",
+            "tertiary-fixed": "#68fcbf",
+            "surface-bright": "#36393e",
+            "primary-fixed": "#ffdbcf",
+            "on-primary-container": "#511500",
+            "inverse-surface": "#e1e2e8",
+            "tertiary": "#45dfa4",
+            "on-tertiary-container": "#003120",
+            "outline-variant": "#56423c",
+            "on-secondary": "#412d08",
+            "on-tertiary": "#003825",
+            "on-surface-variant": "#ddc0b7",
+            "on-error-container": "#ffdad6",
+            "on-tertiary-fixed-variant": "#005137"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-lg": "1.25rem",
+            "space-2xl": "3rem",
+            "gutter-desktop": "1.25rem",
+            "space-xl": "2rem",
+            "margin-tablet": "1.5rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "gutter-tablet": "0.75rem",
+            "margin-desktop": "2rem",
+            "gutter": "1rem",
+            "space-md": "0.875rem"
+          },
+          "fontFamily": {
+            "display-lg-mobile": ["Outfit"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Outfit"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "mono-price-md": ["JetBrains Mono"],
+            "headline-md": ["Outfit"],
+            "display-lg": ["Outfit"],
+            "mono-price-lg": ["JetBrains Mono"],
+            "mono-data-sm": ["JetBrains Mono"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-sm": ["Outfit"]
+          },
+          "fontSize": {
+            "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "mono-price-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "mono-price-lg": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "mono-data-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      vertical-align: middle;
+    }
+    .material-symbols-outlined.fill-icon {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    /* Hairline dividers & custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0e12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #323539;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #56423c;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-md min-h-screen overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- TOP APP BAR (Cockpit App Bar) -->
+<header class="w-full h-14 px-4 flex items-center justify-between border-b border-outline-variant/30 bg-surface-container-lowest z-30 fixed top-0 left-0 right-0">
+<div class="flex items-center space-x-6">
+<div class="flex items-center gap-3">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse"></span>
+<span class="text-headline-sm font-headline-sm tracking-wider uppercase text-primary">ATELIER // LIVE COCKPIT</span>
+</div>
+<div class="hidden lg:flex items-center gap-2 px-3 py-1 bg-surface-container-low rounded border border-outline-variant/30 text-mono-data-sm font-mono-data-sm text-secondary">
+<span class="material-symbols-outlined text-[16px] text-tertiary">check_circle</span>
+<span>Servicio Cena Activa • Turno Noche (20:00 - 01:30)</span>
+<span class="text-outline-variant">|</span>
+<span class="text-on-surface-variant">Pass Central / Atelier</span>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-6 text-label-md font-label-md">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">En Vivo</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">Tickets Cocina</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors pb-1" href="#">CRM Huéspedes</a>
+<!-- Active Link -->
+<a class="text-primary border-b-2 border-primary pb-1 font-semibold" href="#">Histórico</a>
+</nav>
+<!-- Trailing Actions & User Profile -->
+<div class="flex items-center gap-3">
+<div class="hidden sm:flex items-center gap-2 border-r border-outline-variant/30 pr-3">
+<button class="px-3 py-1.5 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-secondary text-label-md font-label-md flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px]">file_download</span>
+<span>Exportar Arqueo</span>
+</button>
+<button class="px-3 py-1.5 rounded bg-surface-container-high hover:bg-surface-variant text-on-surface border border-outline-variant/30 text-label-md font-label-md flex items-center gap-1.5 transition-all">
+<span class="material-symbols-outlined text-[16px] text-primary">point_of_sale</span>
+<span>Cierre Caja X/Z</span>
+</button>
+</div>
+<div class="flex items-center gap-1.5 text-on-surface-variant">
+<button class="p-1.5 hover:bg-surface-container rounded text-on-surface-variant hover:text-on-surface transition-colors" title="Notificaciones">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container rounded text-on-surface-variant hover:text-on-surface transition-colors" title="Ajustes">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+<button class="p-1.5 hover:bg-surface-container rounded text-on-surface-variant hover:text-on-surface transition-colors" title="Cambiar Terminal">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+</button>
+</div>
+<!-- Chef / Expediter Profile Avatar -->
+<div class="flex items-center gap-2.5 pl-2 border-l border-outline-variant/30">
+<img alt="Chef de Pass Expediter Profile" class="w-8 h-8 rounded-full border border-outline-variant/40 object-cover" data-alt="A portrait of an experienced Michelin star restaurant maitre d wearing a pristine charcoal chef jacket and minimal slate apron in a dimly lit high-end gastronomic dining kitchen with brushed copper accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfVg_CfGNMqJVuAUpKUSL0KjmOy0mfbPDl0Y5I6v4dCnh5Dasislw5T9utXU1IkpHk7bJY0iWfBQ-fLhT1RzJOkg9P3kx-fnNeZO_qDfLllL4lGLRkCcS_qTBn1fEE--iQ11aa0-f3qTdTlbcnHXJWV60vxVEeRNgM2q1A1chc7AKT02jc--rrw6PC8qmZqd5t4p-bqHeKI-68D1jq2HBbOaQC9QvlPAoFim_4J8l3Z5iqzl6McqYHhOfCTBMES17932hSvOtp"/>
+<div class="hidden xl:block text-left">
+<p class="text-label-md font-label-md text-on-surface leading-tight">J. Dupont</p>
+<p class="text-mono-data-sm font-mono-data-sm text-secondary">Maître Pass</p>
+</div>
+</div>
+</div>
+</header>
+<!-- SIDE NAVIGATION RAIL -->
+<aside class="fixed left-0 top-14 bottom-0 w-20 flex flex-col justify-between items-center py-4 border-r border-outline-variant/30 bg-surface-container-lowest z-20">
+<!-- Top Sigil / Brand -->
+<div class="flex flex-col items-center gap-4 w-full">
+<div class="w-10 h-10 rounded border border-outline-variant/40 bg-surface-container-low flex items-center justify-center text-primary group cursor-pointer" title="L'Écrin Atelier">
+<span class="font-headline-sm text-headline-sm font-semibold tracking-tighter">É</span>
+</div>
+<!-- Nav Rail Tabs -->
+<nav class="flex flex-col items-center gap-3 w-full px-2">
+<!-- WhatsApp Feed -->
+<a class="w-12 h-12 flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2 transition-colors group relative" href="#" title="WhatsApp Feed">
+<span class="material-symbols-outlined text-[22px]">chat</span>
+<span class="text-[9px] font-label-md mt-0.5 tracking-tight scale-90 group-hover:scale-100 transition-transform">WA Feed</span>
+<span class="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-tertiary"></span>
+</a>
+<!-- KDS Pass -->
+<a class="w-12 h-12 flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2 transition-colors group" href="#" title="KDS Pass">
+<span class="material-symbols-outlined text-[22px]">restaurant</span>
+<span class="text-[9px] font-label-md mt-0.5 tracking-tight scale-90 group-hover:scale-100 transition-transform">KDS Pass</span>
+</a>
+<!-- Histórico & Auditoría (Active Tab) -->
+<a class="w-12 h-12 flex flex-col items-center justify-center text-primary bg-surface-container-high/80 border border-primary-container/40 rounded-lg p-2 shadow-sm relative group" href="#" title="Histórico &amp; Auditoría">
+<span class="material-symbols-outlined text-[22px] fill-icon text-primary-container">receipt_long</span>
+<span class="text-[9px] font-label-md mt-0.5 tracking-tight font-semibold text-primary">Auditoría</span>
+<span class="absolute -left-2 top-3 bottom-3 w-1 bg-primary-container rounded-r"></span>
+</a>
+<!-- Bodega & Cava -->
+<a class="w-12 h-12 flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2 transition-colors group" href="#" title="Bodega &amp; Cava">
+<span class="material-symbols-outlined text-[22px]">liquor</span>
+<span class="text-[9px] font-label-md mt-0.5 tracking-tight scale-90 group-hover:scale-100 transition-transform">Bodega</span>
+</a>
+<!-- Huéspedes VIP -->
+<a class="w-12 h-12 flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2 transition-colors group" href="#" title="Huéspedes VIP">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+<span class="text-[9px] font-label-md mt-0.5 tracking-tight scale-90 group-hover:scale-100 transition-transform">VIP CRM</span>
+</a>
+<!-- Ajustes Bot -->
+<a class="w-12 h-12 flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2 transition-colors group" href="#" title="Ajustes Bot">
+<span class="material-symbols-outlined text-[22px]">smart_toy</span>
+<span class="text-[9px] font-label-md mt-0.5 tracking-tight scale-90 group-hover:scale-100 transition-transform">Bot AI</span>
+</a>
+</nav>
+</div>
+<!-- Bottom Actions Rail -->
+<div class="flex flex-col items-center gap-3 w-full px-2">
+<button class="w-10 h-10 rounded border border-error/30 hover:border-error bg-error-container/20 text-error flex items-center justify-center transition-all group" title="Pausa Urgente">
+<span class="material-symbols-outlined text-[20px]">pause</span>
+</button>
+<div class="w-8 h-[1px] bg-outline-variant/30 my-1"></div>
+<a class="text-on-surface-variant hover:text-on-surface p-2 rounded hover:bg-surface-container transition-colors" href="#" title="Soporte">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</a>
+<a class="text-on-surface-variant hover:text-error p-2 rounded hover:bg-surface-container transition-colors" href="#" title="Cerrar Turno">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</a>
+</div>
+</aside>
+<!-- MAIN WRAPPER (Offset by Navs) -->
+<main class="ml-20 pt-14 min-h-screen flex flex-col bg-background">
+<!-- QUICK FINANCIAL KPI SUMMARY STRIP -->
+<section class="w-full bg-surface-container-lowest border-b border-outline-variant/30 px-6 py-3">
+<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
+<!-- KPI 1 -->
+<div class="flex items-center justify-between p-3 rounded bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Total Ventas Hoy</p>
+<p class="font-mono-price-lg text-mono-price-lg text-secondary tabular-nums mt-0.5">€8,450.20</p>
+</div>
+<div class="w-8 h-8 rounded bg-secondary-container/40 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[18px]">payments</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="flex items-center justify-between p-3 rounded bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Comandas Cerradas</p>
+<div class="flex items-baseline gap-2 mt-0.5">
+<p class="font-mono-price-lg text-mono-price-lg text-on-surface tabular-nums">68</p>
+<span class="text-mono-data-sm font-mono-data-sm text-tertiary">97.1% Éxito</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[18px]">done_all</span>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="flex items-center justify-between p-3 rounded bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Tickets Anulados</p>
+<div class="flex items-baseline gap-2 mt-0.5">
+<p class="font-mono-price-lg text-mono-price-lg text-error tabular-nums">2</p>
+<span class="text-mono-data-sm font-mono-data-sm text-error/80 tabular-nums">€142.00</span>
+</div>
+</div>
+<div class="w-8 h-8 rounded bg-error-container/20 flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="flex items-center justify-between p-3 rounded bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">Fiado / Ctas. Abiertas</p>
+<p class="font-mono-price-lg text-mono-price-lg text-primary tabular-nums mt-0.5">€530.00</p>
+</div>
+<div class="w-8 h-8 rounded bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+</div>
+</div>
+<!-- KPI 5 -->
+<div class="col-span-2 md:col-span-1 flex items-center justify-between p-3 rounded bg-surface-container-low border border-outline-variant/30">
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider">IVA Gastronomía (10%)</p>
+<p class="font-mono-price-lg text-mono-price-lg text-on-surface tabular-nums mt-0.5">€768.20</p>
+</div>
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]">receipt</span>
+</div>
+</div>
+</div>
+</section>
+<!-- WORKSPACE SPLIT: TABLE (LEFT/CENTER) & INSPECTOR (RIGHT) -->
+<div class="flex-1 flex flex-col xl:flex-row overflow-hidden">
+<!-- LEFT & CENTER AREA: Search, Granular Filters, and Audit Ledger -->
+<section class="flex-1 flex flex-col border-r border-outline-variant/30 bg-background overflow-y-auto">
+<!-- FILTER CONTROL BAR -->
+<div class="p-4 border-b border-outline-variant/30 bg-surface-container-lowest space-y-3">
+<!-- Omnibar Search & Quick Range -->
+<div class="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+<div class="relative flex-1">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant/30 focus:border-primary-container rounded text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none transition-all" placeholder="Buscar por N° Ticket (#WA-4091, #POS-1082), Huésped VIP, Mesa o Camarero..." type="text" value="#WA-4091"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[11px] font-mono-data-sm text-on-surface-variant px-1.5 py-0.5 rounded bg-surface-container border border-outline-variant/20">
+                ⌘K
+              </div>
+</div>
+<!-- Date Range Selector -->
+<div class="flex items-center gap-1 bg-surface-container-low p-1 rounded border border-outline-variant/30 text-label-md font-label-md overflow-x-auto">
+<button class="px-2.5 py-1 rounded bg-surface-container-high text-primary font-semibold border border-primary-container/30 whitespace-nowrap">
+                Hoy (18 Oct 2024)
+              </button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap">
+                Ayer
+              </button>
+<button class="px-2.5 py-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap">
+                Últimos 7 días
+              </button>
+<button class="px-2 py-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">calendar_today</span>
+<span>Personalizado</span>
+</button>
+</div>
+</div>
+<!-- Secondary Granular Pill Filters -->
+<div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+<!-- Canal Origin Pills -->
+<div class="flex items-center gap-1.5 overflow-x-auto py-0.5">
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant mr-1">CANAL:</span>
+<button class="px-2.5 py-1 rounded-full text-label-md font-label-md bg-surface-container-high text-on-surface border border-outline-variant/40">Todos</button>
+<button class="px-2.5 py-1 rounded-full text-label-md font-label-md bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-secondary">table_restaurant</span>
+                Salón / Mesas
+              </button>
+<button class="px-2.5 py-1 rounded-full text-label-md font-label-md bg-surface-container text-primary-fixed-dim hover:text-primary border border-primary-container/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-tertiary">chat</span>
+                WhatsApp Concierge
+              </button>
+<button class="px-2.5 py-1 rounded-full text-label-md font-label-md bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">moped</span>
+                Delivery Gourmet
+              </button>
+<button class="px-2.5 py-1 rounded-full text-label-md font-label-md bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant/20">Mostrador</button>
+</div>
+<!-- Payment Method Dropdown & Filter Count -->
+<div class="flex items-center gap-2">
+<div class="relative">
+<select class="appearance-none bg-surface-container-low text-on-surface-variant hover:text-on-surface pl-3 pr-8 py-1 rounded border border-outline-variant/30 text-label-md font-label-md focus:outline-none focus:border-primary">
+<option>Método de Pago: Todos</option>
+<option>Tarjeta Crédito/Débito</option>
+<option>Efectivo</option>
+<option>MercadoPago / QR</option>
+<option>Fiado Cta Corriente</option>
+</select>
+<span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-[16px]">expand_more</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">
+                Mostrando <strong class="text-on-surface">6</strong> de 70 comandas
+              </span>
+</div>
+</div>
+</div>
+<!-- HIGH-DENSITY AUDIT TABLE -->
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-lowest border-b border-outline-variant/30 text-mono-data-sm font-mono-data-sm text-on-surface-variant uppercase tracking-wider">
+<th class="py-2.5 px-4 font-semibold">N° Ticket &amp; Origen</th>
+<th class="py-2.5 px-3 font-semibold">Hora</th>
+<th class="py-2.5 px-4 font-semibold">Mesa / Huésped</th>
+<th class="py-2.5 px-3 font-semibold">Operador</th>
+<th class="py-2.5 px-4 font-semibold">Resumen Comanda</th>
+<th class="py-2.5 px-3 font-semibold">Pago</th>
+<th class="py-2.5 px-3 font-semibold">Estado Fiscal</th>
+<th class="py-2.5 px-4 text-right font-semibold">Total (€)</th>
+<th class="py-2.5 px-3 text-center font-semibold">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/15 text-body-sm font-body-sm">
+<!-- ROW 1 (SELECTED ROW) -->
+<tr class="bg-surface-container-low/90 border-l-4 border-l-primary-container relative cursor-pointer hover:bg-surface-container transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">#WA-4091</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-tertiary-container/20 text-tertiary border border-tertiary/30">WA VIP</span>
+</div>
+</td>
+<td class="py-3 px-3 font-mono-data-sm text-mono-data-sm text-on-surface-variant">21:14:08</td>
+<td class="py-3 px-4">
+<div class="font-label-lg text-label-lg text-on-surface flex items-center gap-1.5">
+<span>Mesa 06</span>
+<span class="text-secondary text-xs">• Mme. Valérie Moreau</span>
+</div>
+<span class="text-[11px] text-tertiary flex items-center gap-0.5 mt-0.5">
+<span class="material-symbols-outlined text-[12px] fill-icon">star</span> Huésped Presidencial
+                  </span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">David R.</td>
+<td class="py-3 px-4 text-on-surface">
+<span class="line-clamp-1 text-xs text-on-surface-variant">Tartar Balfegó, 2x Risotto Boletus, Ponsot 2018</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-xs text-on-surface">
+<span class="material-symbols-outlined text-[14px] text-secondary">credit_card</span>
+                    Visa Sig.
+                  </span>
+</td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-md bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                    Facturado
+                  </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="font-mono-price-md text-mono-price-md font-semibold text-primary tabular-nums">€426.25</span>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="p-1 rounded text-primary hover:bg-surface-container-high transition-colors" title="Ver Inspector">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- ROW 2: Fiado Dr. Sotomayor -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface font-semibold">#POS-1094</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-surface-container text-on-surface-variant border border-outline-variant/30">Salón</span>
+</div>
+</td>
+<td class="py-3 px-3 font-mono-data-sm text-mono-data-sm text-on-surface-variant">20:58:33</td>
+<td class="py-3 px-4">
+<div class="font-label-lg text-label-lg text-on-surface">Mesa 12 (Degustación 4p)</div>
+<div class="text-[11px] text-primary mt-0.5">Dr. Alejandro Sotomayor</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">Marc P.</td>
+<td class="py-3 px-4 text-on-surface">
+<span class="line-clamp-1 text-xs text-on-surface-variant">4x Menú Degustación Écrin + Maridaje Gran Cru</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-xs text-primary font-medium">
+<span class="material-symbols-outlined text-[14px]">history_edu</span>
+                    Cta Corriente
+                  </span>
+</td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-md bg-secondary-container/30 text-secondary border border-secondary/30 flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
+                    Fiado / Pend.
+                  </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="font-mono-price-md text-mono-price-md font-semibold text-secondary tabular-nums">€780.00</span>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- ROW 3: Mostrador Elena Rostova -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface font-semibold">#POS-1093</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-surface-container-high text-on-surface-variant border border-outline-variant/30">Mostrador</span>
+</div>
+</td>
+<td class="py-3 px-3 font-mono-data-sm text-mono-data-sm text-on-surface-variant">20:42:15</td>
+<td class="py-3 px-4">
+<div class="font-label-lg text-label-lg text-on-surface">Take-Away #04</div>
+<div class="text-[11px] text-on-surface-variant mt-0.5">Elena Rostova</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">Clara M.</td>
+<td class="py-3 px-4 text-on-surface">
+<span class="line-clamp-1 text-xs text-on-surface-variant">Caja Bombones Trufa Negra + Macarons Caviar</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-xs text-on-surface">
+<span class="material-symbols-outlined text-[14px]">attach_money</span>
+                    Efectivo
+                  </span>
+</td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-md bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                    Entregado
+                  </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="font-mono-price-md text-mono-price-md font-semibold text-on-surface tabular-nums">€64.50</span>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- ROW 4: Anulado Supervisor -->
+<tr class="bg-error-container/5 hover:bg-error-container/10 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-mono-data-sm text-mono-data-sm text-error font-semibold line-through">#POS-1090</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-error-container/30 text-error border border-error/40">Anulado</span>
+</div>
+</td>
+<td class="py-3 px-3 font-mono-data-sm text-mono-data-sm text-error/80">20:15:10</td>
+<td class="py-3 px-4">
+<div class="font-label-lg text-label-lg text-error">Mesa 04 (Duplicada)</div>
+<div class="text-[11px] text-error/70 mt-0.5">Autorizado: Maître J. Dupont</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">David R.</td>
+<td class="py-3 px-4 text-error/80 italic">
+<span class="line-clamp-1 text-xs">Error duplicidad de comanda en salón central</span>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">—</td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-md bg-error-container/40 text-error border border-error/30 flex items-center gap-1 w-max">
+<span class="material-symbols-outlined text-[12px]">lock</span>
+                    Void Supervisor
+                  </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="font-mono-price-md text-mono-price-md font-semibold text-error line-through tabular-nums">€142.00</span>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="p-1 rounded text-error/80 hover:text-error hover:bg-error-container/30 transition-colors">
+<span class="material-symbols-outlined text-[18px]">info</span>
+</button>
+</td>
+</tr>
+<!-- ROW 5: Delivery Gourmet -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface font-semibold">#POS-1088</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-surface-container text-secondary border border-secondary/30">Delivery</span>
+</div>
+</td>
+<td class="py-3 px-3 font-mono-data-sm text-mono-data-sm text-on-surface-variant">19:50:22</td>
+<td class="py-3 px-4">
+<div class="font-label-lg text-label-lg text-on-surface">Envío #902 • Suite 412</div>
+<div class="text-[11px] text-on-surface-variant mt-0.5">Concierge Grand Palace</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">Bot Concierge</td>
+<td class="py-3 px-4 text-on-surface">
+<span class="line-clamp-1 text-xs text-on-surface-variant">Terrina Foie Gras, Brioche Artesanal, Selección Quesos</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-xs text-on-surface">
+<span class="material-symbols-outlined text-[14px] text-tertiary">qr_code_2</span>
+                    MercadoPago QR
+                  </span>
+</td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-md bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                    Entregado
+                  </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="font-mono-price-md text-mono-price-md font-semibold text-on-surface tabular-nums">€118.00</span>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- ROW 6: Chef Table Amex Centurion -->
+<tr class="hover:bg-surface-container/50 transition-colors">
+<td class="py-3 px-4">
+<div class="flex items-center gap-2">
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface font-semibold">#POS-1085</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-surface-container-high text-secondary border border-outline-variant/30">Chef Table</span>
+</div>
+</td>
+<td class="py-3 px-3 font-mono-data-sm text-mono-data-sm text-on-surface-variant">19:30:41</td>
+<td class="py-3 px-4">
+<div class="font-label-lg text-label-lg text-on-surface flex items-center gap-1.5">
+<span>Mesa 08 (Chef's Pass)</span>
+</div>
+<div class="text-[11px] text-secondary mt-0.5">Lord H. Sterling (6 pax)</div>
+</td>
+<td class="py-3 px-3 text-on-surface-variant">J. Dupont</td>
+<td class="py-3 px-4 text-on-surface">
+<span class="line-clamp-1 text-xs text-on-surface-variant">Gran Degustación Omakase Atelier &amp; Cava Imperial</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 text-xs text-on-surface font-medium">
+<span class="material-symbols-outlined text-[14px] text-on-surface">credit_card</span>
+                    Amex Centurion
+                  </span>
+</td>
+<td class="py-3 px-3">
+<span class="px-2 py-0.5 rounded-full text-[11px] font-label-md bg-tertiary/10 text-tertiary border border-tertiary/20 flex items-center gap-1 w-max">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                    Facturado
+                  </span>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="font-mono-price-md text-mono-price-md font-semibold text-secondary tabular-nums">€1,240.00</span>
+</td>
+<td class="py-3 px-3 text-center">
+<button class="p-1 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- TABLE FOOTER AUDIT BAR -->
+<div class="p-3 border-t border-outline-variant/30 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between text-mono-data-sm font-mono-data-sm text-on-surface-variant gap-2">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+              Sincronización Fiscal Veri*Factu: OK
+            </span>
+<span class="text-outline-variant">|</span>
+<span>Firmas TicketBAI: 68/68 Validadas</span>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface disabled:opacity-40" disabled="">Anterior</button>
+<span class="px-2 text-on-surface font-semibold">1</span>
+<button class="px-2 py-1 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface">Siguiente</button>
+</div>
+</div>
+</section>
+<!-- RIGHT AREA: INTERACTIVE SIDE DRAWER / INSPECTOR (#WA-4091 PREVIEW) -->
+<aside class="w-full xl:w-[480px] bg-surface-container-low flex flex-col border-l border-outline-variant/30 overflow-y-auto">
+<!-- INSPECTOR HEADER -->
+<div class="p-4 border-b border-outline-variant/30 bg-surface-container-lowest flex items-center justify-between">
+<div>
+<div class="flex items-center gap-2">
+<span class="text-headline-sm font-headline-sm text-on-surface font-semibold">Ticket #WA-4091</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono-data-sm bg-tertiary-container/20 text-tertiary border border-tertiary/30 font-semibold uppercase">COBRADO • SALÓN VIP</span>
+</div>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant mt-0.5">
+              Emitido: Hoy a las 21:14h • Mozo: David R. • Mesa 06
+            </p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-1 rounded hover:bg-surface-container transition-colors" title="Minimizar Inspector">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="p-4 space-y-5 flex-1">
+<!-- THERMAL RECEIPT PREVIEW (AUTHENTIC MONOSPACED PAPER STYLING) -->
+<div class="bg-surface-container-lowest border border-outline-variant/40 rounded p-5 shadow-2xl relative">
+<!-- Decorative Tear Lines -->
+<div class="absolute -top-1.5 left-4 right-4 border-t-2 border-dashed border-outline-variant/50"></div>
+<!-- Receipt Header Monogram -->
+<div class="text-center pb-4 border-b border-dashed border-outline-variant/30">
+<span class="text-secondary font-headline-md font-headline-md tracking-widest font-semibold block uppercase">L'Écrin Atelier</span>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant text-[10px] mt-0.5 uppercase tracking-wider">Haute Cuisine &amp; Cellar Pass</p>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant text-[9px] mt-1">Carrer de Mallorca 244, Barcelona • NIF: B-88291048</p>
+<div class="mt-3 inline-block px-2 py-0.5 bg-surface-container rounded text-[10px] font-mono-data-sm text-secondary border border-outline-variant/20">
+                FACTURA SIMPLIFICADA F-2024-8841
+              </div>
+</div>
+<!-- Receipt Meta Info -->
+<div class="py-3 border-b border-dashed border-outline-variant/30 text-mono-data-sm font-mono-data-sm text-on-surface-variant space-y-1 text-xs">
+<div class="flex justify-between">
+<span>Fecha: 18/10/2024 21:14</span>
+<span>Terminal: T-01 CENTRAL</span>
+</div>
+<div class="flex justify-between">
+<span>Huésped: Mme. Valérie Moreau</span>
+<span class="text-tertiary">Mesa: 06 (VIP)</span>
+</div>
+<div class="flex justify-between">
+<span>Canal: Concierge WhatsApp</span>
+<span>Cubiertos: 2 pax</span>
+</div>
+</div>
+<!-- Receipt Items Breakdown -->
+<div class="py-3 border-b border-dashed border-outline-variant/30 space-y-2.5">
+<!-- Item 1 -->
+<div class="text-mono-data-sm font-mono-data-sm text-xs">
+<div class="flex justify-between text-on-surface">
+<span class="font-medium">1x Tartar de Atún Balfegó</span>
+<span class="tabular-nums">€34.50</span>
+</div>
+<div class="text-[10px] text-on-surface-variant pl-4 italic">Caviares de trufa &amp; aliño de yuzu</div>
+</div>
+<!-- Item 2 -->
+<div class="text-mono-data-sm font-mono-data-sm text-xs">
+<div class="flex justify-between text-on-surface">
+<span class="font-medium">2x Risotto de Boletus</span>
+<span class="tabular-nums">€91.00</span>
+</div>
+<div class="text-[10px] text-secondary pl-4">+ Suplemento Trufa Negra Melanosporum (€18.00x2)</div>
+</div>
+<!-- Item 3 -->
+<div class="text-mono-data-sm font-mono-data-sm text-xs">
+<div class="flex justify-between text-on-surface">
+<span class="font-medium">1x Pichón Asado a la Brasa</span>
+<span class="tabular-nums">€38.00</span>
+</div>
+<div class="text-[10px] text-primary-fixed-dim pl-4 italic font-medium">Nota cocina: SIN MORAS (Alergia declarada)</div>
+</div>
+<!-- Item 4 (Wine) -->
+<div class="text-mono-data-sm font-mono-data-sm text-xs">
+<div class="flex justify-between text-on-surface">
+<span class="font-medium">1x Domaine Ponsot Grand Cru 2018</span>
+<span class="tabular-nums">€240.00</span>
+</div>
+<div class="text-[10px] text-secondary pl-4">Cava Histórica • Botella #142</div>
+</div>
+</div>
+<!-- Financial Totals -->
+<div class="py-3 border-b border-dashed border-outline-variant/30 space-y-1.5 text-mono-data-sm font-mono-data-sm text-xs">
+<div class="flex justify-between text-on-surface-variant">
+<span>Base Imponible (Subtotal):</span>
+<span class="tabular-nums">€387.50</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>IVA Gastronomía &amp; Bodega (10%):</span>
+<span class="tabular-nums">€38.75</span>
+</div>
+<div class="flex justify-between text-on-surface font-semibold text-sm pt-1 border-t border-outline-variant/20">
+<span class="text-primary">TOTAL FACTURA:</span>
+<span class="font-mono-price-md text-mono-price-md text-primary font-semibold tabular-nums">€426.25</span>
+</div>
+<div class="flex justify-between text-on-surface-variant text-[11px] pt-0.5">
+<span>Método de Pago:</span>
+<span class="text-on-surface">Visa Signature (**** 9042)</span>
+</div>
+</div>
+<!-- Fiscal Verification QR & Hash -->
+<div class="pt-3 flex items-center justify-between gap-3 text-mono-data-sm font-mono-data-sm">
+<div class="space-y-1 text-[9px] text-on-surface-variant">
+<p class="font-semibold text-on-surface">VERIFICACIÓN FISCAL VERI*FACTU</p>
+<p>Hash: 7A9D-20F1-BB84-90AE-2024</p>
+<p>Huella Digital TBai: OK • Transmisión Directa AEAT</p>
+<p class="text-secondary">Gracias por su visita al Atelier</p>
+</div>
+<div class="w-14 h-14 bg-white p-1 rounded flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[48px] text-black">qr_code_2</span>
+</div>
+</div>
+<!-- Decorative Tear Bottom -->
+<div class="absolute -bottom-1.5 left-4 right-4 border-b-2 border-dashed border-outline-variant/50"></div>
+</div>
+<!-- PRIMARY ACTION PANEL -->
+<div class="grid grid-cols-2 gap-2">
+<button class="px-3 py-2.5 rounded bg-primary-container text-on-primary-container hover:brightness-110 font-label-lg text-label-lg flex items-center justify-center gap-2 font-semibold shadow transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">print</span>
+<span>Reimprimir Ticket</span>
+</button>
+<button class="px-3 py-2.5 rounded bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px] text-tertiary">share</span>
+<span>Enviar WhatsApp/Mail</span>
+</button>
+</div>
+<!-- SUPERVISOR VOID ACTION (EXPANDABLE SECURITY DRAWER) -->
+<div class="p-4 rounded border border-error/30 bg-surface-container-lowest/80 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-[20px]">admin_panel_settings</span>
+<span class="font-label-lg text-label-lg text-error font-semibold">Anulación y Rectificación Fiscal</span>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-error-container/20 text-error border border-error/30">Nivel Maître</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant text-xs leading-relaxed">
+              La anulación generará un abono rectificativo fiscal R-2024 ante la AEAT. Se requiere PIN de Supervisor y registro de motivo.
+            </p>
+<!-- Motivo Dropdown -->
+<div class="space-y-1">
+<label class="text-label-md font-label-md text-on-surface-variant uppercase text-[10px] tracking-wider block">Motivo de Anulación</label>
+<select class="w-full bg-surface-container border border-outline-variant/30 rounded py-1.5 px-3 text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-error">
+<option>Seleccione causal justificada...</option>
+<option>Error de facturación / Duplicidad</option>
+<option>Devolución por disconformidad de cliente</option>
+<option>Plato / Botella no marchada en comanda</option>
+<option>Cobro atribuido a mesa errónea</option>
+</select>
+</div>
+<!-- Supervisor Passcode Keypad Display -->
+<div class="space-y-2 pt-1">
+<div class="flex items-center justify-between">
+<span class="text-label-md font-label-md text-on-surface-variant uppercase text-[10px] tracking-wider">PIN Maître expediter</span>
+<span class="text-mono-data-sm font-mono-data-sm text-secondary text-[11px]">Autorizado: J. Dupont</span>
+</div>
+<div class="flex items-center justify-center gap-3 py-2 bg-surface-container-low rounded border border-outline-variant/40">
+<span class="w-3 h-3 rounded-full bg-error animate-ping"></span>
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<span class="w-3 h-3 rounded-full bg-surface-container-high border border-outline-variant/40"></span>
+<span class="w-3 h-3 rounded-full bg-surface-container-high border border-outline-variant/40"></span>
+</div>
+<!-- Action Confirmation Button -->
+<button class="w-full py-2 px-3 rounded bg-transparent border border-error text-error hover:bg-error hover:text-on-error font-label-lg text-label-lg font-semibold flex items-center justify-center gap-2 transition-all duration-150">
+<span class="material-symbols-outlined text-[16px]">lock_reset</span>
+<span>Confirmar Anulación Fiscal (Void)</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</body></html>

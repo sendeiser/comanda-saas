@@ -13,6 +13,7 @@ import { storageService } from '../../../services/storageService.js';
 export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated }) {
   const [step, setStep] = useState(1);
   const [selectedIndustry, setSelectedIndustry] = useState('fast_food');
+  const [customIndustry, setCustomIndustry] = useState('');
   
   // Form State
   const [storeName, setStoreName] = useState('');
@@ -54,6 +55,12 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
 
   const handleIndustrySelect = (indId) => {
     setSelectedIndustry(indId);
+    if (indId === 'custom') {
+      setPrimaryColor('#f59e0b');
+      setAccentColor('#10b981');
+      setBgDark('#0b0f19');
+      return;
+    }
     const tmpl = STORE_TEMPLATES.find(t => t.id === indId);
     if (tmpl && tmpl.theme) {
       setPrimaryColor(tmpl.theme.primaryColor || '#f59e0b');
@@ -71,13 +78,16 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
       if (!storeName.trim()) throw new Error('Por favor ingresá el nombre del comercio.');
       if (!cleanSlug) throw new Error('Por favor ingresá un slug web válido.');
 
+      const isCustom = selectedIndustry === 'custom';
       const tmpl = STORE_TEMPLATES.find(t => t.id === selectedIndustry) || STORE_TEMPLATES[0];
+      const finalIndustry = isCustom ? (customIndustry.trim() || 'Gastronomía Personal') : selectedIndustry;
+      const finalTagline = tagline.trim() || (isCustom ? (customIndustry.trim() || 'Gastronomía Artesanal') : tmpl.name);
 
       const storePayload = {
         name: storeName.trim(),
         slug: cleanSlug,
-        tagline: tagline.trim() || tmpl.name,
-        industry: selectedIndustry,
+        tagline: finalTagline,
+        industry: finalIndustry,
         theme: {
           primaryColor,
           accentColor,
@@ -265,7 +275,7 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
           {step === 1 && !createdStore && (
             <div>
               <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 12 }}>1. Seleccioná el rubro del local</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: selectedIndustry === 'custom' ? '12px' : '20px' }}>
                 {STORE_TEMPLATES.map(t => (
                   <button
                     key={t.id}
@@ -287,7 +297,59 @@ export default function StoreOnboardingWizard({ isOpen, onClose, onStoreCreated 
                     <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>{t.description}</div>
                   </button>
                 ))}
+
+                {/* Opción Personalizada */}
+                <button
+                  type="button"
+                  onClick={() => handleIndustrySelect('custom')}
+                  style={{
+                    background: selectedIndustry === 'custom' ? 'rgba(245, 158, 11, 0.2)' : '#1e293b',
+                    border: selectedIndustry === 'custom' ? '2px solid #f59e0b' : '1px dashed #64748b',
+                    borderRadius: '12px',
+                    padding: '14px',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#fff',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ fontSize: '1.6rem', marginBottom: '4px' }}>✨</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.95rem', color: selectedIndustry === 'custom' ? '#f59e0b' : '#fff' }}>
+                    Concepto Propio / Personal
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+                    Escribí tu rubro gastronómico libremente
+                  </div>
+                </button>
               </div>
+
+              {selectedIndustry === 'custom' && (
+                <div style={{ marginBottom: 20, padding: '14px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '0.85rem', color: '#f59e0b', fontWeight: 800, marginBottom: '6px' }}>
+                    ✨ ¿Cuál es tu rubro o concepto gastronómico? *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: Trattoria Italiana, Sushi Nikkei, Cafetería de Especialidad, Lomitería, Shawarma..."
+                    value={customIndustry}
+                    onChange={(e) => setCustomIndustry(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      background: '#0e1626',
+                      border: '1px solid #f59e0b',
+                      color: '#fff',
+                      fontSize: '0.95rem',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
+                  />
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#94a3b8', marginTop: 4 }}>
+                    Personalizaremos las categorías iniciales e identidad según lo que definas aquí.
+                  </span>
+                </div>
+              )}
 
               <h3 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 12 }}>2. Nombre e Identidad Web</h3>
               <div style={{ marginBottom: 16 }}>

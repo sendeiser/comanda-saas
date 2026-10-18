@@ -179,7 +179,6 @@ export default function AuditKpisTab({
                 fontWeight: 700,
                 color: selectedShiftId !== 'all' ? 'var(--accent-amber)' : 'var(--text-primary)',
                 borderColor: selectedShiftId !== 'all' ? 'var(--accent-amber)' : 'var(--border-subtle)',
-                background: 'var(--bg-main)',
                 maxWidth: '260px'
               }}
             >

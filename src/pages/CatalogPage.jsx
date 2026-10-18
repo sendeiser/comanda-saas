@@ -237,12 +237,12 @@ function ProductCard({ product, onOpen }) {
           <div className="cat-product-card-desc">{product.description.toUpperCase()}</div>
         )}
         <div className="cat-product-card-price-wrap">
-          <span className="cat-product-card-price">{formatPrice(product.price)}</span>
+          <span className="cat-product-card-price font-data-mono">{formatPrice(product.price)}</span>
           {hasDiscount && (
-            <span className="cat-product-card-original-price">{formatPrice(product.originalPrice)}</span>
+            <span className="cat-product-card-original-price font-data-mono">{formatPrice(product.originalPrice)}</span>
           )}
           {hasDiscount && discountPercent > 0 && (
-            <span className="cat-product-card-discount-tag">-{discountPercent}%</span>
+            <span className="cat-product-card-discount-tag font-data-mono-sm">-{discountPercent}%</span>
           )}
           {isSoldOut ? (
             <span className="cat-product-card-badge" style={{ background: '#ef4444', color: '#fff', fontWeight: 800 }}>
@@ -337,7 +337,7 @@ function UpsellCard({ product, onAdd }) {
       </button>
       <div className="cat-upsell-card-info">
         <div className="cat-upsell-card-name">{product.name}</div>
-        <div className="cat-upsell-card-price">{formatPrice(product.price)}</div>
+        <div className="cat-upsell-card-price font-data-mono">{formatPrice(product.price)}</div>
       </div>
     </div>
   );
@@ -696,6 +696,14 @@ export default function CatalogPage({ initialCashShift }) {
 
   useEffect(() => {
     applyCatalogTheme(activeCatalogThemeId);
+
+    if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined') {
+      const observer = new MutationObserver(() => {
+        applyCatalogTheme(activeCatalogThemeId);
+      });
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      return () => observer.disconnect();
+    }
   }, [activeCatalogThemeId]);
 
   // Pedido activo de mesa para seguimiento en vivo y reordenar
@@ -2197,10 +2205,12 @@ export default function CatalogPage({ initialCashShift }) {
             <span>{isCashOpen ? 'Abierto' : 'Cerrado'}</span>
           </div>
 
-          {/* Center: Retro Brand Typography */}
-          <div className="cat-banner-center-title">
-            {brandBannerTitle}
-          </div>
+          {/* Center: Retro Brand Typography (only if no custom banner image exists) */}
+          {!brandBanner && (
+            <div className="cat-banner-center-title">
+              {brandBannerTitle}
+            </div>
+          )}
         </div>
       </div>
 
@@ -2234,7 +2244,7 @@ export default function CatalogPage({ initialCashShift }) {
             className="cat-store-info-btn"
             onClick={() => setShowInfoModal(true)}
           >
-            <Info size={17} />
+            <Info size={16} />
             <span>Información</span>
           </button>
 
@@ -2283,6 +2293,7 @@ export default function CatalogPage({ initialCashShift }) {
           ) : (
             <button
               type="button"
+              className="cat-store-info-btn"
               onClick={() => {
                 const chosen = window.prompt('¿En qué mesa o ubicación estás sentado? (Ej: 1, 4, Barra)');
                 if (chosen && chosen.trim()) {
@@ -2290,19 +2301,6 @@ export default function CatalogPage({ initialCashShift }) {
                   setServiceType('dine_in');
                   showToast(`🍽️ Asignada ${chosen.trim().toLowerCase().startsWith('mesa') ? chosen.trim() : `Mesa ${chosen.trim()}`}`);
                 }
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-                background: 'var(--cat-surface)',
-                border: '1px solid var(--cat-border-strong)',
-                borderRadius: 20,
-                padding: '5px 12px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                color: 'var(--cat-text-muted)',
-                cursor: 'pointer'
               }}
             >
               <span>🍽️ ¿Estás en el local?</span>
@@ -2639,7 +2637,7 @@ export default function CatalogPage({ initialCashShift }) {
                   )}
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff' }}>{brandName}</h3>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--cat-text, #fff)' }}>{brandName}</h3>
                   <span style={{ fontSize: '0.75rem', color: isCashOpen ? '#22c55e' : '#ef4444', fontWeight: 700 }}>
                     ● {isCashOpen ? 'Abierto ahora' : 'Cerrado ahora'}
                   </span>
@@ -2729,7 +2727,7 @@ export default function CatalogPage({ initialCashShift }) {
         <div className="cat-modal-overlay" onClick={() => setShowCategoriesDrawer(false)}>
           <div className="cat-drawer-sheet" onClick={e => e.stopPropagation()}>
             <div className="cat-drawer-header">
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', color: '#fff' }}>Categorías</h3>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 900, textTransform: 'uppercase', color: 'var(--cat-text, #fff)' }}>Categorías</h3>
               <button 
                 type="button"
                 className="cat-sheet-close-btn"

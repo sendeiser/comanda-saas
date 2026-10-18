@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-background" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>ComandaSaaS - KDS Pantalla de Cocina</title>
+<!-- Fonts: Geist & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with custom configuration -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-lowest": "#ffffff",
+            "secondary": "#5b5e67",
+            "inverse-on-surface": "#f1f1f0",
+            "on-secondary": "#ffffff",
+            "on-surface-variant": "#58423c",
+            "error-container": "#ffdad6",
+            "secondary-fixed-dim": "#c3c6d0",
+            "on-error-container": "#93000a",
+            "background": "#f9f9f8",
+            "on-tertiary-container": "#fefcff",
+            "primary-fixed": "#ffdbd1",
+            "primary-fixed-dim": "#ffb5a0",
+            "secondary-container": "#dfe2ec",
+            "on-primary-fixed-variant": "#862201",
+            "surface-container-high": "#e8e8e7",
+            "outline": "#8b716a",
+            "inverse-primary": "#ffb5a0",
+            "surface-bright": "#f9f9f8",
+            "on-surface": "#1a1c1c",
+            "surface-container-highest": "#e2e2e2",
+            "surface-dim": "#dadad9",
+            "tertiary-container": "#67758e",
+            "on-primary-fixed": "#3b0900",
+            "error": "#ba1a1a",
+            "primary-container": "#c54f2c",
+            "surface-container": "#eeeeed",
+            "secondary-fixed": "#dfe2ec",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed-variant": "#43474f",
+            "surface-tint": "#a73918",
+            "surface-variant": "#e2e2e2",
+            "surface": "#f9f9f8",
+            "primary": "#a43716",
+            "outline-variant": "#dfc0b7",
+            "on-secondary-container": "#61646d",
+            "tertiary-fixed": "#d5e3ff",
+            "on-secondary-fixed": "#181c23",
+            "on-background": "#1a1c1c",
+            "on-primary": "#ffffff",
+            "on-error": "#ffffff",
+            "on-tertiary-fixed": "#0d1c31",
+            "inverse-surface": "#2f3130",
+            "tertiary": "#4f5d75",
+            "surface-container-low": "#f3f4f3",
+            "on-tertiary-fixed-variant": "#39475e",
+            "on-primary-container": "#fffbff",
+            "tertiary-fixed-dim": "#b9c7e3"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "space-sm": "0.5rem",
+            "margin-desktop": "2.5rem",
+            "gutter": "1rem",
+            "space-lg": "1.25rem",
+            "margin-tablet": "1.5rem",
+            "space-md": "0.75rem",
+            "space-2xl": "3rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "gutter-desktop": "1.5rem"
+          },
+          "fontFamily": {
+            "label-caps": ["Geist", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "headline-lg": ["Geist", "sans-serif"],
+            "headline-sm": ["Geist", "sans-serif"],
+            "headline-md": ["Geist", "sans-serif"],
+            "headline-xl-mobile": ["Geist", "sans-serif"],
+            "body-lg": ["Geist", "sans-serif"],
+            "data-mono": ["JetBrains Mono", "monospace"],
+            "headline-xl": ["Geist", "sans-serif"],
+            "display-lg": ["Geist", "sans-serif"],
+            "data-mono-sm": ["JetBrains Mono", "monospace"],
+            "body-sm": ["Geist", "sans-serif"]
+          },
+          "fontSize": {
+            "label-caps": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["1rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "data-mono": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "data-mono-sm": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Touch optimization for kitchen terminals */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="h-full bg-background text-on-surface antialiased flex flex-col items-center justify-start">
+<!-- Mobile Viewport Container capped at 390px (iPhone 14/15 frame) -->
+<main class="w-full max-w-[390px] min-h-screen bg-background flex flex-col relative pb-32">
+<!-- Top Sticky Header -->
+<header class="sticky top-0 z-40 bg-surface-container-lowest border-b border-surface-container-high px-3.5 pt-2.5 pb-2">
+<!-- Row 1: Brand & Sync Status -->
+<div class="flex items-center justify-between gap-2 mb-2">
+<div class="flex items-center space-x-2">
+<div class="w-7 h-7 rounded bg-on-surface flex items-center justify-center text-surface-container-lowest font-headline-sm text-headline-sm font-semibold tracking-tight">
+            C
+          </div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-surface">Comanda KDS</span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary">v2.8</span>
+</div>
+</div>
+</div>
+<!-- Sync SQLite Pill -->
+<div class="flex items-center space-x-1.5 px-2 py-0.5 rounded bg-surface-container-low border border-surface-container-high">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="font-data-mono-sm text-data-mono-sm font-medium text-secondary">SYNC 0ms Local-First</span>
+</div>
+</div>
+<!-- Row 2: Clock & Active Count -->
+<div class="flex items-center justify-between bg-surface-container-low px-3 py-1.5 rounded border border-surface-container-high mb-2">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">schedule</span>
+<span class="font-data-mono text-data-mono font-semibold tracking-tight text-on-surface" id="kitchen-clock">21:38:42</span>
+</div>
+<div class="flex items-center space-x-1">
+<span class="font-label-caps text-label-caps text-secondary uppercase">Activas:</span>
+<span class="font-data-mono text-data-mono font-bold text-primary px-1.5 py-0.2 rounded bg-primary-fixed">8 Comandas</span>
+</div>
+</div>
+<!-- Row 3: Partida Filter Chips (Horizontal Scrollable) -->
+<nav aria-label="Filtrado por estación" class="flex items-center space-x-1.5 overflow-x-auto no-scrollbar pt-0.5">
+<button class="flex items-center space-x-1 px-3 py-1.5 rounded text-primary bg-primary-fixed font-data-mono-sm text-data-mono-sm font-semibold whitespace-nowrap active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[15px]">table_restaurant</span>
+<span>Todas (8)</span>
+</button>
+<button class="flex items-center space-x-1 px-2.5 py-1.5 rounded text-secondary hover:bg-surface-container-low font-data-mono-sm text-data-mono-sm whitespace-nowrap active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[15px]">outdoor_grill</span>
+<span>Plancha (4)</span>
+</button>
+<button class="flex items-center space-x-1 px-2.5 py-1.5 rounded text-secondary hover:bg-surface-container-low font-data-mono-sm text-data-mono-sm whitespace-nowrap active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[15px]">skillet</span>
+<span>Freidora (3)</span>
+</button>
+<button class="flex items-center space-x-1 px-2.5 py-1.5 rounded text-secondary hover:bg-surface-container-low font-data-mono-sm text-data-mono-sm whitespace-nowrap active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[15px]">lunch_dining</span>
+<span>Armado (1)</span>
+</button>
+</nav>
+</header>
+<!-- Kitchen Orders Stack -->
+<section aria-label="Pila de tickets de cocina" class="flex flex-col p-3 space-y-3">
+<!-- TICKET #1042 (Normal / On Time) -->
+<article class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-3 flex flex-col shadow-none">
+<!-- Ticket Header -->
+<header class="flex items-start justify-between border-b border-surface-container-high pb-2.5">
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-data-mono text-[1.05rem] font-bold text-on-surface">#1042</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-caps text-label-caps font-semibold text-on-surface">SALÓN · MESA 04</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">Mozo: Lucas G. · <span class="font-data-mono-sm text-data-mono-sm">21:32</span></p>
+</div>
+<!-- Timer Pill -->
+<div class="flex flex-col items-end">
+<span class="font-data-mono text-[1.15rem] font-bold text-emerald-700">06:14</span>
+<span class="px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-800 font-label-caps text-label-caps uppercase">A tiempo</span>
+</div>
+</header>
+<!-- Ticket Items -->
+<div class="py-2.5 space-y-2">
+<!-- Item 1 (Done) -->
+<label class="flex items-start space-x-3 p-2 rounded bg-surface-container-low cursor-pointer active:bg-surface-container transition-colors">
+<input checked="" class="mt-1 w-5 h-5 rounded border-surface-container-highest text-on-surface focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-sm text-[0.95rem] font-semibold text-on-surface line-through decoration-secondary/50 text-secondary">
+                  2x Doble Cheese Burger
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary px-1.5 py-0.2 rounded bg-surface-container-highest">PLANCHA</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5 font-normal">
+                Punto: Jugoso, <strong class="text-error font-medium">SIN cebolla</strong>, doble cheddar fundido.
+              </p>
+</div>
+</label>
+<!-- Item 2 (Pending) -->
+<label class="flex items-start space-x-3 p-2 rounded bg-surface-container-lowest border border-surface-container-high cursor-pointer active:bg-surface-container-low transition-colors">
+<input class="mt-1 w-5 h-5 rounded border-surface-container-highest text-on-surface focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-sm text-[0.95rem] font-semibold text-on-surface">
+                  1x Papas Trufadas
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary px-1.5 py-0.2 rounded bg-surface-container-low border border-surface-container-high">FREIDORA</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">
+                Dip alioli aparte.
+              </p>
+</div>
+</label>
+</div>
+<!-- Ticket Footer Button -->
+<footer class="pt-1">
+<button class="w-full h-11 bg-primary hover:bg-[#862201] active:scale-[0.98] transition-all text-on-primary font-body-md font-medium rounded flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span>Despachar Comanda</span>
+<span class="font-data-mono-sm text-data-mono-sm bg-black/20 px-1.5 py-0.5 rounded text-white">[F1]</span>
+</button>
+</footer>
+</article>
+<!-- TICKET #1043 (Medium Delay / Warning) -->
+<article class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-3 flex flex-col shadow-none">
+<!-- Ticket Header -->
+<header class="flex items-start justify-between border-b border-surface-container-high pb-2.5">
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-data-mono text-[1.05rem] font-bold text-on-surface">#1043</span>
+<span class="px-2 py-0.5 rounded bg-surface-container font-label-caps text-label-caps font-semibold text-on-surface">SALÓN · MESA 08</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">Mozo: Facundo · <span class="font-data-mono-sm text-data-mono-sm">21:24</span></p>
+</div>
+<!-- Timer Pill -->
+<div class="flex flex-col items-end">
+<span class="font-data-mono text-[1.15rem] font-bold text-amber-700">14:20</span>
+<span class="px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-800 font-label-caps text-label-caps uppercase">Demora Media · 14m</span>
+</div>
+</header>
+<!-- Ticket Items -->
+<div class="py-2.5 space-y-2">
+<!-- Item 1 (Pending) -->
+<label class="flex items-start space-x-3 p-2 rounded bg-surface-container-lowest border border-surface-container-high cursor-pointer active:bg-surface-container-low transition-colors">
+<input class="mt-1 w-5 h-5 rounded border-surface-container-highest text-on-surface focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-sm text-[0.95rem] font-semibold text-on-surface">
+                  1x Smash Burger Simple
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary px-1.5 py-0.2 rounded bg-surface-container-low border border-surface-container-high">PLANCHA</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">
+                Cebolla crispy, salsa especial.
+              </p>
+</div>
+</label>
+<!-- Item 2 (Checked) -->
+<label class="flex items-start space-x-3 p-2 rounded bg-surface-container-low cursor-pointer active:bg-surface-container transition-colors">
+<input checked="" class="mt-1 w-5 h-5 rounded border-surface-container-highest text-on-surface focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-sm text-[0.95rem] font-semibold text-on-surface line-through text-secondary">
+                  1x Bacon Crispy Doble
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary px-1.5 py-0.2 rounded bg-surface-container-highest">ARMADO</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">
+                Extra crocante, pan de papa tostado.
+              </p>
+</div>
+</label>
+</div>
+<!-- Ticket Split Footer Buttons -->
+<footer class="pt-1 grid grid-cols-2 gap-2">
+<button class="h-10 bg-on-surface text-surface-container-lowest hover:bg-black active:scale-[0.98] transition-all font-body-sm font-medium rounded flex items-center justify-center space-x-1.5">
+<span class="material-symbols-outlined text-[18px]">forward</span>
+<span>Avanzar Embalaje</span>
+</button>
+<button class="h-10 bg-transparent border border-surface-container-high hover:bg-surface-container-low active:scale-[0.98] transition-all text-on-surface font-body-sm font-medium rounded flex items-center justify-center space-x-1.5">
+<span class="material-symbols-outlined text-[18px]">notifications_active</span>
+<span>Avisar Mozo</span>
+</button>
+</footer>
+</article>
+<!-- TICKET #1044 (Critical SLA / Red Urgent) -->
+<article class="bg-surface-container-lowest rounded-xl border-2 border-error/70 p-3 flex flex-col shadow-sm">
+<!-- Ticket Header with Warning accent -->
+<header class="flex items-start justify-between border-b border-surface-container-high pb-2.5">
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-data-mono text-[1.05rem] font-bold text-error">#1044</span>
+<span class="px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-caps text-label-caps font-semibold">DELIVERY #24</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5 flex items-center gap-1">
+<span>Pedido WhatsApp</span>
+<span>·</span>
+<span class="font-data-mono-sm text-data-mono-sm">21:16</span>
+</p>
+</div>
+<!-- Critical SLA Timer -->
+<div class="flex flex-col items-end">
+<span class="font-data-mono text-[1.15rem] font-bold text-error animate-pulse">22:45</span>
+<span class="px-1.5 py-0.5 rounded bg-error text-on-error font-label-caps text-label-caps uppercase font-bold tracking-wider">SLA Vencido · Urgente</span>
+</div>
+</header>
+<!-- Ticket Items -->
+<div class="py-2.5 space-y-2">
+<!-- Item 1 (Urgent pending) -->
+<label class="flex items-start space-x-3 p-2 rounded bg-error-container/20 border border-error/30 cursor-pointer active:bg-error-container/30 transition-colors">
+<input class="mt-1 w-5 h-5 rounded border-error text-error focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-sm text-[0.95rem] font-semibold text-on-surface">
+                  3x Hamburguesa Clásica
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-error font-semibold px-1.5 py-0.2 rounded bg-error-container">PLANCHA</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">
+                Carne 120g, queso americano, aderezo de la casa.
+              </p>
+</div>
+</label>
+<!-- Item 2 (Urgent pending) -->
+<label class="flex items-start space-x-3 p-2 rounded bg-error-container/20 border border-error/30 cursor-pointer active:bg-error-container/30 transition-colors">
+<input class="mt-1 w-5 h-5 rounded border-error text-error focus:ring-0 cursor-pointer" type="checkbox"/>
+<div class="flex-1">
+<div class="flex items-baseline justify-between">
+<span class="font-headline-sm text-[0.95rem] font-semibold text-on-surface">
+                  2x Porción Papas Rústicas
+                </span>
+<span class="font-data-mono-sm text-data-mono-sm text-error font-semibold px-1.5 py-0.2 rounded bg-error-container">FREIDORA</span>
+</div>
+<p class="font-body-sm text-body-sm text-secondary mt-0.5">
+                Cheddar caliente abundante.
+              </p>
+</div>
+</label>
+</div>
+<!-- Ticket Urgent Action Button -->
+<footer class="pt-1">
+<button class="w-full h-11 bg-error hover:bg-[#93000a] active:scale-[0.98] transition-all text-on-error font-body-md font-semibold rounded flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+<span>Priorizar Despacho Inmediato</span>
+</button>
+</footer>
+</article>
+</section>
+<!-- Bottom Sticky Bar: En Fuego & Master Dispatch Quick Control -->
+<footer class="fixed bottom-0 left-0 right-0 max-w-[390px] mx-auto z-50 bg-surface-container-lowest border-t border-surface-container-high px-3 py-2 flex flex-col space-y-1.5 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+<!-- Consolidated Real-Time Kitchen Production Ribbon -->
+<div class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded border border-surface-container-high">
+<div class="flex items-center space-x-1.5 overflow-hidden">
+<span class="text-primary font-bold text-sm">🔥</span>
+<span class="font-label-caps text-label-caps font-semibold text-primary uppercase whitespace-nowrap">En Fuego:</span>
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface truncate">
+            5x Doble Cheese · 4x Papas · 3x Clásicas
+          </span>
+</div>
+</div>
+<!-- Quick Action Toolbar -->
+<div class="flex items-center justify-between space-x-2">
+<!-- Sound Alert Status -->
+<button class="flex-1 h-9 px-2 rounded bg-surface-container-lowest border border-surface-container-high text-on-surface flex items-center justify-center space-x-1.5 text-body-sm font-medium hover:bg-surface-container-low active:scale-[0.98] transition-all" id="buzzer-toggle">
+<span class="material-symbols-outlined text-primary text-[18px]">volume_up</span>
+<span class="font-data-mono-sm text-data-mono-sm">Alerta Activa</span>
+</button>
+<!-- Quick Filters Preset -->
+<button class="flex-1 h-9 px-2 rounded bg-surface-container-lowest border border-surface-container-high text-on-surface flex items-center justify-center space-x-1.5 text-body-sm font-medium hover:bg-surface-container-low active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-secondary text-[18px]">tune</span>
+<span class="font-data-mono-sm text-data-mono-sm">Filtros Rápidos</span>
+</button>
+<!-- Quick Recall Button -->
+<button class="w-9 h-9 rounded bg-surface-container-lowest border border-surface-container-high text-secondary flex items-center justify-center hover:bg-surface-container-low active:scale-[0.98] transition-all" title="Comandas Despachadas">
+<span class="material-symbols-outlined text-[18px]">history</span>
+</button>
+</div>
+</footer>
+</main>
+<!-- Live Clock Script -->
+<script>
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const clockElement = document.getElementById('kitchen-clock');
+      if (clockElement) {
+        clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Micro-interaction for buzzer
+    const buzzerBtn = document.getElementById('buzzer-toggle');
+    if (buzzerBtn) {
+      buzzerBtn.addEventListener('click', () => {
+        const icon = buzzerBtn.querySelector('.material-symbols-outlined');
+        const text = buzzerBtn.querySelector('span:last-child');
+        if (icon.textContent === 'volume_up') {
+          icon.textContent = 'volume_off';
+          icon.classList.remove('text-primary');
+          icon.classList.add('text-secondary');
+          text.textContent = 'Silenciado';
+        } else {
+          icon.textContent = 'volume_up';
+          icon.classList.add('text-primary');
+          icon.classList.remove('text-secondary');
+          text.textContent = 'Alerta Activa';
+        }
+      });
+    }
+  </script>
+</body></html>

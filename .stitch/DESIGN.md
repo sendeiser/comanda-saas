@@ -42,17 +42,22 @@ Sistema de diseño unificado generado y sincronizado a través del MCP de Google
 
 ---
 
-## 2. Pantallas Generadas en Google Stitch
+## 2. Pantallas Rediseñadas en Google Stitch (100% Cobertura Desktop & Mobile)
 
-| Vista / Pantalla | Dispositivo | Screen ID en Stitch | Archivos en `.stitch/designs/` |
-|---|---|---|---|
-| **Landing Page Principal** | Desktop | `60e82055e425437680dbef02eae4dafd` | `landing-minimalista-desktop.html` / `.png` |
-| **Landing Page Mobile** | Mobile | `4af888e00062482cbe3579cc590ce467` | `landing-minimalista-mobile.html` / `.png` |
-| **Terminal POS Táctil** | Desktop | `e3636961295b47e9b3825ec8e0cb4fa4` | `pos-terminal-desktop.html` / `.png` |
-| **Comandero Móvil de Mozo** | Mobile | `add1e5077f10423aa3a521dc6b26dc12` | `waiter-pos-mobile.html` / `.png` |
-| **KDS Pantalla de Cocina** | Desktop | `5fef9d5d92824fe4b0a08af0f2b77783` | `kds-screen-desktop.html` / `.png` |
-| **Carta Digital QR & Pedidos** | Mobile | `3c306334f63c455d96a7b300fdd25a53` | `catalog-screen-mobile.html` / `.png` |
-| **Portal SaaS & Red Multilocal** | Desktop | `35096408e88c44e58301cb6adf0801ee` | `saas-admin-desktop.html` / `.png` |
+| Módulo / Ruta | Dispositivo | Screen ID en Stitch | Archivos en `.stitch/designs/` | Captura Playwright Original |
+|---|---|---|---|---|
+| **Landing Page Principal** (`/`) | Desktop | `60e82055e425437680dbef02eae4dafd` | `landing-minimalista-desktop.html` / `.png` | `.stitch/crawler-screenshots/landing-desktop.png` |
+| **Landing Page Mobile** (`/`) | Mobile | `4af888e00062482cbe3579cc590ce467` | `landing-minimalista-mobile.html` / `.png` | `.stitch/crawler-screenshots/landing-mobile.png` |
+| **Terminal POS Táctil** (`/#pos`) | Desktop | `e3636961295b47e9b3825ec8e0cb4fa4` | `pos-terminal-desktop.html` / `.png` | `.stitch/crawler-screenshots/pos-terminal-desktop.png` |
+| **Comandero Móvil de Mozo** (`/#pos`) | Mobile | `add1e5077f10423aa3a521dc6b26dc12` | `waiter-pos-mobile.html` / `.png` | `.stitch/crawler-screenshots/pos-terminal-mobile.png` |
+| **KDS Pantalla de Cocina** (`/#cocina`) | Desktop | `5fef9d5d92824fe4b0a08af0f2b77783` | `kds-screen-desktop.html` / `.png` | `.stitch/crawler-screenshots/kitchen-kds-desktop.png` |
+| **KDS Pantalla de Cocina** (`/#cocina`) | Mobile | `202727b044a0452b983a63e2c6c8c13d` | `kds-screen-mobile.html` / `.png` | `.stitch/crawler-screenshots/kitchen-kds-mobile.png` |
+| **Carta Digital QR Clientes** (`/#catalog`) | Desktop | `ab03bf23292f44668113595a8ccca5f2` | `catalog-screen-desktop.html` / `.png` | `.stitch/crawler-screenshots/public-catalog-desktop.png` |
+| **Carta Digital QR Clientes** (`/#catalog`) | Mobile | `3c306334f63c455d96a7b300fdd25a53` | `catalog-screen-mobile.html` / `.png` | `.stitch/crawler-screenshots/public-catalog-mobile.png` |
+| **Portal SaaS & Red Multilocal** (`/#saas`) | Desktop | `35096408e88c44e58301cb6adf0801ee` | `saas-admin-desktop.html` / `.png` | `.stitch/crawler-screenshots/saas-admin-desktop.png` |
+| **Portal SaaS & Red Multilocal** (`/#saas`) | Mobile | `14b0725d6cb841269071cc3c1ee11898` | `saas-admin-mobile.html` / `.png` | `.stitch/crawler-screenshots/saas-admin-mobile.png` |
+| **Portal Auditoría de Dueño** (`/#dueno`) | Desktop | `422c41af9e944a4c97ccc8848321d1ee` | `owner-audit-desktop.html` / `.png` | `.stitch/crawler-screenshots/owner-audit-desktop.png` |
+| **Portal Auditoría de Dueño** (`/#dueno`) | Mobile | `e3285cfc10294d2291b102852dbba537` | `owner-audit-mobile.html` / `.png` | `.stitch/crawler-screenshots/owner-audit-mobile.png` |
 
 ---
 

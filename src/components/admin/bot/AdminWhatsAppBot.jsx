@@ -4,8 +4,8 @@ import {
   Smartphone, CheckCircle2, Save, RotateCcw, Plus, 
   Trash2, Copy, Check, Info, Zap, AlertCircle, RefreshCw,
   Power, Wifi, WifiOff, ExternalLink, Clock, UserCheck, MessageSquare, Store,
-  Timer, Play, Gauge, ChevronLeft, ChevronRight, FileText, GitBranch, Variable,
-  ChefHat, Sliders, Shield, ShoppingBag, ArrowRight, Cpu
+  Timer, Play, Gauge, ChevronLeft, ChevronRight, FileText, Variable, GitBranch,
+  Sliders, Shield, ShoppingBag, ArrowRight
 } from 'lucide-react';
 import AdminBotFlowsTab from './AdminBotFlowsTab';
 import AdminBotVariablesTab from './AdminBotVariablesTab';
@@ -143,11 +143,6 @@ export default function AdminWhatsAppBot({ initialTab }) {
   const [aiTestResult, setAiTestResult] = useState(null);
   const [showGroqKey, setShowGroqKey] = useState(false);
 
-  // Update State (GitHub Repo OTA)
-  const [updateInfo, setUpdateInfo] = useState(null);
-  const [checkingUpdate, setCheckingUpdate] = useState(false);
-  const [applyingUpdate, setApplyingUpdate] = useState(false);
-  const [updateStatusMsg, setUpdateStatusMsg] = useState(null);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
   const [showDeepSeekKey, setShowDeepSeekKey] = useState(false);
   const [aiSavedSuccess, setAiSavedSuccess] = useState(false);
@@ -772,178 +767,6 @@ endlocal
     URL.revokeObjectURL(url);
   };
 
-  const handleDownloadAllScript = () => {
-    const batContent = `@echo off
-chcp 65001 > nul
-title ComandaFast - Lanzador Completo (Sistema + Bot)
-color 0E
-cls
-
-echo =====================================================================
-echo    [COMANDAFAST BURGERS] - LANZADOR COMPLETO (SISTEMA + BOT)
-echo =====================================================================
-echo.
-echo Este script iniciara:
-echo   1. Servidor del Bot de WhatsApp (Puerto 3002)
-echo   2. Servidor Web POS / Cocina / Auditoria de Dueno (Vite)
-echo   3. Apertura automatica del navegador en el panel administrativo
-echo.
-echo =====================================================================
-echo.
-pause
-
-cd /d "%~dp0"
-
-echo.
-echo [1/3] Lanzando Servidor WhatsApp Bot en ventana separada...
-start "ComandaFast - WhatsApp Bot" cmd /c "INICIAR_BOT_WHATSAPP.bat"
-
-timeout /t 2 /nobreak >nul
-
-echo [2/3] Abriendo navegador en el Portal del Dueno & Chatbot...
-start http://localhost:5174/#dueno
-
-echo [3/3] Iniciando Servidor Web (Vite)...
-echo.
-echo (Para cerrar todo cuando termines, simplemente cerra estas consolas)
-echo =====================================================================
-echo.
-
-call npm run dev
-`;
-    const blob = new Blob([batContent], { type: 'application/x-bat;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'INICIAR_SISTEMA_COMPLETO.bat';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleDownloadUpdateScript = () => {
-    const batContent = `@echo off
-chcp 65001 > nul
-title ComandaFast - Actualizador de Bot WhatsApp desde GitHub
-color 0A
-cls
-
-echo =====================================================================
-echo    🍔 [COMANDAFAST BURGERS] - ACTUALIZADOR DE BOT WHATSAPP
-echo    Descarga las ultimas mejoras, correcciones y funciones desde GitHub
-echo =====================================================================
-echo.
-
-cd /d "%~dp0"
-
-where node >nul 2>nul
-if %errorlevel% neq 0 (
-    color 0C
-    echo [ERROR] Node.js no esta instalado o no se encuentra en el PATH.
-    echo Por favor descarga e instala Node.js desde: https://nodejs.org/
-    echo.
-    pause
-    exit /b 1
-)
-
-node server/botUpdateService.js update
-
-echo.
-echo =====================================================================
-echo    Proceso de actualizacion finalizado.
-echo =====================================================================
-echo.
-pause
-`.replace(/\r?\n/g, '\r\n');
-
-    const blob = new Blob([batContent], { type: 'application/x-bat;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ACTUALIZAR_BOT.bat';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const handleCheckUpdate = useCallback(async () => {
-    setCheckingUpdate(true);
-    try {
-      if (BOT_SERVER_URL) {
-        const res = await fetch(`${BOT_SERVER_URL}/api/bot/update/check`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success) {
-            setUpdateInfo(data);
-            if (data.hasUpdate) {
-              setUpdateStatusMsg({ type: 'warning', text: '¡Hay una nueva actualización disponible en GitHub!' });
-            } else {
-              setUpdateStatusMsg({ type: 'success', text: 'El bot está actualizado con la última versión de GitHub.' });
-            }
-            return;
-          }
-        }
-      }
-      
-      // Fallback directo a GitHub si el microservicio local aún no responde
-      const ghRes = await fetch('https://api.github.com/repos/sendeiser/ComandaFastBurga/commits/main');
-      if (ghRes.ok) {
-        const commit = await ghRes.json();
-        setUpdateInfo({
-          remoteCommit: commit.sha ? commit.sha.substring(0, 7) : 'N/A',
-          remoteMessage: commit.commit?.message?.split('\n')[0] || '',
-          remoteDate: commit.commit?.author?.date || null,
-          remoteAuthor: commit.commit?.author?.name || 'GitHub',
-          localCommit: 'Inicia el bot para ver versión local',
-          hasUpdate: null
-        });
-        setUpdateStatusMsg({ type: 'info', text: 'Último commit en GitHub consultado. Inicia el servidor del bot para ver versión local y sincronizar.' });
-      }
-    } catch (err) {
-      console.warn('[AdminWhatsAppBot] Error checking updates:', err);
-      setUpdateStatusMsg({ type: 'error', text: `No se pudo verificar: ${err.message}` });
-    } finally {
-      setCheckingUpdate(false);
-    }
-  }, []);
-
-  const handleApplyUpdate = async () => {
-    if (!window.confirm('¿Deseas descargar e instalar la última versión del Bot desde GitHub?\n\nTu sesión de WhatsApp y tus productos se mantendrán guardados.')) {
-      return;
-    }
-    setApplyingUpdate(true);
-    setUpdateStatusMsg({ type: 'info', text: 'Descargando e instalando actualización...' });
-    try {
-      if (BOT_SERVER_URL) {
-        const res = await fetch(`${BOT_SERVER_URL}/api/bot/update/apply`, { method: 'POST' });
-        const data = await res.json();
-        if (data.success) {
-          setUpdateStatusMsg({ 
-            type: 'success', 
-            text: `¡Actualización completada con éxito! ${data.message} ${data.requiresRestart ? '(El servidor se reiniciará automáticamente)' : ''}` 
-          });
-          setTimeout(handleCheckUpdate, 4000);
-        } else {
-          setUpdateStatusMsg({ type: 'error', text: `Error: ${data.error || data.message}` });
-        }
-      } else {
-        setUpdateStatusMsg({ type: 'error', text: 'El servidor local del Bot no está conectado en el puerto 3002.' });
-      }
-    } catch (err) {
-      setUpdateStatusMsg({ type: 'error', text: `Error de comunicación: ${err.message}` });
-    } finally {
-      setApplyingUpdate(false);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === 'connection' && serverOnline) {
-      handleCheckUpdate();
-    }
-  }, [activeTab, serverOnline, handleCheckUpdate]);
-
   const handleStartBot = async () => {
     setLoadingAction(true);
     try {
@@ -1086,11 +909,11 @@ pause
     },
     {
       id: 'ai',
-      label: 'IA Gemini',
+      label: 'IA Groq Cloud',
       icon: Sparkles,
       color: '#a855f7',
       badge: aiConfig.enabled ? (
-        <span className="bot-tab-badge purple">Gemini</span>
+        <span className="bot-tab-badge purple">Groq</span>
       ) : null
     },
     {
@@ -1121,17 +944,6 @@ pause
       icon: ShieldCheck,
       color: '#ea580c',
       badge: null
-    },
-    {
-      id: 'tester',
-      label: '🧪 Laboratorio Web',
-      icon: Terminal,
-      color: '#10b981',
-      badge: (
-        <span className="bot-tab-badge emerald">
-          Link Aparte
-        </span>
-      )
     }
   ];
 
@@ -1185,34 +997,6 @@ pause
         >
           <ChevronRight size={16} />
         </button>
-
-        {/* Botón Laboratorio en Link Aparte */}
-        <a
-          href={SIMULATOR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            padding: '0.35rem 0.85rem',
-            borderRadius: '9999px',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2))',
-            border: '1px solid rgba(16, 185, 129, 0.45)',
-            color: '#10b981',
-            fontSize: '0.8rem',
-            fontWeight: 700,
-            textDecoration: 'none',
-            whiteSpace: 'nowrap',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-            transition: 'all 0.2s ease',
-            marginLeft: 'auto'
-          }}
-          title="Abrir Laboratorio de Pruebas en pestaña aparte"
-        >
-          <ExternalLink size={13} />
-          <span>🧪 Abrir Laboratorio</span>
-        </a>
 
         {/* Global Save Indicator */}
         {saveSuccess && (
@@ -3016,7 +2800,7 @@ pause
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <h3 style={{ fontSize: '1.1rem', fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>
-                    Asistente Inteligente Multi-IA (Groq + Gemini + DeepSeek)
+                    Asistente Inteligente Groq Cloud (Exclusivo)
                   </h3>
                   <span style={{
                     fontSize: '0.7rem',
@@ -3083,8 +2867,8 @@ pause
                   className="search-input"
                   style={{ width: '100%', height: '36px', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}
                 >
-                  <option value="cascade">⚡ Cascada Inteligente (Groq ➔ Gemini ➔ DeepSeek con Auto-Failover)</option>
-                  <option value="only_groq">🚀 Solo Groq Cloud (Llama 3.3 70B - Ultrarrápido y Gratis)</option>
+                  <option value="only_groq">⚡ Solo Groq Cloud (Exclusivo - Ultrarrápido y Gratis)</option>
+                  <option value="cascade">🛡️ Cascada Inteligente (Groq ➔ Gemini ➔ DeepSeek con Auto-Failover)</option>
                   <option value="only_gemini">🔮 Solo Google Gemini (2.0 Flash - Gratis)</option>
                   <option value="only_deepseek">🧠 Solo DeepSeek (V3 / Chat - Económico)</option>
                 </select>
@@ -3903,113 +3687,7 @@ pause
                 </div>
               </div>
 
-              {/* CARD 2: EXPLICACION DE FUNCIONALIDADES (4 PILARES EN GRID) */}
-              <div style={{
-                background: 'var(--bg-main)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1.15rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.85rem'
-              }}>
-                <div style={{ fontSize: '0.92rem', fontWeight: 900, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Bot size={18} style={{ color: 'var(--accent-blue)' }} />
-                  <span>¿Qué hace el Bot de WhatsApp? (Capacidades del Sistema)</span>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
-                  
-                  {/* PILAR 1: MOTOR DUAL */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Cpu size={16} style={{ color: '#25D366' }} />
-                      <span>1. Motor Dual (Baileys QR y Python)</span>
-                    </div>
-                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.45 }}>
-                      • <strong>Baileys (WebSockets Oficial):</strong> Conecta tu WhatsApp como dispositivo vinculado. Cero costo por mensaje y sin suscripciones a APIs pagas.<br />
-                      • <strong>Python Engine:</strong> Simulador en consola interactiva (<code>-i</code>) y microservicio para webhooks de Meta Cloud API o Evolution API.
-                    </p>
-                  </div>
-
-                  {/* PILAR 2: NOTIFICACIONES KDS */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <ChefHat size={16} style={{ color: 'var(--accent-amber)' }} />
-                      <span>2. Notificaciones de Cocina (KDS) en Vivo</span>
-                    </div>
-                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.45 }}>
-                      Cuando los cocineros o la cajera cambian el estado en pantalla, el bot notifica automáticamente al cliente:<br />
-                      • 👨‍🍳 <strong>En Plancha:</strong> Avisa que se está cocinando.<br />
-                      • 🔔 <strong>Listo:</strong> Avisa que puede retirar por el mostrador.<br />
-                      • 🛵 <strong>En Camino:</strong> Notifica la salida del cadete a su dirección.
-                    </p>
-                  </div>
-
-                  {/* PILAR 3: MODO HUMANO & ANTI-BAN */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Shield size={16} style={{ color: 'var(--accent-emerald)' }} />
-                      <span>3. Blindaje Anti-Spam y Modo Humano</span>
-                    </div>
-                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.45 }}>
-                      • <strong>Tipeo Humano Dinámico:</strong> Simula "Escribiendo..." durante 1.5 a 3.0s para evitar ser detectado como spam.<br />
-                      • <strong>Filtro Anti-Bucle:</strong> Detecta "gracias", "dale", "ok" y emojis sin reiniciar el menú.<br />
-                      • <strong>Pausa de 25 min:</strong> Si respondés desde el celular, el bot se calla en ese chat para permitir atención humana.
-                    </p>
-                  </div>
-
-                  {/* PILAR 4: COMANDOS POR CHAT */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Terminal size={16} style={{ color: 'var(--accent-blue)' }} />
-                      <span>4. Comandos de Dueño por Chat</span>
-                    </div>
-                    <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.45 }}>
-                      Enviá estos comandos directos desde el WhatsApp del local:<br />
-                      • <code>#agotados</code>: Ver lista de productos sin stock.<br />
-                      • <code>#agotado [nombre]</code>: Desactivar producto al instante.<br />
-                      • <code>#activar [nombre]</code>: Volver a activar producto.<br />
-                      • <code>#stock [nombre] [cant]</code>: Modificar stock.<br />
-                      • <code>#actualizar</code>: Descargar mejoras desde GitHub OTA.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 3: PASOS PARA CONECTAR (1 - 2 - 3) */}
+              {/* CARD 2: PASOS PARA CONECTAR (1 - 2 - 3) */}
               <div style={{
                 background: 'var(--bg-main)',
                 border: '1px solid var(--border-subtle)',
@@ -4031,292 +3709,7 @@ pause
                 </div>
               </div>
 
-              {/* CARD 4: DESCARGA DE SCRIPTS DE EJECUCION LOCAL (.BAT) */}
-              <div style={{
-                background: 'var(--bg-main)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1.15rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.75rem'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Download size={17} style={{ color: 'var(--accent-emerald)' }} />
-                    <span>Lanzadores y Scripts para Windows</span>
-                  </div>
-                  <span style={{ fontSize: '0.7rem', background: 'rgba(37, 211, 102, 0.15)', color: '#25D366', padding: '2px 8px', borderRadius: '4px', fontWeight: 800 }}>
-                    100% Compatibles
-                  </span>
-                </div>
-                
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                  Archivos <strong>.bat</strong> sin caracteres incompatibles, con menú interactivo [1-5], detección de Node.js/Python y selector multi-comercio:
-                </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginTop: '2px' }}>
-                  {/* SCRIPT 1 */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Smartphone size={15} style={{ color: '#25D366' }} />
-                      <span>iniciar_bot.bat</span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      Lanzador unificado con selector Baileys QR, Reset, Python y Multi-Comercio.
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleDownloadBotScript}
-                      className="cat-pill-btn active"
-                      style={{
-                        marginTop: '6px',
-                        height: '32px',
-                        fontSize: '0.75rem',
-                        gap: '6px',
-                        justifyContent: 'center',
-                        background: '#25D366',
-                        color: '#052e16',
-                        fontWeight: 800
-                      }}
-                    >
-                      <Download size={13} />
-                      <span>Descargar iniciar_bot.bat</span>
-                    </button>
-                  </div>
-
-                  {/* SCRIPT 2 */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Zap size={15} style={{ color: 'var(--accent-amber)' }} />
-                      <span>Sistema Completo</span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      Inicia Bot Baileys + Servidor Web Vite + Abre el navegador en 1 clic.
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleDownloadAllScript}
-                      className="cat-pill-btn"
-                      style={{
-                        marginTop: '6px',
-                        height: '32px',
-                        fontSize: '0.75rem',
-                        gap: '6px',
-                        justifyContent: 'center',
-                        background: 'rgba(245, 158, 11, 0.15)',
-                        color: 'var(--accent-amber)',
-                        border: '1px solid var(--accent-amber)',
-                        fontWeight: 800
-                      }}
-                    >
-                      <Download size={13} />
-                      <span>Descargar SISTEMA_COMPLETO.bat</span>
-                    </button>
-                  </div>
-
-                  {/* SCRIPT 3 */}
-                  <div style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid var(--border-subtle)',
-                    borderRadius: 'var(--radius-md)',
-                    padding: '0.85rem',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '6px'
-                  }}>
-                    <div style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <GitBranch size={15} style={{ color: 'var(--accent-blue)' }} />
-                      <span>Actualizador OTA</span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      Descarga mejoras de GitHub manteniendo sesiones de WhatsApp y menú.
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleDownloadUpdateScript}
-                      className="cat-pill-btn"
-                      style={{
-                        marginTop: '6px',
-                        height: '32px',
-                        fontSize: '0.75rem',
-                        gap: '6px',
-                        justifyContent: 'center',
-                        background: 'rgba(59, 130, 246, 0.15)',
-                        color: 'var(--accent-blue)',
-                        border: '1px solid var(--accent-blue)',
-                        fontWeight: 800
-                      }}
-                    >
-                      <Download size={13} />
-                      <span>Descargar ACTUALIZAR_BOT.bat</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 5: ACTUALIZACIONES DESDE GITHUB (OTA) */}
-              <div style={{
-                background: 'var(--bg-main)',
-                border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-md)',
-                padding: '1.15rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.85rem'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <GitBranch size={17} style={{ color: 'var(--accent-blue)' }} />
-                    <span>Actualizaciones del Bot desde GitHub (OTA)</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <button
-                      type="button"
-                      disabled={checkingUpdate || applyingUpdate}
-                      onClick={handleCheckUpdate}
-                      className="cat-pill-btn"
-                      style={{
-                        height: '28px',
-                        padding: '0 0.75rem',
-                        fontSize: '0.72rem',
-                        gap: '5px',
-                        background: 'rgba(59, 130, 246, 0.12)',
-                        color: 'var(--accent-blue)',
-                        border: '1px solid rgba(59, 130, 246, 0.3)',
-                        fontWeight: 700
-                      }}
-                    >
-                      <RefreshCw size={12} className={checkingUpdate ? 'spin-slow' : ''} />
-                      <span>{checkingUpdate ? 'Buscando...' : 'Buscar Actualizaciones'}</span>
-                    </button>
-                  </div>
-                </div>
-
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
-                  Cuando existan nuevas versiones en GitHub, podés sincronizar el Bot directamente desde este panel o ejecutando <strong>ACTUALIZAR_BOT.bat</strong>. Tus sesiones activas de WhatsApp (QR) y tus productos no se pierden.
-                </p>
-
-                {/* COMMIT / VERSION DETAILS */}
-                <div style={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '0.75rem 1rem',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                  gap: '0.75rem',
-                  fontSize: '0.75rem'
-                }}>
-                  <div>
-                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Versión Local Instalada:</span>
-                    <strong style={{ color: 'var(--text-primary)', fontFamily: 'monospace', fontSize: '0.82rem' }}>
-                      {updateInfo?.localCommit || (serverOnline ? 'Detectando...' : 'Servidor apagado')}
-                    </strong>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--text-muted)', display: 'block' }}>Última Versión en GitHub:</span>
-                    <strong style={{ color: 'var(--accent-blue)', fontFamily: 'monospace', fontSize: '0.82rem' }}>
-                      {updateInfo?.remoteCommit || 'Consultar GitHub'}
-                    </strong>
-                  </div>
-                  {updateInfo?.remoteDate && (
-                    <div>
-                      <span style={{ color: 'var(--text-muted)', display: 'block' }}>Fecha de última mejora:</span>
-                      <span style={{ color: 'var(--text-secondary)' }}>
-                        {new Date(updateInfo.remoteDate).toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {updateInfo?.remoteMessage && (
-                  <div style={{
-                    fontSize: '0.75rem',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    borderLeft: '3px solid var(--accent-blue)',
-                    padding: '6px 10px',
-                    color: 'var(--text-secondary)'
-                  }}>
-                    <strong>Último commit:</strong> {updateInfo.remoteMessage} {updateInfo.remoteAuthor ? `(por ${updateInfo.remoteAuthor})` : ''}
-                  </div>
-                )}
-
-                {updateStatusMsg && (
-                  <div style={{
-                    padding: '0.65rem 0.85rem',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.76rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: updateStatusMsg.type === 'success' ? 'rgba(16, 185, 129, 0.12)' :
-                                updateStatusMsg.type === 'warning' ? 'rgba(245, 158, 11, 0.12)' :
-                                updateStatusMsg.type === 'error' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(59, 130, 246, 0.12)',
-                    color: updateStatusMsg.type === 'success' ? 'var(--accent-emerald)' :
-                           updateStatusMsg.type === 'warning' ? 'var(--accent-amber)' :
-                           updateStatusMsg.type === 'error' ? 'var(--accent-rose)' : 'var(--accent-blue)',
-                    border: `1px solid ${
-                      updateStatusMsg.type === 'success' ? 'rgba(16, 185, 129, 0.3)' :
-                      updateStatusMsg.type === 'warning' ? 'rgba(245, 158, 11, 0.3)' :
-                      updateStatusMsg.type === 'error' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(59, 130, 246, 0.3)'
-                    }`
-                  }}>
-                    {updateStatusMsg.type === 'success' ? <CheckCircle2 size={16} /> :
-                     updateStatusMsg.type === 'warning' ? <AlertCircle size={16} /> :
-                     updateStatusMsg.type === 'error' ? <AlertCircle size={16} /> : <Info size={16} />}
-                    <span>{updateStatusMsg.text}</span>
-                  </div>
-                )}
-
-                {/* ACTION BUTTON */}
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <button
-                    type="button"
-                    disabled={applyingUpdate || !serverOnline || (updateInfo && !updateInfo.hasUpdate)}
-                    onClick={handleApplyUpdate}
-                    className="cat-pill-btn active"
-                    style={{
-                      height: '34px',
-                      padding: '0 1.1rem',
-                      fontSize: '0.78rem',
-                      gap: '6px',
-                      background: (updateInfo?.hasUpdate) ? 'var(--accent-emerald)' : 'rgba(16, 185, 129, 0.2)',
-                      color: (updateInfo?.hasUpdate) ? '#052e16' : 'var(--accent-emerald)',
-                      fontWeight: 800,
-                      opacity: (updateInfo && !updateInfo.hasUpdate && !applyingUpdate) ? 0.6 : 1,
-                      cursor: (updateInfo && !updateInfo.hasUpdate && !applyingUpdate) ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    <RefreshCw size={13} className={applyingUpdate ? 'spin-slow' : ''} />
-                    <span>{applyingUpdate ? 'Instalando Actualización...' : (updateInfo?.hasUpdate ? 'Actualizar Bot Ahora' : 'El Bot está al día')}</span>
-                  </button>
-
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    {serverOnline 
-                      ? '💡 También podés escribir #actualizar en WhatsApp para actualizar remotamente.' 
-                      : '⚠️ El servidor del bot debe estar encendido para aplicar la actualización desde esta pantalla.'}
-                  </div>
-                </div>
-              </div>
-
-              {/* CARD 6: DIAGNOSTICO DE SERVIDOR */}
+              {/* CARD 3: DIAGNOSTICO DE SERVIDOR */}
               <div style={{
                 background: 'rgba(59, 130, 246, 0.08)',
                 border: '1px solid rgba(59, 130, 246, 0.25)',

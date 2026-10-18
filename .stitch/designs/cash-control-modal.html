@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Control de Caja &amp; Cierre Ciego de Turno - L'Étoile Atelier</title>
+<!-- Google Fonts: Plus Jakarta Sans, Outfit, JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Outfit:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration Verbatim -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-error-container": "#ffdad6",
+            "surface-container": "#1d2024",
+            "primary-container": "#e07148",
+            "background": "#111418",
+            "inverse-on-surface": "#2e3135",
+            "surface-container-lowest": "#0b0e12",
+            "on-surface-variant": "#ddc0b7",
+            "on-background": "#e1e2e8",
+            "secondary": "#e2c291",
+            "on-primary-fixed-variant": "#802a05",
+            "inverse-surface": "#e1e2e8",
+            "surface-container-low": "#191c20",
+            "tertiary-container": "#00a574",
+            "on-primary-container": "#511500",
+            "on-secondary-fixed-variant": "#59431d",
+            "error": "#ffb4ab",
+            "on-surface": "#e1e2e8",
+            "outline": "#a58b83",
+            "tertiary-fixed": "#68fcbf",
+            "on-tertiary-fixed-variant": "#005137",
+            "outline-variant": "#56423c",
+            "primary-fixed-dim": "#ffb59c",
+            "on-secondary-container": "#d3b484",
+            "surface-variant": "#323539",
+            "tertiary": "#45dfa4",
+            "secondary-fixed-dim": "#e2c291",
+            "surface-tint": "#ffb59c",
+            "on-tertiary-fixed": "#002114",
+            "on-secondary-fixed": "#281900",
+            "secondary-fixed": "#ffdead",
+            "on-primary": "#5c1900",
+            "secondary-container": "#5c451f",
+            "inverse-primary": "#a0401c",
+            "surface-bright": "#36393e",
+            "primary-fixed": "#ffdbcf",
+            "surface-container-highest": "#323539",
+            "on-tertiary-container": "#003120",
+            "surface-container-high": "#272a2e",
+            "on-tertiary": "#003825",
+            "tertiary-fixed-dim": "#45dfa4",
+            "primary": "#ffb59c",
+            "surface": "#111418",
+            "on-secondary": "#412d08",
+            "on-error": "#690005",
+            "surface-dim": "#111418",
+            "error-container": "#93000a",
+            "on-primary-fixed": "#390c00"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-2xl": "3rem",
+            "gutter": "1rem",
+            "space-xl": "2rem",
+            "margin-tablet": "1.5rem",
+            "gutter-desktop": "1.25rem",
+            "space-sm": "0.5rem",
+            "gutter-tablet": "0.75rem",
+            "space-xs": "0.25rem",
+            "space-lg": "1.25rem",
+            "space-md": "0.875rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Plus Jakarta Sans"],
+            "display-lg-mobile": ["Outfit"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Outfit"],
+            "display-lg": ["Outfit"],
+            "mono-price-md": ["JetBrains Mono"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "mono-price-lg": ["JetBrains Mono"],
+            "headline-sm": ["Outfit"],
+            "headline-md": ["Outfit"],
+            "mono-data-sm": ["JetBrains Mono"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "mono-price-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "mono-price-lg": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "mono-data-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: #0b0e12;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: #272a2e;
+      border-radius: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb:hover {
+      background: #56423c;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased font-body-md text-body-md select-none overflow-x-hidden min-h-screen relative">
+<!-- ========================================================================= -->
+<!-- BACKGROUND ATELIER POS INTERFACE (DIMMED & LUXURY BACKDROP FILTER)       -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 pointer-events-none filter blur-sm brightness-[0.22] contrast-[1.05] scale-[1.01] flex flex-col z-0">
+<!-- Top Bar Simulation -->
+<header class="flex justify-between items-center w-full px-space-xl py-space-sm h-16 bg-surface-container-lowest border-b border-outline-variant/30">
+<div class="flex items-center gap-space-lg">
+<span class="text-headline-sm font-headline-sm font-semibold tracking-wider text-primary uppercase">L'Étoile Atelier</span>
+<div class="flex gap-space-md">
+<span class="text-primary border-b-2 border-primary font-label-lg text-label-lg pb-1">Salón Principal</span>
+<span class="text-on-surface-variant font-label-lg text-label-lg">Terraza Exterior</span>
+<span class="text-on-surface-variant font-label-lg text-label-lg">Barra Cava</span>
+<span class="text-on-surface-variant font-label-lg text-label-lg">Cava Bodega</span>
+</div>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="px-space-md py-space-xs rounded-lg bg-surface-container-high text-primary font-label-md text-label-md">Pase Cocina</span>
+<span class="px-space-md py-space-xs rounded-lg bg-primary-container text-on-primary-container font-label-md text-label-md">Nuevo Comensal</span>
+</div>
+</header>
+<div class="flex-1 flex overflow-hidden">
+<!-- SideNav Simulation -->
+<aside class="w-64 bg-surface-container-lowest border-r border-outline-variant/20 flex flex-col justify-between p-space-md">
+<div class="space-y-2">
+<div class="p-space-sm flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 border border-primary-container/30 flex items-center justify-center text-primary font-bold">É</div>
+<div>
+<p class="text-label-md font-label-md text-on-surface font-semibold">Atelier L'Étoile</p>
+<p class="text-mono-data-sm font-mono-data-sm text-secondary">Servicio Noche · Pase Activo</p>
+</div>
+</div>
+<div class="h-px bg-outline-variant/20 my-2"></div>
+<div class="px-space-md py-space-sm rounded-lg bg-surface-container-high text-primary border-l-2 border-primary font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="table_bar">table_bar</span> Plano de Sala
+          </div>
+<div class="px-space-md py-space-sm rounded-lg text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="order_approve">order_approve</span> Comandas Activas
+          </div>
+<div class="px-space-md py-space-sm rounded-lg text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="wine_bar">wine_bar</span> Cava &amp; Vinos
+          </div>
+<div class="px-space-md py-space-sm rounded-lg text-on-surface-variant font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="skillet">skillet</span> Pase &amp; KDS
+          </div>
+</div>
+<div class="p-space-sm bg-surface-container-low rounded-lg border border-outline-variant/20 text-center text-secondary font-label-md text-label-md">
+          Cerrar Turno
+        </div>
+</aside>
+<!-- Main Ambient Content (Tables Grid & Ticket Ledger) -->
+<main class="flex-1 grid grid-cols-12 gap-space-lg p-space-xl">
+<div class="col-span-8 grid grid-cols-4 gap-space-md">
+<div class="bg-surface-container border border-outline-variant/30 rounded-lg p-space-md h-32 flex flex-col justify-between">
+<div class="flex justify-between items-center text-label-md font-label-md text-secondary">
+<span>Mesa 01 (4p)</span>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Postres &amp; Café</p>
+<p class="text-mono-price-md font-mono-price-md text-on-surface">€385.00</p>
+</div>
+<div class="bg-surface-container border border-primary/40 rounded-lg p-space-md h-32 flex flex-col justify-between">
+<div class="flex justify-between items-center text-label-md font-label-md text-primary">
+<span>Mesa 02 (2p)</span>
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+</div>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Maridaje Gran Reserva</p>
+<p class="text-mono-price-md font-mono-price-md text-on-surface">€620.00</p>
+</div>
+<div class="bg-surface-container border border-outline-variant/30 rounded-lg p-space-md h-32 flex flex-col justify-between">
+<div class="flex justify-between items-center text-label-md font-label-md text-secondary">
+<span>Mesa 03 (6p)</span>
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+</div>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Pase Salado Terminado</p>
+<p class="text-mono-price-md font-mono-price-md text-on-surface">€1,180.00</p>
+</div>
+<div class="bg-surface-container-high border border-outline-variant/20 rounded-lg p-space-md h-32 flex flex-col justify-between">
+<div class="flex justify-between items-center text-label-md font-label-md text-on-surface-variant">
+<span>Mesa 04 (2p)</span>
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+</div>
+<p class="text-mono-data-sm font-mono-data-sm text-secondary">Cobrado Efectivo</p>
+<p class="text-mono-price-md font-mono-price-md text-on-surface">€295.00</p>
+</div>
+</div>
+<div class="col-span-4 bg-surface-container-low border border-outline-variant/30 rounded-lg p-space-md flex flex-col justify-between">
+<div>
+<h3 class="text-label-lg font-label-lg text-primary uppercase">Tickets Abiertos</h3>
+<div class="space-y-2 mt-4">
+<div class="p-2 bg-surface-container rounded border border-outline-variant/20 text-body-sm font-body-sm flex justify-between">
+<span>#402 · Barón de Brane</span>
+<span class="font-mono-data-sm text-secondary">€185.00</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<!-- ========================================================================= -->
+<!-- HIGH-FIDELITY MODAL OVERLAY: CONTROL DE CAJA & CIERRE CIEGO DE TURNO      -->
+<!-- ========================================================================= -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-md overflow-y-auto custom-scroll">
+<!-- Modal Card Container -->
+<div class="relative w-full max-w-5xl bg-surface border border-white/[0.08] rounded-xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9),0_0_0_1px_rgba(255,255,255,0.06)] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+<!-- Top Terracotta Accent Hairline -->
+<div class="h-0.5 w-full bg-gradient-to-r from-transparent via-primary-container to-transparent"></div>
+<!-- ===================================================================== -->
+<!-- 1. MODAL HEADER & TAX AUDIT IDENTITY                                  -->
+<!-- ===================================================================== -->
+<div class="px-space-lg py-space-md bg-surface-container-lowest/80 border-b border-outline-variant/30 flex flex-wrap items-center justify-between gap-4">
+<div class="space-y-1">
+<div class="flex items-center gap-3">
+<span class="p-1.5 rounded-lg bg-primary-container/20 border border-primary-container/40 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg" data-icon="point_of_sale">point_of_sale</span>
+</span>
+<h1 class="text-headline-md font-headline-md text-on-surface tracking-tight">
+              Control de Caja &amp; Cierre Ciego de Turno
+            </h1>
+<span class="px-2 py-0.5 text-label-md font-label-md tracking-wider bg-surface-container-high border border-outline-variant/40 text-secondary rounded-lg">
+              ARQUEO X / Z
+            </span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant flex items-center gap-2">
+<span class="font-semibold text-on-surface">Terminal T-01 Central</span>
+<span class="text-outline-variant">•</span>
+<span>Turno Cena (20:00 - 01:30)</span>
+<span class="text-outline-variant">•</span>
+<span>Cajero / Maître: <strong class="text-on-surface font-semibold">David R.</strong></span>
+<span class="text-outline-variant">•</span>
+<span class="font-mono-data-sm text-secondary bg-surface-container px-1.5 py-0.5 rounded border border-outline-variant/20">
+              Informe Fiscal Z-2024-8841
+            </span>
+</p>
+</div>
+<!-- Top Right Quick Action Pills -->
+<div class="flex items-center gap-2">
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-surface-container-high border border-outline-variant/30 text-tertiary hover:border-tertiary/40 transition-colors font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+            Auditoría en Vivo
+          </button>
+<button class="inline-flex items-center gap-1.5 px-space-md py-1.5 rounded-lg bg-surface-container border border-outline-variant/30 text-on-surface hover:text-secondary hover:border-secondary/40 transition-colors font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm" data-icon="print">print</span>
+            Imprimir Informe X
+          </button>
+<button aria-label="Cerrar modal" class="p-1.5 rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors border border-outline-variant/20">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- ===================================================================== -->
+<!-- 2. THREE-COLUMN SECTION GRID: RECONCILIATION WORKBENCH               -->
+<!-- ===================================================================== -->
+<div class="p-space-lg grid grid-cols-1 lg:grid-cols-3 gap-space-md bg-surface-container-lowest/30">
+<!-- =================================================================== -->
+<!-- COLUMN 1 / SECTION A: FONDO INICIAL & VENTAS EN SISTEMA             -->
+<!-- =================================================================== -->
+<div class="flex flex-col justify-between bg-surface-container-low border border-white/[0.06] rounded-xl p-space-md relative overflow-hidden">
+<div class="absolute -right-8 -top-8 w-24 h-24 bg-primary-container/5 rounded-full pointer-events-none blur-xl"></div>
+<div>
+<!-- Section Header -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-data-sm font-semibold">A</span>
+<h2 class="text-label-lg font-label-lg text-on-surface font-semibold tracking-wide">
+                  Lectura POS Teórica
+                </h2>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">
+                Auto-Sync AEAT
+              </span>
+</div>
+<!-- Ledger Breakdown Items -->
+<div class="mt-4 space-y-3">
+<!-- Item 1: Fondo Inicial -->
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/20">
+<div>
+<span class="text-body-sm font-body-sm text-on-surface block font-medium">Fondo Inicial Apertura</span>
+<span class="text-mono-data-sm font-mono-data-sm text-secondary">Fijo verificado (Bolsa A-01)</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface font-semibold tabular-nums">
+                  €300.00
+                </span>
+</div>
+<!-- Item 2: Ventas Efectivo Cobradas -->
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/20">
+<div>
+<span class="text-body-sm font-body-sm text-on-surface block font-medium">Ventas Efectivo Sistema</span>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">18 tickets auditados</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-tertiary font-semibold tabular-nums">
+                  +€1,420.50
+                </span>
+</div>
+<!-- Item 3: Entradas Extra -->
+<div class="flex items-center justify-between p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/20">
+<div>
+<span class="text-body-sm font-body-sm text-on-surface block font-medium">Entradas Extra / Cambio</span>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Inyecciones a cajón</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface-variant font-medium tabular-nums">
+                  €0.00
+                </span>
+</div>
+<!-- Separator: Subtotal Teórico en Cajón -->
+<div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between">
+<div>
+<span class="text-label-md font-label-md text-primary font-semibold uppercase">Subtotal Bruto Cajón</span>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Fondo inicial + Ventas cash</p>
+</div>
+<span class="text-mono-price-lg font-mono-price-lg text-primary font-bold tabular-nums">
+                  €1,720.50
+                </span>
+</div>
+<!-- Item 4: Informativo Tarjetas (No afecta cajón físico) -->
+<div class="p-2.5 rounded-lg bg-surface-container-lowest/80 border border-dashed border-outline-variant/40 mt-3">
+<div class="flex justify-between items-center text-body-sm font-body-sm text-on-surface-variant mb-1">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="credit_card">credit_card</span>
+                    Cobros Tarjeta / TPV
+                  </span>
+<span class="text-mono-price-md font-mono-price-md text-secondary font-medium tabular-nums">€6,730.20</span>
+</div>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant/80">
+                  50 transacciones · Redsys Pasarela (Informativo, no computa en efectivo)
+                </p>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-outline-variant/20 flex items-center justify-between text-mono-data-sm text-on-surface-variant">
+<span>Último sync TPV: 01:28:14</span>
+<span class="flex items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined text-xs" data-icon="check_circle">check_circle</span> Verificado
+            </span>
+</div>
+</div>
+<!-- =================================================================== -->
+<!-- COLUMN 2 / SECTION B: SALIDAS DE CAJA / GASTOS DE TURNO             -->
+<!-- =================================================================== -->
+<div class="flex flex-col justify-between bg-surface-container-low border border-white/[0.06] rounded-xl p-space-md relative overflow-hidden">
+<div class="absolute -right-8 -top-8 w-24 h-24 bg-error/5 rounded-full pointer-events-none blur-xl"></div>
+<div>
+<!-- Section Header -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded bg-surface-container-high text-primary flex items-center justify-center font-mono-data-sm font-semibold">B</span>
+<h2 class="text-label-lg font-label-lg text-on-surface font-semibold tracking-wide">
+                  Gastos Menores / Salidas
+                </h2>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-error bg-error-container/20 px-2 py-0.5 rounded border border-error/30 font-medium">
+                -€160.50
+              </span>
+</div>
+<!-- List of Minor Outflows -->
+<div class="mt-4 space-y-2.5 max-h-[260px] overflow-y-auto custom-scroll pr-1">
+<!-- Gasto 1: Hielo -->
+<div class="p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<div class="flex items-start justify-between gap-2">
+<div class="space-y-0.5">
+<span class="inline-block px-1.5 py-0.2 text-[10px] uppercase font-mono-data-sm font-semibold rounded bg-surface-container-high text-secondary border border-outline-variant/30">
+                      Hielo / Suministro urgente
+                    </span>
+<p class="text-body-sm font-body-sm text-on-surface font-medium leading-tight">
+                      Compra hielo seco coctelería
+                    </p>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Ticket #G-101 · Firmado Bar Manager</p>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-error font-semibold tabular-nums whitespace-nowrap">
+                    -€24.00
+                  </span>
+</div>
+</div>
+<!-- Gasto 2: Proveedor Lonja -->
+<div class="p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<div class="flex items-start justify-between gap-2">
+<div class="space-y-0.5">
+<span class="inline-block px-1.5 py-0.2 text-[10px] uppercase font-mono-data-sm font-semibold rounded bg-surface-container-high text-primary border border-outline-variant/30">
+                      Proveedor / Pescadería
+                    </span>
+<p class="text-body-sm font-body-sm text-on-surface font-medium leading-tight">
+                      Pago lonja entrega nocturna ostras
+                    </p>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Albarán #442 · Ostras Gillardeau</p>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-error font-semibold tabular-nums whitespace-nowrap">
+                    -€120.00
+                  </span>
+</div>
+</div>
+<!-- Gasto 3: Mercadería Menor -->
+<div class="p-2.5 rounded-lg bg-surface-container/60 border border-outline-variant/20 hover:border-outline-variant/50 transition-colors">
+<div class="flex items-start justify-between gap-2">
+<div class="space-y-0.5">
+<span class="inline-block px-1.5 py-0.2 text-[10px] uppercase font-mono-data-sm font-semibold rounded bg-surface-container-high text-secondary border border-outline-variant/30">
+                      Mercadería Menor
+                    </span>
+<p class="text-body-sm font-body-sm text-on-surface font-medium leading-tight">
+                      Hierbas frescas mercado La Boqueria
+                    </p>
+<p class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">Ticket #G-102 · Sous Chef Joan</p>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-error font-semibold tabular-nums whitespace-nowrap">
+                    -€16.50
+                  </span>
+</div>
+</div>
+</div>
+<!-- Add New Expense Button -->
+<div class="mt-3 pt-2">
+<button class="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg border border-dashed border-outline-variant/50 bg-surface-container-lowest/40 hover:bg-surface-container text-on-surface-variant hover:text-on-surface transition-all font-label-md text-label-md">
+<span class="material-symbols-outlined text-sm text-primary" data-icon="add_circle">add_circle</span>
+<span>Añadir Salida / Gasto de Caja</span>
+</button>
+</div>
+</div>
+<!-- Theoretical Target To Declare -->
+<div class="mt-4 pt-3 border-t border-outline-variant/30 bg-surface-container-high/40 -mx-space-md -mb-space-md p-space-md rounded-b-xl">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-label-md font-label-md text-secondary font-semibold uppercase block">
+                  Efectivo Esperado a Declarar
+                </span>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">
+                  (Fondo €300 + Ventas €1,420.50 - Gastos €160.50)
+                </span>
+</div>
+<span class="text-mono-price-lg font-mono-price-lg text-secondary font-bold tabular-nums">
+                €1,560.00
+              </span>
+</div>
+</div>
+</div>
+<!-- =================================================================== -->
+<!-- COLUMN 3 / SECTION C: ARQUEO CIEGO & RECONCILIACIÓN FÍSICA          -->
+<!-- =================================================================== -->
+<div class="flex flex-col justify-between bg-surface-container-low border border-white/[0.08] rounded-xl p-space-md relative overflow-hidden shadow-lg">
+<div class="absolute -right-8 -top-8 w-24 h-24 bg-tertiary-container/10 rounded-full pointer-events-none blur-xl"></div>
+<div>
+<!-- Section Header -->
+<div class="flex items-center justify-between pb-3 border-b border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-5 h-5 rounded bg-primary-container text-on-primary-container flex items-center justify-center font-mono-data-sm font-bold">C</span>
+<h2 class="text-label-lg font-label-lg text-on-surface font-semibold tracking-wide">
+                  Arqueo Físico de Valores
+                </h2>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-primary bg-primary-container/20 px-2 py-0.5 rounded border border-primary/30">
+                Blind Count
+              </span>
+</div>
+<!-- Currency Breakdown Matrix -->
+<div class="mt-3 space-y-2">
+<!-- 50€ Row -->
+<div class="flex items-center justify-between gap-2 p-1.5 px-2 bg-surface-container rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-9 text-mono-data-sm font-mono-data-sm font-bold text-secondary">50€</span>
+<span class="text-on-surface-variant text-body-sm">×</span>
+<input class="w-14 h-7 text-center font-mono-price-md font-semibold bg-surface-container-lowest border border-outline-variant/40 rounded text-on-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" type="number" value="18"/>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">uds</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface font-medium tabular-nums">€900.00</span>
+</div>
+<!-- 20€ Row -->
+<div class="flex items-center justify-between gap-2 p-1.5 px-2 bg-surface-container rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-9 text-mono-data-sm font-mono-data-sm font-bold text-secondary">20€</span>
+<span class="text-on-surface-variant text-body-sm">×</span>
+<input class="w-14 h-7 text-center font-mono-price-md font-semibold bg-surface-container-lowest border border-outline-variant/40 rounded text-on-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" type="number" value="22"/>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">uds</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface font-medium tabular-nums">€440.00</span>
+</div>
+<!-- 10€ Row -->
+<div class="flex items-center justify-between gap-2 p-1.5 px-2 bg-surface-container rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-9 text-mono-data-sm font-mono-data-sm font-bold text-secondary">10€</span>
+<span class="text-on-surface-variant text-body-sm">×</span>
+<input class="w-14 h-7 text-center font-mono-price-md font-semibold bg-surface-container-lowest border border-outline-variant/40 rounded text-on-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" type="number" value="15"/>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">uds</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface font-medium tabular-nums">€150.00</span>
+</div>
+<!-- 5€ Row -->
+<div class="flex items-center justify-between gap-2 p-1.5 px-2 bg-surface-container rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="w-9 text-mono-data-sm font-mono-data-sm font-bold text-secondary">5€</span>
+<span class="text-on-surface-variant text-body-sm">×</span>
+<input class="w-14 h-7 text-center font-mono-price-md font-semibold bg-surface-container-lowest border border-outline-variant/40 rounded text-on-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" type="number" value="12"/>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">uds</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface font-medium tabular-nums">€60.00</span>
+</div>
+<!-- Monedas (Fracción) -->
+<div class="flex items-center justify-between gap-2 p-1.5 px-2 bg-surface-container rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-2">
+<span class="text-mono-data-sm font-mono-data-sm font-bold text-on-surface-variant">Monedas</span>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant">(2€, 1€, 0.50€)</span>
+</div>
+<span class="text-mono-price-md font-mono-price-md text-on-surface font-medium tabular-nums">€15.00</span>
+</div>
+<!-- Total Efectivo Físico Contado -->
+<div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between px-1">
+<span class="text-label-md font-label-md text-on-surface font-semibold uppercase">Total Físico Contado:</span>
+<span class="text-mono-price-lg font-mono-price-lg text-on-surface font-bold tabular-nums">€1,565.00</span>
+</div>
+</div>
+<!-- Automated Discrepancy Calculation Banner -->
+<div class="mt-3 p-2.5 rounded-lg bg-surface-container-high border border-tertiary/30 shadow-inner">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-mono-data-sm font-mono-data-sm text-on-surface-variant block uppercase tracking-wider">
+                    Diferencia de Arqueo:
+                  </span>
+<span class="text-[10px] text-tertiary flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" data-icon="info">info</span> Tolerancia admisible: ±€2.00
+                  </span>
+</div>
+<div class="text-right">
+<span class="inline-block px-2.5 py-1 rounded bg-tertiary/15 border border-tertiary/40 text-tertiary font-mono-price-md font-bold tabular-nums">
+                    +€5.00 SOBRANTE
+                  </span>
+</div>
+</div>
+</div>
+<!-- Notes Textarea -->
+<div class="mt-2.5">
+<label class="block text-[11px] font-label-md text-on-surface-variant uppercase tracking-wider mb-1">
+                Justificación de Descuadre / Observaciones:
+              </label>
+<textarea class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-2 text-body-sm font-body-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none resize-none" rows="2">Comensal mesa 04 dejó redondeo de €5.00 voluntario no registrado como propina separada.</textarea>
+</div>
+</div>
+</div>
+</div>
+<!-- ===================================================================== -->
+<!-- 3. BOTTOM ACTIONS & AUDIT SUMMARY BAR                                 -->
+<!-- ===================================================================== -->
+<div class="px-space-lg py- space-md py-4 bg-surface-container-lowest border-t border-outline-variant/30 flex flex-wrap items-center justify-between gap-4">
+<!-- Shift Telemetry Stats -->
+<div class="flex items-center gap-4 text-mono-data-sm font-mono-data-sm text-on-surface-variant">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="receipt">receipt</span>
+<span><strong class="text-on-surface">68</strong> comandas cerradas</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="verified_user">verified_user</span>
+<span><strong class="text-on-surface">0</strong> anulaciones pendientes</span>
+</div>
+<span class="text-outline-variant">•</span>
+<div class="flex items-center gap-1.5 text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+<span>Veri*Factu AEAT Sincronizado</span>
+</div>
+</div>
+<!-- Action Buttons Cluster -->
+<div class="flex flex-wrap items-center gap-3">
+<!-- Secondary Action: Recontar Valores -->
+<button class="px-space-md py-2 rounded-lg bg-surface-container-high border border-outline-variant/40 hover:border-outline-variant/80 text-on-surface font-label-md text-label-md transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm" data-icon="restart_alt">restart_alt</span>
+            Recontar Valores
+          </button>
+<!-- Supervisor PIN Input Group -->
+<div class="flex items-center gap-2 bg-surface-container-high/60 border border-outline-variant/40 rounded-lg px-2.5 py-1">
+<span class="material-symbols-outlined text-sm text-secondary" data-icon="pin">pin</span>
+<span class="text-label-md font-label-md text-on-surface-variant">PIN Supervisor:</span>
+<input class="w-14 h-7 text-center font-mono-price-md font-bold tracking-widest bg-surface-container-lowest border border-outline-variant/40 rounded text-secondary focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" maxlength="4" placeholder="••••" type="password" value="8841"/>
+</div>
+<!-- Primary CTA: Cerrar Turno & Bloquear Cajón (Informe Z) -->
+<button class="px-space-lg py-2.5 rounded-lg bg-primary-container text-on-primary-container font-label-lg text-label-lg font-bold hover:brightness-110 active:scale-[0.98] transition-all shadow-[0_4px_16px_rgba(224,113,72,0.35)] flex items-center gap-2">
+<span class="material-symbols-outlined text-base" data-icon="lock">lock</span>
+            Cerrar Turno &amp; Bloquear Cajón (Informe Z)
+          </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

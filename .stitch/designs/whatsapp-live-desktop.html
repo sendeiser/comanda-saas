@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Écrin Atelier // WhatsApp Live Monitor &amp; Conversational AI Order Stream</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Outfit:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-error": "#690005",
+            "surface": "#111418",
+            "on-secondary-fixed": "#281900",
+            "on-primary-fixed-variant": "#802a05",
+            "background": "#111418",
+            "on-primary": "#5c1900",
+            "tertiary-container": "#00a574",
+            "surface-variant": "#323539",
+            "surface-container-lowest": "#0b0e12",
+            "surface-container-high": "#272a2e",
+            "surface-container": "#1d2024",
+            "primary-fixed": "#ffdbcf",
+            "inverse-on-surface": "#2e3135",
+            "tertiary-fixed-dim": "#45dfa4",
+            "surface-container-highest": "#323539",
+            "outline-variant": "#56423c",
+            "tertiary": "#45dfa4",
+            "tertiary-fixed": "#68fcbf",
+            "primary-fixed-dim": "#ffb59c",
+            "on-secondary": "#412d08",
+            "on-background": "#e1e2e8",
+            "surface-dim": "#111418",
+            "secondary-fixed": "#ffdead",
+            "on-primary-fixed": "#390c00",
+            "surface-container-low": "#191c20",
+            "primary-container": "#e07148",
+            "on-error-container": "#ffdad6",
+            "on-primary-container": "#511500",
+            "inverse-primary": "#a0401c",
+            "primary": "#ffb59c",
+            "surface-bright": "#36393e",
+            "on-tertiary-container": "#003120",
+            "on-tertiary": "#003825",
+            "secondary-container": "#5c451f",
+            "outline": "#a58b83",
+            "on-tertiary-fixed": "#002114",
+            "on-surface-variant": "#ddc0b7",
+            "on-secondary-container": "#d3b484",
+            "on-surface": "#e1e2e8",
+            "surface-tint": "#ffb59c",
+            "error": "#ffb4ab",
+            "secondary": "#e2c291",
+            "on-secondary-fixed-variant": "#59431d",
+            "secondary-fixed-dim": "#e2c291",
+            "error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#005137",
+            "inverse-surface": "#e1e2e8"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-tablet": "0.75rem",
+            "space-sm": "0.5rem",
+            "space-md": "0.875rem",
+            "margin-tablet": "1.5rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-2xl": "3rem",
+            "gutter-desktop": "1.25rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem",
+            "space-lg": "1.25rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Plus Jakarta Sans"],
+            "mono-price-md": ["JetBrains Mono"],
+            "headline-sm": ["Outfit"],
+            "display-lg": ["Outfit"],
+            "body-md": ["Plus Jakarta Sans"],
+            "mono-price-lg": ["JetBrains Mono"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "mono-data-sm": ["JetBrains Mono"],
+            "display-lg-mobile": ["Outfit"],
+            "headline-md": ["Outfit"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Outfit"],
+            "body-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "mono-price-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "mono-price-lg": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "mono-data-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Titanium hairline helper */
+    .titanium-border {
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+    .titanium-border-strong {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .terracotta-glow {
+      box-shadow: 0 0 0 1px rgba(217, 107, 67, 0.4), 0 8px 24px -4px rgba(217, 107, 67, 0.18);
+    }
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0e12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #272a2e;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #323539;
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface antialiased overflow-hidden select-none font-body-md text-body-md h-screen w-screen flex flex-col">
+<!-- ================= TOP APP BAR (Cockpit App Bar) ================= -->
+<header class="w-full h-14 px-4 flex items-center justify-between border-b titanium-border bg-surface-container-lowest z-30 shrink-0">
+<!-- Left branding & Live Pulse -->
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-3">
+<span class="text-headline-sm font-headline-sm tracking-wider uppercase text-primary">ATELIER // LIVE COCKPIT</span>
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-mono-data-sm font-mono-data-sm bg-surface-container border titanium-border text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-tertiary animate-pulse mr-1.5"></span>
+          WhatsApp Gateway: Conectado (32ms latencia)
+        </span>
+</div>
+<!-- Navigation Links from JSON Anchor -->
+<nav class="hidden xl:flex items-center space-x-6 ml-4">
+<button class="text-primary border-b-2 border-primary pb-1 font-semibold text-label-md font-label-md transition-colors flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">sensors</span>
+          En Vivo
+        </button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">receipt_long</span>
+          Tickets Cocina
+        </button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">group</span>
+          CRM Huéspedes
+        </button>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors pb-1 text-label-md font-label-md flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">history</span>
+          Histórico
+        </button>
+</nav>
+</div>
+<!-- Center Status Telemetry Badges -->
+<div class="hidden lg:flex items-center space-x-3 bg-surface-container-low px-3 py-1.5 rounded-lg border titanium-border">
+<div class="flex items-center space-x-1.5 text-mono-data-sm font-mono-data-sm text-on-surface px-2">
+<span class="text-tertiary font-semibold">14</span>
+<span class="text-on-surface-variant">Chats Activos</span>
+</div>
+<span class="text-outline-variant/40">|</span>
+<div class="flex items-center space-x-1.5 text-mono-data-sm font-mono-data-sm text-on-surface px-2">
+<span class="text-secondary font-semibold">4</span>
+<span class="text-on-surface-variant">Carritos en Curso</span>
+</div>
+<span class="text-outline-variant/40">|</span>
+<div class="flex items-center space-x-1.5 text-mono-data-sm font-mono-data-sm px-2 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping mr-0.5"></span>
+<span class="font-semibold">1</span>
+<span class="text-primary-fixed-dim">Intervención Pendiente</span>
+</div>
+<span class="text-outline-variant/40">|</span>
+<div class="flex items-center space-x-1.5 text-mono-data-sm font-mono-data-sm text-on-surface px-2">
+<span class="text-tertiary-fixed-dim font-mono-price-md font-semibold">€1,840</span>
+<span class="text-on-surface-variant">Pedidos WA Hoy</span>
+</div>
+</div>
+<!-- Right Controls & Actions -->
+<div class="flex items-center space-x-3">
+<!-- Station selector dropdown -->
+<div class="flex items-center bg-surface-container px-2.5 py-1 rounded border titanium-border text-mono-data-sm font-mono-data-sm text-on-surface cursor-pointer hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[15px] text-secondary mr-1.5">countertops</span>
+<span>Pass Central / Atelier</span>
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant ml-1">expand_more</span>
+</div>
+<!-- Icon Actions from JSON Anchor -->
+<div class="flex items-center space-x-1 border-l titanium-border pl-2">
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative" title="Notificaciones">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary-container"></span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Ajustes de Pass">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+<button class="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Cambio de Terminal">
+<span class="material-symbols-outlined text-[20px]">swap_horiz</span>
+</button>
+</div>
+<!-- Trailing Action Buttons -->
+<div class="flex items-center space-x-2 pl-2">
+<button class="px-3 py-1.5 bg-surface-container text-secondary text-label-md font-label-md rounded border titanium-border hover:border-secondary transition-all flex items-center space-x-1">
+<span class="material-symbols-outlined text-[15px]">send_and_archive</span>
+<span>Inyectar a POS</span>
+</button>
+<button class="px-3 py-1.5 bg-primary-container hover:bg-inverse-primary text-surface-container-lowest font-headline-sm text-label-md font-label-md rounded transition-all active:scale-[0.98] shadow-sm flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-[16px]">skillet</span>
+<span>Marchar a Cocina</span>
+<span class="text-[10px] bg-black/25 px-1 py-0.5 rounded text-surface-tint">F10</span>
+</button>
+</div>
+</div>
+</header>
+<!-- ================= COCKPIT BODY (Rail + 3 Column Dashboard) ================= -->
+<div class="flex flex-1 overflow-hidden relative">
+<!-- SIDE NAV RAIL (from Shared Components JSON) -->
+<aside class="w-20 bg-surface-container-lowest border-r titanium-border flex flex-col justify-between items-center py-3 z-20 shrink-0">
+<!-- Rail Header Sigil -->
+<div class="flex flex-col items-center mb-3">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low border titanium-border flex items-center justify-center text-primary mb-1">
+<span class="material-symbols-outlined text-[22px]">wine_bar</span>
+</div>
+<span class="text-[10px] text-on-surface-variant tracking-wider font-mono-data-sm">PASS #04</span>
+</div>
+<!-- Rail Tabs from JSON: WhatsApp Feed, KDS Pass, Bodega & Cava, Huéspedes VIP, Ajustes Bot -->
+<nav class="flex flex-col items-center space-y-3 w-full px-2">
+<!-- 1. WhatsApp Feed (Active) -->
+<button class="w-full flex flex-col items-center justify-center text-primary bg-surface-container-high/80 rounded-lg p-2.5 shadow-sm relative group" title="WhatsApp Feed">
+<span class="material-symbols-outlined text-[22px]">chat</span>
+<span class="text-[9px] font-label-md mt-1 tracking-tight text-center">WA Feed</span>
+<span class="absolute top-1.5 right-2 bg-primary-container text-surface-container-lowest text-[10px] font-bold px-1 rounded-full leading-none">3</span>
+</button>
+<!-- 2. KDS Pass -->
+<button class="w-full flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors group" title="KDS Pass">
+<span class="material-symbols-outlined text-[22px]">restaurant</span>
+<span class="text-[9px] font-label-md mt-1 tracking-tight text-center">KDS Pass</span>
+</button>
+<!-- 3. Bodega & Cava -->
+<button class="w-full flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors group" title="Bodega &amp; Cava">
+<span class="material-symbols-outlined text-[22px]">liquor</span>
+<span class="text-[9px] font-label-md mt-1 tracking-tight text-center">Cava</span>
+</button>
+<!-- 4. Huéspedes VIP -->
+<button class="w-full flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors group" title="Huéspedes VIP">
+<span class="material-symbols-outlined text-[22px]">badge</span>
+<span class="text-[9px] font-label-md mt-1 tracking-tight text-center">VIP Pass</span>
+</button>
+<!-- 5. Ajustes Bot -->
+<button class="w-full flex flex-col items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors group" title="Ajustes Bot">
+<span class="material-symbols-outlined text-[22px]">smart_toy</span>
+<span class="text-[9px] font-label-md mt-1 tracking-tight text-center">AI Config</span>
+</button>
+<!-- Urgent CTA from Rail JSON -->
+<div class="pt-2 w-full flex justify-center">
+<button class="w-12 h-8 rounded border border-error/40 hover:bg-error-container/30 text-error flex items-center justify-center transition-all" title="Pausa Urgente">
+<span class="material-symbols-outlined text-[18px]">pause_circle</span>
+</button>
+</div>
+</nav>
+<!-- Rail Footer Tabs: Soporte & Cerrar Turno -->
+<div class="flex flex-col items-center space-y-2.5 pt-3 border-t titanium-border w-full">
+<button class="text-on-surface-variant hover:text-on-surface p-2 transition-colors" title="Soporte">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<button class="text-on-surface-variant hover:text-error p-2 transition-colors" title="Cerrar Turno">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+<div class="w-2 h-2 rounded-full bg-tertiary mt-1" title="Pass 01 Online"></div>
+</div>
+</aside>
+<!-- ================= 3-COLUMN COCKPIT WORKSPACE ================= -->
+<main class="flex-1 flex overflow-hidden bg-background">
+<!-- ================= COLUMN A: LIVE CHAT FEED (330px) ================= -->
+<section class="w-[330px] border-r titanium-border flex flex-col bg-surface-container-lowest shrink-0">
+<!-- Search & Filter Controls -->
+<div class="p-3 border-b titanium-border space-y-2.5">
+<!-- Search input -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-2.5 top-2 text-[18px] text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border titanium-border rounded px-2.5 py-1.5 pl-8 text-mono-data-sm font-mono-data-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" placeholder="Buscar por cliente, teléfono o mesa..." type="text"/>
+</div>
+<!-- Filter Pills -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-mono-data-sm font-mono-data-sm no-scrollbar">
+<button class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface whitespace-nowrap border titanium-border">Todos (18)</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant hover:text-on-surface whitespace-nowrap">Bot (12)</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-low text-secondary whitespace-nowrap">Carritos (4)</button>
+<button class="px-2 py-0.5 rounded bg-primary-container/20 text-primary border border-primary-container/30 whitespace-nowrap flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              Humano (1)
+            </button>
+<button class="px-2 py-0.5 rounded bg-surface-container-low text-error whitespace-nowrap">Urgente (1)</button>
+</div>
+</div>
+<!-- Chat Stream Scroll Area -->
+<div class="flex-1 overflow-y-auto divide-y divide-white/5">
+<!-- ACTIVE ITEM: Mme. Valérie Moreau -->
+<div class="p-3.5 bg-surface-container-low border-l-2 border-primary-container cursor-pointer transition-all hover:bg-surface-container">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="px-1.5 py-0.5 text-[9px] font-mono-data-sm font-semibold uppercase bg-secondary-container/40 text-secondary rounded border border-secondary/30">VIP Grand Cru</span>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Mesa 06</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-primary font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-ping"></span>
+                Ahora
+              </span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<h4 class="font-headline-sm text-body-md text-on-surface font-semibold tracking-tight">Mme. Valérie Moreau</h4>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">+34 682 910 234</span>
+</div>
+<!-- Status Alert Pill -->
+<div class="mt-1.5">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono-data-sm bg-primary-container/15 text-primary border border-primary-container/40">
+<span class="material-symbols-outlined text-[13px] mr-1">person_alert</span>
+                Intervención Humana Requerida
+              </span>
+</div>
+<!-- Message Preview -->
+<p class="mt-2 text-body-sm font-body-sm text-on-surface-variant line-clamp-2 italic">
+              "¿Podría cambiar el pichón por lubina salvaje? Alérgica a las moras de la salsa..."
+            </p>
+<!-- Metadata tags -->
+<div class="mt-2.5 flex items-center justify-between text-mono-data-sm font-mono-data-sm pt-2 border-t titanium-border">
+<span class="text-secondary font-mono-price-md font-medium">Draft: €426.25 (4 items)</span>
+<span class="text-tertiary flex items-center">
+<span class="material-symbols-outlined text-[14px] mr-0.5">smart_toy</span>
+                NLP Parsed
+              </span>
+</div>
+</div>
+<!-- ITEM 2: Dr. Alejandro Sotomayor -->
+<div class="p-3.5 bg-surface-container-lowest hover:bg-surface-container-low/60 cursor-pointer transition-colors">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="px-1.5 py-0.5 text-[9px] font-mono-data-sm font-semibold uppercase bg-surface-container-high text-on-surface-variant rounded">Habitual</span>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Take-Away Pass</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Hace 4 min</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<h4 class="font-headline-sm text-body-md text-on-surface">Dr. Alejandro Sotomayor</h4>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">+34 611 445 789</span>
+</div>
+<div class="mt-1.5 flex items-center space-x-2">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-secondary-container/20 text-secondary border border-secondary/20">
+<span class="material-symbols-outlined text-[12px] mr-1">shopping_cart</span>
+                Carrito Activo (€168.00)
+              </span>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">3 platos en parseo</span>
+</div>
+<p class="mt-2 text-body-sm font-body-sm text-on-surface-variant/80 truncate">
+              Bot: "He añadido dos lubinas al horno de sarmiento y el postre Cacao 80%..."
+            </p>
+</div>
+<!-- ITEM 3: Mesa 12 Reservados -->
+<div class="p-3.5 bg-surface-container-lowest hover:bg-surface-container-low/60 cursor-pointer transition-colors">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="px-1.5 py-0.5 text-[9px] font-mono-data-sm font-semibold uppercase bg-surface-container-high text-on-surface-variant rounded">Sala Principal</span>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Mesa 12</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Hace 11 min</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<h4 class="font-headline-sm text-body-md text-on-surface">Mesa 12 // Pre-Orden Degustación</h4>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">+34 600 332 119</span>
+</div>
+<div class="mt-1.5">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-tertiary/10 text-tertiary border border-tertiary/20">
+<span class="material-symbols-outlined text-[12px] mr-1">smart_toy</span>
+                Bot Atendiendo • Carta Otoño
+              </span>
+</div>
+<p class="mt-2 text-body-sm font-body-sm text-on-surface-variant/80 truncate">
+              "Maridaje sugerido: Selección Cava Reserva Privada aceptado por el comensal."
+            </p>
+</div>
+<!-- ITEM 4: Novatech Catering (Urgente) -->
+<div class="p-3.5 bg-surface-container-lowest hover:bg-surface-container-low/60 cursor-pointer transition-colors">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="px-1.5 py-0.5 text-[9px] font-mono-data-sm font-semibold uppercase bg-error/15 text-error rounded border border-error/30">Urgente</span>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Privado 02</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Hace 26 min</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<h4 class="font-headline-sm text-body-md text-on-surface">Novatech Catering</h4>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">+34 699 881 220</span>
+</div>
+<p class="mt-2 text-body-sm font-body-sm text-on-surface-variant/80 line-clamp-2">
+              Solicita confirmación de factura proforma y menú cerrado para 8 comensales ejecutivos de las 21:30h.
+            </p>
+</div>
+<!-- ITEM 5: Gastronomía & Eventos -->
+<div class="p-3.5 bg-surface-container-lowest hover:bg-surface-container-low/60 cursor-pointer transition-colors opacity-70">
+<div class="flex items-start justify-between">
+<div class="flex items-center space-x-2">
+<span class="px-1.5 py-0.5 text-[9px] font-mono-data-sm font-semibold uppercase bg-surface-container-high text-on-surface-variant rounded">Nuevo</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Hace 42 min</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<h4 class="font-headline-sm text-body-md text-on-surface">Elena Rostova</h4>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">+34 670 120 445</span>
+</div>
+<p class="mt-2 text-body-sm font-body-sm text-on-surface-variant/70 truncate">
+              Reserva confirmada por el agente conversacional.
+            </p>
+</div>
+</div>
+</section>
+<!-- ================= COLUMN B: TRANSCRIPT & AI PARSING (Center Flex) ================= -->
+<section class="flex-1 flex flex-col bg-surface border-r titanium-border min-w-0">
+<!-- Transcript Top Header -->
+<div class="h-16 px-5 border-b titanium-border flex items-center justify-between bg-surface-container-lowest shrink-0">
+<div class="flex items-center space-x-3.5 min-w-0">
+<div class="w-10 h-10 rounded-full bg-surface-container-high border titanium-border flex items-center justify-center text-primary shrink-0 font-headline-sm">
+              VM
+            </div>
+<div class="min-w-0">
+<div class="flex items-center space-x-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Mme. Valérie Moreau</h3>
+<span class="px-2 py-0.2 rounded-full text-[10px] font-mono-data-sm uppercase bg-secondary-container/40 text-secondary border border-secondary/30">VIP Grand Cru</span>
+<span class="text-mono-data-sm font-mono-data-sm text-tertiary flex items-center">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary mr-1"></span>
+                  En línea
+                </span>
+</div>
+<div class="flex items-center space-x-3 text-mono-data-sm font-mono-data-sm text-on-surface-variant mt-0.5">
+<span>+34 682 910 234</span>
+<span class="text-outline-variant/40">•</span>
+<span>Mesa asignada: 06 (Terrace Atelier)</span>
+<span class="text-outline-variant/40">•</span>
+<span class="text-secondary font-mono-price-md">Gasto Medio: €220 / pax</span>
+</div>
+</div>
+</div>
+<!-- Human Takeover & AI Controls -->
+<div class="flex items-center space-x-3 shrink-0">
+<div class="flex items-center bg-surface-container px-3 py-1.5 rounded-lg border titanium-border space-x-2">
+<div class="flex flex-col text-right">
+<span class="text-mono-data-sm font-mono-data-sm text-tertiary font-semibold">Modo IA Asistido</span>
+<span class="text-[10px] text-outline">Orquestando con Chef de Pass</span>
+</div>
+<button class="px-2.5 py-1 bg-primary-container text-surface-container-lowest text-label-md font-label-md rounded font-semibold hover:bg-inverse-primary transition-all flex items-center space-x-1 shadow-sm">
+<span class="material-symbols-outlined text-[15px]">pan_tool</span>
+<span>Tomar Control Manual</span>
+</button>
+</div>
+<button class="p-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Ver Historial de Conversación">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Chat Stream Workspace -->
+<div class="flex-1 overflow-y-auto p-5 space-y-4 bg-[#0a0d10]">
+<!-- Session divider -->
+<div class="flex items-center justify-center">
+<span class="px-3 py-1 rounded-full text-mono-data-sm font-mono-data-sm bg-surface-container text-outline border titanium-border">
+              Sesión Iniciada por WhatsApp Concierge • Hoy 20:41h
+            </span>
+</div>
+<!-- 1. Customer Inbound Audio & Transcript -->
+<div class="flex items-start space-x-3 max-w-2xl">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border titanium-border flex items-center justify-center text-secondary text-xs shrink-0">
+              VM
+            </div>
+<div class="space-y-1.5 flex-1">
+<div class="bg-surface-container-low border titanium-border p-3 rounded-lg shadow-sm">
+<!-- Voice message wave playback bar -->
+<div class="flex items-center space-x-3 mb-2.5 pb-2 border-b titanium-border">
+<button class="w-7 h-7 rounded-full bg-secondary text-surface-container-lowest flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</button>
+<div class="flex-1 flex items-center space-x-0.5 h-6">
+<!-- Simulated audio bars -->
+<span class="w-1 h-3 bg-secondary/80 rounded-full"></span>
+<span class="w-1 h-5 bg-secondary rounded-full"></span>
+<span class="w-1 h-2 bg-secondary/60 rounded-full"></span>
+<span class="w-1 h-6 bg-secondary rounded-full"></span>
+<span class="w-1 h-4 bg-secondary/80 rounded-full"></span>
+<span class="w-1 h-5 bg-secondary rounded-full"></span>
+<span class="w-1 h-3 bg-secondary/40 rounded-full"></span>
+<span class="w-1 h-6 bg-secondary rounded-full"></span>
+<span class="w-1 h-2 bg-secondary/30 rounded-full"></span>
+<span class="w-1 h-5 bg-secondary/70 rounded-full"></span>
+<span class="w-1 h-4 bg-secondary/60 rounded-full"></span>
+<span class="w-1 h-6 bg-secondary/90 rounded-full"></span>
+<span class="w-1 h-3 bg-secondary/50 rounded-full"></span>
+<span class="w-1 h-2 bg-secondary/40 rounded-full"></span>
+<span class="w-1 h-4 bg-secondary/60 rounded-full"></span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">0:24</span>
+<span class="material-symbols-outlined text-[16px] text-tertiary">mic</span>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface leading-relaxed">
+<span class="text-[10px] font-mono-data-sm uppercase tracking-wider text-secondary block mb-1">Transcripción Automática Whisper v3:</span>
+                  "Hola buenas noches, quisiéramos ordenar para mesa: un Tartar de Atún Balfegó, dos Risotto de Boletus pero con trufa extra, y el Pichón asado... aunque tengo una duda con la salsa por alergia a las moras silvestres."
+                </div>
+</div>
+<span class="text-[10px] font-mono-data-sm text-outline block pl-1">20:42h • Entregado vía WhatsApp Business</span>
+</div>
+</div>
+<!-- 2. AI Concierge Response -->
+<div class="flex items-start justify-end space-x-3 max-w-2xl ml-auto">
+<div class="space-y-1.5 flex-1 text-right">
+<div class="bg-surface-container-high border titanium-border p-3.5 rounded-lg text-left shadow-sm inline-block">
+<div class="flex items-center justify-between space-x-4 mb-1.5 text-mono-data-sm font-mono-data-sm">
+<span class="text-primary font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">smart_toy</span>
+                    L'Étoile Atelier AI Concierge
+                  </span>
+<span class="text-tertiary text-[10px] bg-tertiary/10 px-1.5 py-0.5 rounded border border-tertiary/20">Chef Validated Protocol</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface leading-relaxed">
+                  "Buenas noches Mme. Moreau, un placer recibirla de nuevo en L'Écrin Atelier. He tomado nota del <strong>Tartar Balfegó</strong> y los <strong>dos Risottos con refuerzo de trufa Melanosporum</strong>. Respecto al Pichón a la brasa, confirmamos que la salsa base contiene emulsión de moras silvestres; ¿desea que el Chef sustituya la guarnición por nuestro glaseado de <strong>chalotas confitadas al jugo de sarmiento</strong>?"
+                </p>
+</div>
+<span class="text-[10px] font-mono-data-sm text-outline block pr-1">20:43h • AI Latencia: 420ms</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container/20 border border-primary-container/40 flex items-center justify-center text-primary text-xs shrink-0">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+</div>
+<!-- 3. Customer Reply -->
+<div class="flex items-start space-x-3 max-w-2xl">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border titanium-border flex items-center justify-center text-secondary text-xs shrink-0">
+              VM
+            </div>
+<div class="space-y-1.5 flex-1">
+<div class="bg-surface-container-low border titanium-border p-3 rounded-lg shadow-sm">
+<p class="text-body-sm font-body-sm text-on-surface leading-relaxed">
+                  "¡Perfecto! Sustitúyalo por favor, las chalotas suenan maravillosas. Y por favor, añadan una botella de <strong>Domaine Ponsot Clos de la Roche 2018</strong> de la cava."
+                </p>
+</div>
+<div class="flex items-center space-x-2 pl-1">
+<span class="text-[10px] font-mono-data-sm text-outline">20:44h</span>
+<span class="text-[10px] font-mono-data-sm text-tertiary flex items-center">
+<span class="material-symbols-outlined text-[12px] mr-0.5">done_all</span>
+                  Leído por pass
+                </span>
+</div>
+</div>
+</div>
+<!-- 4. NLP Parsing Live Engine Card (Embedded Bento in Stream) -->
+<div class="rounded-lg bg-surface-container-lowest border border-tertiary/30 p-3.5 space-y-2.5 my-2 shadow-lg">
+<div class="flex items-center justify-between border-b titanium-border pb-2">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-tertiary text-[18px]">verified</span>
+<span class="font-headline-sm text-label-lg font-semibold text-on-surface">Motor NLP Parsing Gastronomique v4.2</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-mono-data-sm bg-tertiary/15 text-tertiary font-medium">100% de Confianza</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Auto-sync con KDS</span>
+</div>
+<div class="grid grid-cols-3 gap-2 text-mono-data-sm font-mono-data-sm">
+<div class="bg-surface-container-low p-2 rounded border titanium-border">
+<span class="text-outline block text-[10px] uppercase">Platos &amp; Bebidas</span>
+<span class="text-on-surface font-semibold">4 Ítems Identificados</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border border-primary-container/30">
+<span class="text-primary block text-[10px] uppercase">Alérgeno Crítico</span>
+<span class="text-on-surface font-semibold">Moras ➔ Chalotas OK</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded border titanium-border">
+<span class="text-secondary block text-[10px] uppercase">Stock Bodega</span>
+<span class="text-on-surface font-semibold">Ponsot 2018 (3 Disp.)</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-mono-data-sm font-mono-data-sm pt-1 text-on-surface-variant">
+<span class="flex items-center">
+<span class="material-symbols-outlined text-[15px] text-tertiary mr-1">task_alt</span>
+                Comanda sincronizada instantáneamente en panel de comandero derecho
+              </span>
+<span class="text-primary font-medium hover:underline cursor-pointer">Verificar logs de intención</span>
+</div>
+</div>
+</div>
+<!-- Conversational Input Bar & Quick Actions -->
+<div class="p-3 border-t titanium-border bg-surface-container-lowest shrink-0 space-y-2.5">
+<!-- Canned Quick Responses (Pass Expediter Shortcuts) -->
+<div class="flex items-center space-x-2 overflow-x-auto no-scrollbar">
+<span class="text-[10px] font-mono-data-sm uppercase text-outline shrink-0">Atajos Pass:</span>
+<button class="px-2.5 py-1 rounded bg-surface-container text-body-sm font-body-sm text-secondary hover:bg-surface-container-high transition-colors border titanium-border whitespace-nowrap">
+              Confirmar Sustitución Chalotas
+            </button>
+<button class="px-2.5 py-1 rounded bg-surface-container text-body-sm font-body-sm text-on-surface hover:bg-surface-container-high transition-colors border titanium-border whitespace-nowrap">
+              Enviar Enlace de Pago (€426.25)
+            </button>
+<button class="px-2.5 py-1 rounded bg-surface-container text-body-sm font-body-sm text-tertiary hover:bg-surface-container-high transition-colors border titanium-border whitespace-nowrap">
+              Traspasar a Sommelier Pass
+            </button>
+<button class="px-2.5 py-1 rounded bg-surface-container text-body-sm font-body-sm text-on-surface-variant hover:text-on-surface transition-colors border titanium-border whitespace-nowrap">
+              Avisar Tiempo Marcha (18 min)
+            </button>
+</div>
+<!-- Message input form -->
+<div class="flex items-center space-x-2">
+<button class="p-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Adjuntar Carta / Menú PDF">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+<button class="p-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Plantillas de Mensaje Concierge">
+<span class="material-symbols-outlined text-[20px]">quickreply</span>
+</button>
+<div class="flex-1 relative">
+<input class="w-full bg-surface-container-low border titanium-border rounded px-3 py-2 text-body-sm font-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-all" type="text" value="Perfecto Mme. Moreau, la cocina ya prepara las chalotas confitadas para el pichón y atemperamos el Domaine Ponsot."/>
+</div>
+<button class="p-2 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors" title="Grabar Nota de Voz Whisper">
+<span class="material-symbols-outlined text-[20px]">mic</span>
+</button>
+<button class="px-4 py-2 bg-primary-container text-surface-container-lowest font-headline-sm text-label-md font-label-md rounded font-semibold hover:bg-inverse-primary transition-all active:scale-[0.98] flex items-center space-x-1.5 shadow-sm">
+<span>Enviar</span>
+<span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ================= COLUMN C: LIVE EXTRACTED ORDER & CRM (360px) ================= -->
+<section class="w-[370px] border-l titanium-border flex flex-col bg-surface-container-lowest shrink-0">
+<!-- Header of Order Hub -->
+<div class="p-3.5 border-b titanium-border flex items-center justify-between bg-surface-container-low shrink-0">
+<div>
+<div class="flex items-center space-x-2">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Comanda Extraída por IA</h3>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-mono-data-sm bg-primary-container/20 text-primary border border-primary-container/30">Borrador Activo</span>
+</div>
+<span class="text-mono-data-sm font-mono-data-sm text-outline">Ticket Ref: #WA-4091 • Mesa 06</span>
+</div>
+<div class="flex items-center space-x-1">
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface" title="Editar comanda">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container text-on-surface-variant hover:text-on-surface" title="Revertir cambios">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+</div>
+</div>
+<!-- Extracted Items List -->
+<div class="flex-1 overflow-y-auto p-3 space-y-2.5">
+<!-- Item 1: Tartar Atún Balfegó -->
+<div class="p-2.5 rounded bg-surface-container-low border titanium-border hover:border-white/20 transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5">
+<input checked="" class="mt-1 rounded text-primary-container bg-surface-container border-outline focus:ring-0" type="checkbox"/>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="font-mono-data-sm font-semibold text-secondary">1x</span>
+<span class="font-headline-sm text-body-md text-on-surface font-medium">Tartar de Atún Rojo Balfegó</span>
+</div>
+<div class="flex items-center space-x-1.5 mt-1">
+<span class="px-1.5 py-0.5 rounded text-[9px] font-mono-data-sm bg-tertiary/10 text-tertiary border border-tertiary/20">Sin Gluten</span>
+<span class="text-[11px] text-outline">Pase Frío</span>
+</div>
+</div>
+</div>
+<span class="font-mono-price-md text-mono-price-md text-on-surface font-medium">€34.50</span>
+</div>
+</div>
+<!-- Item 2: Risotto de Boletus con Extra Trufa -->
+<div class="p-2.5 rounded bg-surface-container-low border titanium-border hover:border-white/20 transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5">
+<input checked="" class="mt-1 rounded text-primary-container bg-surface-container border-outline focus:ring-0" type="checkbox"/>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="font-mono-data-sm font-semibold text-secondary">2x</span>
+<span class="font-headline-sm text-body-md text-on-surface font-medium">Risotto de Boletus Edulis &amp; Parmesano</span>
+</div>
+<!-- Indented modifier -->
+<div class="mt-1.5 pl-3 border-l-2 border-secondary/50 space-y-0.5">
+<div class="text-[11px] font-mono-data-sm text-secondary italic flex items-center justify-between">
+<span>+ Suplemento Extra Trufa Melanosporum (2x)</span>
+<span>+€16.00</span>
+</div>
+<span class="text-[10px] text-outline font-mono-data-sm">Fórmula: 6g rallada fresca en mesa</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<span class="font-mono-price-md text-mono-price-md text-on-surface font-medium">€75.00</span>
+<span class="block text-[10px] text-outline font-mono-data-sm">(€59.00 + €16)</span>
+</div>
+</div>
+</div>
+<!-- Item 3: Pichón Asado a la Brasa con MODIFICACIÓN CRÍTICA -->
+<div class="p-2.5 rounded bg-surface-container border border-primary-container/40 hover:border-primary-container transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5">
+<input checked="" class="mt-1 rounded text-primary-container bg-surface-container border-outline focus:ring-0" type="checkbox"/>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="font-mono-data-sm font-semibold text-secondary">1x</span>
+<span class="font-headline-sm text-body-md text-on-surface font-medium">Pichón Asado a la Brasa</span>
+</div>
+<!-- Allergen critical override -->
+<div class="mt-1.5 p-1.5 rounded bg-primary-container/15 border border-primary-container/40">
+<div class="flex items-center space-x-1 text-primary text-[11px] font-mono-data-sm font-semibold uppercase">
+<span class="material-symbols-outlined text-[13px]">warning</span>
+<span>ALERTA ALÉRGENO: Sin Moras</span>
+</div>
+<p class="text-[11px] text-on-surface-variant font-mono-data-sm mt-0.5">
+                      ➔ Sustituir emulsión por <strong>Glaseado de chalotas confitadas</strong>
+</p>
+</div>
+</div>
+</div>
+<span class="font-mono-price-md text-mono-price-md text-on-surface font-medium">€38.00</span>
+</div>
+</div>
+<!-- Item 4: Domaine Ponsot 2018 (Cava) -->
+<div class="p-2.5 rounded bg-surface-container-low border titanium-border hover:border-white/20 transition-all">
+<div class="flex items-start justify-between">
+<div class="flex items-start space-x-2.5">
+<input checked="" class="mt-1 rounded text-primary-container bg-surface-container border-outline focus:ring-0" type="checkbox"/>
+<div>
+<div class="flex items-center space-x-1.5">
+<span class="font-mono-data-sm font-semibold text-secondary">1x</span>
+<span class="font-headline-sm text-body-md text-on-surface font-medium">Domaine Ponsot Clos de la Roche 2018</span>
+</div>
+<div class="flex items-center space-x-2 mt-1">
+<span class="px-1.5 py-0.5 rounded text-[9px] font-mono-data-sm bg-surface-container-high text-secondary border titanium-border">Grand Cru Borgoña</span>
+<span class="text-[10px] text-tertiary font-mono-data-sm flex items-center">
+<span class="material-symbols-outlined text-[12px] mr-0.5">check_circle</span>
+                      Cava Pass 02
+                    </span>
+</div>
+</div>
+</div>
+<span class="font-mono-price-md text-mono-price-md text-on-surface font-medium">€240.00</span>
+</div>
+</div>
+<!-- Financial Calculation Breakdown -->
+<div class="mt-3 p-3 rounded bg-surface-container-low border titanium-border space-y-1.5 text-mono-data-sm font-mono-data-sm">
+<div class="flex justify-between text-on-surface-variant">
+<span>Subtotal Alimentos &amp; Vinos:</span>
+<span class="text-on-surface">€387.50</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>IVA Gastronomía (10%):</span>
+<span class="text-on-surface">€38.75</span>
+</div>
+<div class="flex justify-between text-on-surface-variant">
+<span>Servicio de Pan Artesanal &amp; Aceite Coupage:</span>
+<span class="text-tertiary">Cortesía Atelier</span>
+</div>
+<div class="pt-2 border-t titanium-border flex justify-between items-baseline">
+<span class="font-headline-sm text-body-md text-on-surface font-semibold">Total a Facturar:</span>
+<span class="font-mono-price-lg text-mono-price-lg text-primary font-semibold">€426.25</span>
+</div>
+</div>
+<!-- Direct Operations Action Buttons -->
+<div class="space-y-2 pt-2">
+<button class="w-full py-2.5 px-3 bg-primary-container text-surface-container-lowest font-headline-sm text-label-md font-label-md rounded font-semibold hover:bg-inverse-primary transition-all active:scale-[0.98] shadow-md flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[18px]">point_of_sale</span>
+<span>Inyectar a POS &amp; Crear Ticket</span>
+</button>
+<button class="w-full py-2 px-3 bg-surface-container-high border titanium-border hover:border-primary-container text-secondary font-headline-sm text-label-md font-label-md rounded font-semibold transition-all flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined text-[18px]">skillet</span>
+<span>Marchar a Cocina Inmediato (KDS)</span>
+</button>
+</div>
+<!-- CRM Guest Card Embedded -->
+<div class="mt-4 p-3 rounded-lg bg-surface-container-lowest border titanium-border space-y-2.5">
+<div class="flex items-center justify-between border-b titanium-border pb-1.5">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">contact_page</span>
+<span class="font-headline-sm text-label-md font-semibold text-on-surface">Ficha CRM &amp; Fidelización</span>
+</div>
+<span class="text-[10px] font-mono-data-sm text-tertiary bg-tertiary/10 px-1.5 py-0.5 rounded border border-tertiary/20">
+                Al Día (€0.00 fiado)
+              </span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-mono-data-sm font-mono-data-sm">
+<div>
+<span class="text-[10px] text-outline block">Historial Visitas</span>
+<span class="text-on-surface font-semibold">14 Servicios / Año</span>
+</div>
+<div>
+<span class="text-[10px] text-outline block">Preferencia Asiento</span>
+<span class="text-on-surface font-semibold">Junto al Ventanal</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-2 rounded border titanium-border text-mono-data-sm font-mono-data-sm">
+<span class="text-[10px] text-secondary font-semibold uppercase block mb-0.5">Nota de Servicio en Sala:</span>
+<p class="text-[11px] text-on-surface-variant">
+                "Servir siempre agua mineral fría con gas sin hielo ni cítrico. Agradece saludo en francés de maître."
+              </p>
+</div>
+</div>
+</div>
+<!-- Footer status bar of right column -->
+<div class="p-2.5 bg-surface-container-high/40 border-t titanium-border flex items-center justify-between text-mono-data-sm font-mono-data-sm text-outline shrink-0">
+<span class="flex items-center">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary mr-1.5"></span>
+            Impresora Pass 01: Lista
+          </span>
+<span class="text-on-surface-variant font-mono-data-sm">Comandero #WA-4091</span>
+</div>
+</section>
+</main>
+</div>
+</body></html>

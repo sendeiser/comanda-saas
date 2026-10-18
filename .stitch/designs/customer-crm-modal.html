@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>L'Écrin Atelier // CRM Huéspedes &amp; Fiados Cockpit</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Outfit:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary-container": "#5c451f",
+            "on-primary-fixed-variant": "#802a05",
+            "on-primary-fixed": "#390c00",
+            "on-secondary-container": "#d3b484",
+            "surface": "#111418",
+            "primary-fixed-dim": "#ffb59c",
+            "inverse-primary": "#a0401c",
+            "on-secondary": "#412d08",
+            "on-surface-variant": "#ddc0b7",
+            "on-error-container": "#ffdad6",
+            "secondary": "#e2c291",
+            "primary-fixed": "#ffdbcf",
+            "surface-container-lowest": "#0b0e12",
+            "surface-container-low": "#191c20",
+            "error-container": "#93000a",
+            "surface-container-high": "#272a2e",
+            "surface-container": "#1d2024",
+            "primary-container": "#e07148",
+            "tertiary": "#45dfa4",
+            "on-secondary-fixed": "#281900",
+            "secondary-fixed": "#ffdead",
+            "on-secondary-fixed-variant": "#59431d",
+            "inverse-on-surface": "#2e3135",
+            "primary": "#ffb59c",
+            "on-primary": "#5c1900",
+            "tertiary-fixed": "#68fcbf",
+            "surface-container-highest": "#323539",
+            "surface-bright": "#36393e",
+            "on-primary-container": "#511500",
+            "surface-variant": "#323539",
+            "secondary-fixed-dim": "#e2c291",
+            "surface-dim": "#111418",
+            "outline": "#a58b83",
+            "on-background": "#e1e2e8",
+            "tertiary-container": "#00a574",
+            "surface-tint": "#ffb59c",
+            "tertiary-fixed-dim": "#45dfa4",
+            "outline-variant": "#56423c",
+            "error": "#ffb4ab",
+            "on-tertiary": "#003825",
+            "inverse-surface": "#e1e2e8",
+            "on-tertiary-container": "#003120",
+            "background": "#111418",
+            "on-error": "#690005",
+            "on-tertiary-fixed-variant": "#005137",
+            "on-tertiary-fixed": "#002114",
+            "on-surface": "#e1e2e8"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xs": "0.25rem",
+            "margin-tablet": "1.5rem",
+            "space-xl": "2rem",
+            "gutter": "1rem",
+            "space-md": "0.875rem",
+            "space-2xl": "3rem",
+            "gutter-tablet": "0.75rem",
+            "gutter-desktop": "1.25rem",
+            "space-sm": "0.5rem",
+            "margin": "1rem",
+            "space-lg": "1.25rem",
+            "margin-desktop": "2rem"
+          },
+          "fontFamily": {
+            "mono-price-md": ["JetBrains Mono"],
+            "body-md": ["Plus Jakarta Sans"],
+            "mono-price-lg": ["JetBrains Mono"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "mono-data-sm": ["JetBrains Mono"],
+            "display-lg": ["Outfit"],
+            "display-lg-mobile": ["Outfit"],
+            "headline-lg": ["Outfit"],
+            "label-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Outfit"],
+            "headline-sm": ["Outfit"],
+            "label-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "mono-price-md": ["15px", { "lineHeight": "20px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+            "mono-price-lg": ["20px", { "lineHeight": "24px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+            "mono-data-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "400" }],
+            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* Custom scrollbars & titanium micro-rules */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0e12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #272a2e;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #56423c;
+    }
+    .titanium-hairline {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .titanium-hairline-b {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .titanium-hairline-r {
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .terracotta-glow {
+      box-shadow: 0 0 20px -3px rgba(224, 113, 72, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body-md antialiased overflow-hidden select-none">
+<!-- ================= TOP APP BAR (Shared Components: TopNavBar) ================= -->
+<header class="w-full h-14 px-4 flex items-center justify-between border-b border-outline-variant/30 bg-surface-container-lowest z-30 sticky top-0">
+<!-- Brand & Service Telemetry -->
+<div class="flex items-center space-x-6">
+<div class="flex items-center space-x-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container animate-pulse shadow-sm shadow-primary-container/80"></span>
+<span class="font-headline-sm text-headline-sm tracking-wider uppercase text-primary">ATELIER // LIVE COCKPIT</span>
+</div>
+<div class="hidden xl:flex items-center space-x-3 px-3 py-1 rounded-lg bg-surface-container border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary text-sm" data-icon="restaurant_menu">restaurant_menu</span>
+<span class="font-mono-data-sm text-mono-data-sm text-secondary-fixed">Servicio Cena Activa • Turno Noche (20:00 - 01:30)</span>
+<span class="inline-block w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="font-mono-data-sm text-mono-data-sm text-tertiary">Pass Chef: M. Laurent</span>
+</div>
+</div>
+<!-- Cockpit Navigation Links (CRM Active) -->
+<nav class="hidden md:flex items-center space-x-6 h-full">
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg py-4" href="#">En Vivo</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg py-4" href="#">Tickets Cocina</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-semibold font-label-lg text-label-lg py-4 flex items-center gap-1.5" href="#">
+<span>CRM Huéspedes</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-primary-container text-on-primary-container font-mono-data-sm">14 FIADOS</span>
+</a>
+<a class="text-on-surface-variant hover:text-on-surface transition-colors font-label-lg text-label-lg py-4" href="#">Histórico</a>
+</nav>
+<!-- Trailing Action Cluster -->
+<div class="flex items-center space-x-3">
+<!-- Search Trigger Input -->
+<div class="relative hidden lg:block w-52">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline-variant text-base" data-icon="search">search</span>
+<input class="w-full bg-surface-container pl-8 pr-3 py-1 text-xs rounded border border-outline-variant/30 text-on-surface placeholder:text-outline-variant/70 focus:outline-none focus:border-primary-container font-mono-data-sm" placeholder="Buscar folio o mesa..." type="text"/>
+</div>
+<!-- Quick Operational Action -->
+<button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high text-secondary border border-outline-variant/30 rounded font-label-md text-label-md transition-colors flex items-center space-x-1.5 active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm" data-icon="point_of_sale">point_of_sale</span>
+<span>Cierre Caja X/Z</span>
+</button>
+<button class="px-3.5 py-1.5 bg-primary-container hover:bg-primary-container/90 text-on-primary-container rounded font-label-md text-label-md transition-all font-semibold flex items-center space-x-1.5 shadow-sm active:scale-[0.98]">
+<span class="material-symbols-outlined text-sm" data-icon="sync">sync</span>
+<span>Inyectar a POS</span>
+</button>
+<!-- System Icons & Avatar -->
+<div class="flex items-center space-x-1 pl-2 border-l border-outline-variant/30 text-on-surface-variant">
+<button class="p-1.5 hover:text-on-surface hover:bg-surface-container rounded transition-colors relative" title="Alertas de Servicio">
+<span class="material-symbols-outlined text-lg" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary-container"></span>
+</button>
+<button class="p-1.5 hover:text-on-surface hover:bg-surface-container rounded transition-colors" title="Ajustes de Pass">
+<span class="material-symbols-outlined text-lg" data-icon="tune">tune</span>
+</button>
+<div class="ml-2 pl-2 border-l border-outline-variant/30 flex items-center space-x-2">
+<div class="w-7 h-7 rounded bg-secondary-container text-secondary flex items-center justify-center font-mono-data-sm text-xs font-bold border border-secondary/30">
+            EP
+          </div>
+</div>
+</div>
+</div>
+</header>
+<!-- ================= MAIN WORKSPACE (SIDE RAIL + CRM CONTENT) ================= -->
+<div class="flex h-[calc(100vh-3.5rem)] overflow-hidden">
+<!-- SIDE NAVIGATION RAIL (Shared Components: SideNavBar) -->
+<aside class="fixed left-0 top-14 bottom-0 w-20 flex flex-col justify-between items-center py-4 border-r border-outline-variant/30 bg-surface-container-lowest z-20">
+<!-- Upper Section: Atelier Brand Badge & Core Tabs -->
+<div class="flex flex-col items-center space-y-5 w-full">
+<!-- Atelier Sigil Mini-Header -->
+<div class="flex flex-col items-center group cursor-pointer" title="L'Écrin Atelier - Service Pass #04">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant/40 flex items-center justify-center text-primary group-hover:border-primary-container transition-colors">
+<span class="material-symbols-outlined text-xl" data-icon="dinner_dining">dinner_dining</span>
+</div>
+<span class="font-mono-data-sm text-[9px] text-outline-variant mt-1">PASS #04</span>
+</div>
+<div class="w-8 h-[1px] bg-outline-variant/30"></div>
+<!-- Rail Navigation List -->
+<div class="flex flex-col items-center space-y-2 w-full px-2">
+<!-- Tab 1: WA Feed -->
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors flex flex-col items-center group w-full" href="#" title="WhatsApp Feed">
+<span class="material-symbols-outlined text-xl" data-icon="chat">chat</span>
+<span class="font-label-md text-[9px] mt-1 text-center opacity-70 group-hover:opacity-100">WA Feed</span>
+</a>
+<!-- Tab 2: KDS Pass -->
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors flex flex-col items-center group w-full" href="#" title="KDS Pass">
+<span class="material-symbols-outlined text-xl" data-icon="restaurant">restaurant</span>
+<span class="font-label-md text-[9px] mt-1 text-center opacity-70 group-hover:opacity-100">KDS</span>
+</a>
+<!-- Tab 3: CRM Huéspedes VIP / Fiados (ACTIVE) -->
+<a class="text-primary bg-surface-container-high/80 rounded-lg p-2.5 shadow-sm flex flex-col items-center group w-full relative" href="#" title="Huéspedes VIP &amp; Fiados">
+<span class="absolute right-1.5 top-1.5 w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="material-symbols-outlined text-xl text-primary" data-icon="badge">badge</span>
+<span class="font-label-md text-[9px] mt-1 text-center text-primary font-semibold">CRM VIP</span>
+</a>
+<!-- Tab 4: Bodega & Cava -->
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors flex flex-col items-center group w-full" href="#" title="Bodega &amp; Cava">
+<span class="material-symbols-outlined text-xl" data-icon="liquor">liquor</span>
+<span class="font-label-md text-[9px] mt-1 text-center opacity-70 group-hover:opacity-100">Cava</span>
+</a>
+<!-- Tab 5: Bot AI / Concierge -->
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container/40 rounded-lg p-2.5 transition-colors flex flex-col items-center group w-full" href="#" title="Ajustes Bot">
+<span class="material-symbols-outlined text-xl" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-md text-[9px] mt-1 text-center opacity-70 group-hover:opacity-100">Bot AI</span>
+</a>
+</div>
+</div>
+<!-- Lower Section: Emergency Pause & Footers -->
+<div class="flex flex-col items-center space-y-3 w-full px-2">
+<!-- CTA: Pausa Urgente -->
+<button class="w-full py-2 bg-error-container/20 border border-error/30 text-error hover:bg-error-container/40 rounded flex flex-col items-center transition-colors" title="Pausa Urgente de Admisión">
+<span class="material-symbols-outlined text-lg" data-icon="pause_circle">pause_circle</span>
+<span class="font-mono-data-sm text-[8px] uppercase tracking-wider font-bold mt-0.5">Pausa</span>
+</button>
+<div class="w-8 h-[1px] bg-outline-variant/30"></div>
+<a class="text-on-surface-variant hover:text-on-surface p-2 rounded transition-colors" href="#" title="Soporte Técnico">
+<span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+</a>
+<a class="text-on-surface-variant hover:text-error p-2 rounded transition-colors" href="#" title="Cerrar Turno">
+<span class="material-symbols-outlined text-lg" data-icon="logout">logout</span>
+</a>
+</div>
+</aside>
+<!-- CONTENT CANVAS (Shifted by 80px / 5rem for the side rail) -->
+<main class="ml-20 flex-1 flex overflow-hidden bg-surface-dim">
+<!-- LEFT PRIMARY STAGE: KPI CARDS & DIRECTORY TABLE (Width 64%) -->
+<section class="flex-1 flex flex-col border-r border-outline-variant/30 h-full overflow-y-auto">
+<!-- SECTION 1: FINANCIAL KPI HEADER / BALANCE SUMMARY -->
+<div class="p-5 border-b border-outline-variant/30 bg-surface">
+<div class="flex items-center justify-between mb-4">
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-mono-data-sm text-mono-data-sm uppercase tracking-wider text-primary">Cuentas Corrientes • Fiados Concierge</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-surface-container-high border border-outline-variant/30 text-secondary font-mono-data-sm">Auditoría en Tiempo Real</span>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface mt-0.5">Gestión de Crédito Gastronómico &amp; Deudas de Huéspedes</h1>
+</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-1.5 bg-surface-container-high hover:bg-surface-bright text-on-surface rounded border border-outline-variant/40 font-label-md text-label-md flex items-center space-x-1.5 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="file_download">file_download</span>
+<span>Exportar Ledger Veri*Factu</span>
+</button>
+<button class="px-3 py-1.5 bg-surface-container-high hover:bg-surface-bright text-secondary rounded border border-outline-variant/40 font-label-md text-label-md flex items-center space-x-1.5 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add_circle">add_circle</span>
+<span>Apertura de Crédito</span>
+</button>
+</div>
+</div>
+<!-- Bento Grid of 4 Executive Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+<!-- Card 1: Total Fiados Pendientes -->
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/30 relative overflow-hidden group hover:border-primary/50 transition-all">
+<div class="flex items-center justify-between text-on-surface-variant mb-1.5">
+<span class="font-label-md text-label-md uppercase tracking-wider text-outline">Exposición Crédito</span>
+<span class="material-symbols-outlined text-base text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+<div class="font-mono-price-lg text-mono-price-lg text-primary tracking-tight font-bold">$420.500</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-outline-variant/20">
+<span class="font-mono-data-sm text-mono-data-sm text-secondary">14 cuentas abiertas</span>
+<span class="font-mono-data-sm text-[10px] text-tertiary">Activas</span>
+</div>
+</div>
+<!-- Card 2: Clientes en Mora -->
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/30 relative overflow-hidden group hover:border-error/40 transition-all">
+<div class="flex items-center justify-between text-on-surface-variant mb-1.5">
+<span class="font-label-md text-label-md uppercase tracking-wider text-outline">Clientes en Mora</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-error-container/40 text-error font-mono-data-sm font-semibold border border-error/30">&gt;30 DÍAS</span>
+</div>
+<div class="flex items-baseline space-x-2">
+<span class="font-mono-price-lg text-mono-price-lg text-error font-bold">3</span>
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant font-medium">titulares</span>
+</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-outline-variant/20">
+<span class="font-mono-data-sm text-mono-data-sm text-error">Vencido: $118.200</span>
+<span class="material-symbols-outlined text-sm text-error" data-icon="warning">warning</span>
+</div>
+</div>
+<!-- Card 3: Límite Global Comprometido -->
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/30 relative overflow-hidden group hover:border-secondary/40 transition-all">
+<div class="flex items-center justify-between text-on-surface-variant mb-1.5">
+<span class="font-label-md text-label-md uppercase tracking-wider text-outline">Compromiso Cupo</span>
+<span class="font-mono-data-sm text-mono-data-sm text-secondary font-bold">64.2%</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden mt-1 mb-2">
+<div class="bg-primary-container h-full rounded-full" style="width: 64.2%"></div>
+</div>
+<div class="flex items-center justify-between pt-1 border-t border-outline-variant/20">
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant">Límite Total: $655.000</span>
+<span class="font-mono-data-sm text-mono-data-sm text-tertiary">Disp: $234.500</span>
+</div>
+</div>
+<!-- Card 4: Recaudación Recuperada Hoy -->
+<div class="p-3.5 rounded bg-surface-container-low border border-outline-variant/30 relative overflow-hidden group hover:border-tertiary/40 transition-all">
+<div class="flex items-center justify-between text-on-surface-variant mb-1.5">
+<span class="font-label-md text-label-md uppercase tracking-wider text-outline">Recaudado Hoy</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-tertiary/10 text-tertiary font-mono-data-sm border border-tertiary/20">3 Pagos OK</span>
+</div>
+<div class="font-mono-price-lg text-mono-price-lg text-tertiary tracking-tight font-bold">+$96.400</div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-outline-variant/20">
+<span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant">Último: POS Redsys 21:14</span>
+<span class="material-symbols-outlined text-sm text-tertiary" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION 2: CUSTOMER DIRECTORY & ADVANCED SEARCH FILTER -->
+<div class="p-5 flex-1 flex flex-col min-h-0 bg-surface-dim">
+<!-- Search Row + Shortcut -->
+<div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
+<div class="relative flex-1 max-w-2xl">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low pl-10 pr-16 py-2.5 rounded border border-outline-variant/40 text-on-surface placeholder:text-outline/70 focus:outline-none focus:border-primary-container text-body-md font-body-md transition-colors" placeholder="Buscar huésped por nombre, teléfono (+34...), empresa o CIF..." type="text" value="Dr. Alejandro Sotomayor"/>
+<div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center space-x-1">
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest border border-outline-variant/50 text-on-surface-variant font-mono-data-sm text-[10px]">⌘</kbd>
+<kbd class="px-1.5 py-0.5 rounded bg-surface-container-highest border border-outline-variant/50 text-on-surface-variant font-mono-data-sm text-[10px]">K</kbd>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<button class="px-3 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded border border-outline-variant/30 font-label-md text-label-md flex items-center space-x-1.5 transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="filter_list">filter_list</span>
+<span>Filtros Avanzados</span>
+</button>
+<button class="px-3 py-2 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded border border-outline-variant/30 font-label-md text-label-md flex items-center space-x-1 transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="swap_vert">swap_vert</span>
+<span>Mayor Deuda</span>
+</button>
+</div>
+</div>
+<!-- Segmented Filter Tabs -->
+<div class="flex items-center space-x-2 overflow-x-auto pb-2 mb-3 border-b border-outline-variant/20 scrollbar-none">
+<button class="px-3 py-1.5 rounded font-label-md text-label-md bg-surface-container-high text-on-surface border border-outline-variant/40 whitespace-nowrap">
+              Todos <span class="font-mono-data-sm text-outline ml-1">28</span>
+</button>
+<button class="px-3 py-1.5 rounded font-label-md text-label-md bg-primary-container/20 text-primary border border-primary/40 font-semibold whitespace-nowrap flex items-center space-x-1.5">
+<span>Con Deuda Activa</span>
+<span class="px-1.5 py-0.2 rounded-full bg-primary-container text-on-primary-container font-mono-data-sm text-[10px]">14</span>
+</button>
+<button class="px-3 py-1.5 rounded font-label-md text-label-md bg-error-container/20 text-error border border-error/30 whitespace-nowrap flex items-center space-x-1.5">
+<span>En Mora / Vencidos</span>
+<span class="px-1.5 py-0.2 rounded-full bg-error-container text-on-error font-mono-data-sm text-[10px]">3</span>
+</button>
+<button class="px-3 py-1.5 rounded font-label-md text-label-md bg-surface-container text-on-surface-variant hover:text-on-surface border border-outline-variant/20 whitespace-nowrap">
+              Al Día / Sin Deuda <span class="font-mono-data-sm text-outline ml-1">11</span>
+</button>
+<button class="px-3 py-1.5 rounded font-label-md text-label-md bg-secondary-container/20 text-secondary border border-secondary/30 whitespace-nowrap">
+              Límite &gt;80% <span class="font-mono-data-sm text-secondary-fixed ml-1">5</span>
+</button>
+</div>
+<!-- Table of VIP Clients & Accounts -->
+<div class="flex-1 overflow-y-auto rounded border border-outline-variant/30 bg-surface-container-lowest">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/30 bg-surface-container-low/70 text-on-surface-variant font-label-md text-label-md">
+<th class="py-3 px-4 font-semibold uppercase tracking-wider">Huésped / Titular VIP</th>
+<th class="py-3 px-3 font-semibold uppercase tracking-wider">Contacto &amp; Mesa</th>
+<th class="py-3 px-3 font-semibold uppercase tracking-wider text-right">Límite Otorgado</th>
+<th class="py-3 px-3 font-semibold uppercase tracking-wider text-right">Saldo Deudor</th>
+<th class="py-3 px-3 font-semibold uppercase tracking-wider text-center">Cupo %</th>
+<th class="py-3 px-4 font-semibold uppercase tracking-wider text-center">Estado Fiscal</th>
+<th class="py-3 px-2 font-semibold uppercase tracking-wider text-right">Acción</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body-sm text-body-sm">
+<!-- Client 1: Selected (Alejandro Sotomayor) -->
+<tr class="bg-surface-container-high/60 border-l-4 border-l-primary hover:bg-surface-container-high transition-colors cursor-pointer">
+<td class="py-3.5 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded bg-primary-container/20 border border-primary/40 flex items-center justify-center text-primary font-mono-data-sm font-bold">
+                        AS
+                      </div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-label-lg text-label-lg font-semibold text-on-surface">Dr. Alejandro Sotomayor</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-secondary-container text-secondary font-mono-data-sm">VIP GOLD</span>
+</div>
+<div class="text-outline-variant text-[11px] font-mono-data-sm mt-0.5">Socio #0842 • Club Gastronomique</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="text-on-surface font-mono-data-sm">+34 611 445 789</div>
+<div class="text-outline text-[11px] flex items-center space-x-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-secondary" data-icon="history">history</span>
+<span>Hace 2 días (Mesa 12)</span>
+</div>
+</td>
+<td class="py-3.5 px-3 text-right font-mono-price-md text-on-surface-variant">
+                    $150.000
+                  </td>
+<td class="py-3.5 px-3 text-right">
+<div class="font-mono-price-md font-bold text-primary">$142.800</div>
+<div class="text-[10px] font-mono-data-sm text-error">Riesgo Alto</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="w-20 mx-auto">
+<div class="flex justify-between text-[10px] font-mono-data-sm text-primary mb-1">
+<span>95.2%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary-container h-full rounded-full" style="width: 95.2%"></div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono-data-sm font-semibold bg-error-container/30 text-error border border-error/30">
+<span class="w-1.5 h-1.5 rounded-full bg-error mr-1.5 animate-ping"></span>
+                      En Mora (12 días)
+                    </span>
+</td>
+<td class="py-3.5 px-2 text-right">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-primary transition-colors" title="Ver Cuenta Corriente">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Client 2: Lord H. Sterling -->
+<tr class="hover:bg-surface-container/50 transition-colors cursor-pointer">
+<td class="py-3.5 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded bg-surface-container border border-outline-variant/30 flex items-center justify-center text-secondary font-mono-data-sm font-bold">
+                        HS
+                      </div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-label-lg text-label-lg font-medium text-on-surface">Lord H. Sterling</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-surface-container-high text-tertiary-fixed font-mono-data-sm border border-tertiary/20">PLATINUM</span>
+</div>
+<div class="text-outline-variant text-[11px] font-mono-data-sm mt-0.5">Socio #0102 • Embajada UK</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="text-on-surface font-mono-data-sm">+44 770 090 0145</div>
+<div class="text-outline text-[11px] flex items-center space-x-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-tertiary" data-icon="room_service">room_service</span>
+<span>Hoy (Chef's Pass)</span>
+</div>
+</td>
+<td class="py-3.5 px-3 text-right font-mono-price-md text-on-surface-variant">
+                    $300.000
+                  </td>
+<td class="py-3.5 px-3 text-right">
+<div class="font-mono-price-md font-semibold text-secondary-fixed">$165.200</div>
+<div class="text-[10px] font-mono-data-sm text-secondary">Dentro de plazo</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="w-20 mx-auto">
+<div class="flex justify-between text-[10px] font-mono-data-sm text-secondary-fixed mb-1">
+<span>55.0%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 55%"></div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono-data-sm font-semibold bg-tertiary/10 text-tertiary border border-tertiary/20">
+                      Al Corriente
+                    </span>
+</td>
+<td class="py-3.5 px-2 text-right">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Client 3: Mme. Valérie Moreau -->
+<tr class="hover:bg-surface-container/50 transition-colors cursor-pointer">
+<td class="py-3.5 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface-variant font-mono-data-sm font-bold">
+                        VM
+                      </div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-label-lg text-label-lg font-medium text-on-surface">Mme. Valérie Moreau</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-surface-container-high text-secondary font-mono-data-sm">SUITE PRES.</span>
+</div>
+<div class="text-outline-variant text-[11px] font-mono-data-sm mt-0.5">Huésped Hotel Palace • Hab. 504</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="text-on-surface font-mono-data-sm">+33 682 910 234</div>
+<div class="text-outline text-[11px] flex items-center space-x-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="timer">timer</span>
+<span>Hoy (Mesa 06)</span>
+</div>
+</td>
+<td class="py-3.5 px-3 text-right font-mono-price-md text-on-surface-variant">
+                    $120.000
+                  </td>
+<td class="py-3.5 px-3 text-right">
+<div class="font-mono-price-md font-semibold text-primary">$112.500</div>
+<div class="text-[10px] font-mono-data-sm text-secondary-container">Cupo Crítico</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="w-20 mx-auto">
+<div class="flex justify-between text-[10px] font-mono-data-sm text-primary mb-1">
+<span>93.7%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 93.7%"></div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono-data-sm font-semibold bg-secondary-container/40 text-secondary-fixed border border-secondary/30">
+                      Vence Hoy
+                    </span>
+</td>
+<td class="py-3.5 px-2 text-right">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Client 4: Novatech Catering SL -->
+<tr class="hover:bg-surface-container/50 transition-colors cursor-pointer">
+<td class="py-3.5 px-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded bg-surface-container border border-outline-variant/30 flex items-center justify-center text-tertiary font-mono-data-sm font-bold">
+                        NC
+                      </div>
+<div>
+<div class="flex items-center space-x-2">
+<span class="font-label-lg text-label-lg font-medium text-on-surface">Novatech Catering SL</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-surface-container-high text-outline font-mono-data-sm">CORP B2B</span>
+</div>
+<div class="text-outline-variant text-[11px] font-mono-data-sm mt-0.5">CIF: B-88492019 • Factura Mensual</div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="text-on-surface font-mono-data-sm">+34 914 200 900</div>
+<div class="text-outline text-[11px] flex items-center space-x-1 mt-0.5">
+<span class="material-symbols-outlined text-xs text-outline" data-icon="event">event</span>
+<span>Hace 6 días</span>
+</div>
+</td>
+<td class="py-3.5 px-3 text-right font-mono-price-md text-on-surface-variant">
+                    $200.000
+                  </td>
+<td class="py-3.5 px-3 text-right">
+<div class="font-mono-price-md font-semibold text-tertiary">$0</div>
+<div class="text-[10px] font-mono-data-sm text-tertiary">Favor +$15.000</div>
+</td>
+<td class="py-3.5 px-3">
+<div class="w-20 mx-auto">
+<div class="flex justify-between text-[10px] font-mono-data-sm text-tertiary mb-1">
+<span>0.0%</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 0%"></div>
+</div>
+</div>
+</td>
+<td class="py-3.5 px-4 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono-data-sm font-semibold bg-tertiary/10 text-tertiary border border-tertiary/20">
+                      Al Día
+                    </span>
+</td>
+<td class="py-3.5 px-2 text-right">
+<button class="p-1.5 rounded hover:bg-surface-container-highest text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Bottom Summary Bar -->
+<div class="mt-3 flex items-center justify-between text-mono-data-sm font-mono-data-sm text-outline-variant px-1">
+<span>Mostrando 4 de 28 titulares asignados al Chef Pass #04</span>
+<div class="flex items-center space-x-3">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> Conciliación bancaria activa
+              </span>
+<span>Actualizado hace 42s</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ================= RIGHT INSPECTION DRAWER: SELECTED CLIENT LEDGER ================= -->
+<!-- Interactive Customer Ledger Drawer (Width ~36% or min 420px) -->
+<aside class="w-[430px] flex flex-col bg-surface-container-lowest border-l border-outline-variant/30 h-full overflow-y-auto">
+<!-- Drawer Header -->
+<div class="p-4 border-b border-outline-variant/30 bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center space-x-2.5">
+<div class="w-8 h-8 rounded bg-primary-container text-on-primary-container flex items-center justify-center font-mono-data-sm font-bold">
+              AS
+            </div>
+<div>
+<div class="flex items-center space-x-1.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Dr. Alejandro Sotomayor</h3>
+<span class="material-symbols-outlined text-secondary text-base" data-icon="verified">verified</span>
+</div>
+<p class="font-mono-data-sm text-mono-data-sm text-outline">Socio VIP #0842 • Cuenta Gastronómica</p>
+</div>
+</div>
+<div class="flex items-center space-x-1">
+<button class="p-1.5 rounded hover:bg-surface-container text-outline hover:text-on-surface transition-colors" title="Historial Completo">
+<span class="material-symbols-outlined text-lg" data-icon="receipt_long">receipt_long</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container text-outline hover:text-on-surface transition-colors" title="Editar Límite">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<div class="p-4 space-y-4 flex-1">
+<!-- VIP Profile & Credit Health Box -->
+<div class="p-3.5 rounded bg-surface-container border border-primary/30 relative">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-md text-label-md uppercase tracking-wider text-primary">Estado de Cuenta Corriente</span>
+<span class="px-2 py-0.5 rounded text-[10px] bg-error-container/40 text-error font-mono-data-sm border border-error/30 font-bold">
+                12 DÍAS EN MORA
+              </span>
+</div>
+<!-- Big Amount Callout -->
+<div class="flex items-baseline justify-between mt-1">
+<div>
+<span class="text-xs font-mono-data-sm text-outline-variant">Deuda Total Pendiente:</span>
+<div class="font-mono-price-lg text-[26px] text-primary font-bold tracking-tight leading-none mt-1">$142.800</div>
+</div>
+<div class="text-right">
+<span class="text-xs font-mono-data-sm text-outline-variant">Límite Aprobado:</span>
+<div class="font-mono-price-md text-mono-price-md text-on-surface-variant mt-1">$150.000</div>
+</div>
+</div>
+<!-- Credit Progress Bar -->
+<div class="mt-3">
+<div class="flex justify-between font-mono-data-sm text-mono-data-sm mb-1.5">
+<span class="text-primary font-semibold">95.2% del crédito consumido</span>
+<span class="text-tertiary">Disp: $7.200</span>
+</div>
+<div class="w-full bg-surface-container-lowest h-2 rounded-full overflow-hidden p-0.5 border border-outline-variant/30">
+<div class="bg-primary-container h-full rounded-full transition-all duration-500" style="width: 95.2%"></div>
+</div>
+</div>
+<div class="mt-3 pt-2.5 border-t border-outline-variant/30 flex items-center justify-between text-[11px] font-mono-data-sm text-on-surface-variant">
+<span>CIF/NIF: ES-48192044-K</span>
+<span class="text-secondary">Concierge: M. Laurent</span>
+</div>
+</div>
+<!-- Unpaid Tickets Ledger (Comandas a Cuenta) -->
+<div>
+<div class="flex items-center justify-between mb-2">
+<h4 class="font-label-lg text-label-lg font-semibold text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-base text-primary" data-icon="inventory">inventory</span>
+<span>Comandas &amp; Vinos en Fiado</span>
+</h4>
+<span class="font-mono-data-sm text-[11px] text-outline">2 Tickets sin saldar</span>
+</div>
+<div class="space-y-2">
+<!-- Ticket 1: 18 Oct -->
+<div class="p-3 rounded bg-surface-container-low border border-outline-variant/30 hover:border-outline-variant/60 transition-colors">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center space-x-1.5">
+<span class="font-mono-data-sm text-mono-data-sm font-bold text-on-surface">#POS-1094</span>
+<span class="text-outline text-xs">• 18 Oct 2024</span>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-secondary-container/40 text-secondary font-mono-data-sm">
+                    Mesa 12 (4 pax)
+                  </span>
+</div>
+<div class="text-body-sm text-body-sm text-on-surface-variant">
+                  4x Menú Degustación Hommage + 1x Domaine de la Romanée-Conti 2017
+                </div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-outline-variant/20">
+<span class="px-1.5 py-0.2 rounded text-[10px] bg-surface-container-high text-primary font-mono-data-sm">Pendiente Pago</span>
+<span class="font-mono-price-md text-mono-price-md font-bold text-on-surface">$84.500</span>
+</div>
+</div>
+<!-- Ticket 2: 11 Oct (Vencido) -->
+<div class="p-3 rounded bg-surface-container-low border border-error/30 hover:border-error/50 transition-colors">
+<div class="flex items-center justify-between mb-1.5">
+<div class="flex items-center space-x-1.5">
+<span class="font-mono-data-sm text-mono-data-sm font-bold text-on-surface">#POS-1042</span>
+<span class="text-outline text-xs">• 11 Oct 2024</span>
+</div>
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-error-container/40 text-error font-mono-data-sm font-bold">
+                    Vencido 12 días
+                  </span>
+</div>
+<div class="text-body-sm text-body-sm text-on-surface-variant">
+                  Reserva Salón Privado 01 • Cava Histórica &amp; Ostras Gillardeau
+                </div>
+<div class="flex items-center justify-between mt-2 pt-2 border-t border-outline-variant/20">
+<span class="text-mono-data-sm text-[10px] text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-xs" data-icon="schedule">schedule</span> Plazo Expirado
+                  </span>
+<span class="font-mono-price-md text-mono-price-md font-bold text-error">$58.300</span>
+</div>
+</div>
+</div>
+</div>
+<!-- FINANCIAL SETTLEMENT ACTIONS -->
+<div class="pt-2 border-t border-outline-variant/30 space-y-3">
+<h4 class="font-label-md text-label-md uppercase tracking-wider text-outline">Liquidación Inmediata de Saldo</h4>
+<!-- Payment Gateway Selector -->
+<div class="grid grid-cols-3 gap-1.5">
+<button class="py-2 px-1 rounded bg-surface-container-high border border-primary/50 text-primary flex flex-col items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="credit_card">credit_card</span>
+<span class="font-mono-data-sm text-[10px] mt-0.5">TPV Redsys</span>
+</button>
+<button class="py-2 px-1 rounded bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:text-on-surface flex flex-col items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="account_balance">account_balance</span>
+<span class="font-mono-data-sm text-[10px] mt-0.5">Transferencia</span>
+</button>
+<button class="py-2 px-1 rounded bg-surface-container border border-outline-variant/30 text-on-surface-variant hover:text-on-surface flex flex-col items-center justify-center transition-colors">
+<span class="material-symbols-outlined text-base" data-icon="payments">payments</span>
+<span class="font-mono-data-sm text-[10px] mt-0.5">Caja Efectivo</span>
+</button>
+</div>
+<!-- Primary CTAs -->
+<div class="space-y-2">
+<button class="w-full py-2.5 px-4 bg-primary-container hover:bg-primary-container/90 text-on-primary-container rounded font-label-lg text-label-lg font-bold flex items-center justify-center space-x-2 transition-all shadow-md active:scale-[0.99]">
+<span class="material-symbols-outlined text-lg" data-icon="check_circle">check_circle</span>
+<span>Cobrar Deuda Total ($142.800)</span>
+</button>
+<button class="w-full py-2 px-4 bg-surface-container hover:bg-surface-container-high text-secondary border border-outline-variant/40 rounded font-label-md text-label-md font-semibold flex items-center justify-center space-x-1.5 transition-all">
+<span class="material-symbols-outlined text-base" data-icon="pie_chart">pie_chart</span>
+<span>Registrar Pago Parcial / Entrega a Cuenta</span>
+</button>
+</div>
+</div>
+<!-- WHATSAPP CONCIERGE REMINDER MODULE -->
+<div class="p-3.5 rounded bg-surface-container border border-outline-variant/40 space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-1.5">
+<span class="material-symbols-outlined text-tertiary text-base" data-icon="send">send</span>
+<span class="font-label-md text-label-md font-semibold text-on-surface">Recordatorio Concierge WhatsApp</span>
+</div>
+<span class="font-mono-data-sm text-[10px] text-tertiary flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Bot Conectado
+              </span>
+</div>
+<!-- Speech Preview Bubble -->
+<div class="p-2.5 rounded bg-surface-container-lowest border border-outline-variant/20 text-body-sm text-body-sm text-on-surface-variant italic relative leading-relaxed">
+              "L'Étoile Atelier Concierge: Estimado Dr. Sotomayor, le compartimos el extracto de cuenta corriente por un importe de <strong class="text-primary not-italic font-mono-price-md">$142.800</strong> correspondiente a sus últimas veladas gastronómicas. Puede regularizarlo mediante enlace seguro Redsys o en su próxima visita. Un cordial saludo del Chef y Dirección."
+            </div>
+<!-- Tax Invoice & Delivery Options -->
+<div class="flex items-center justify-between text-mono-data-sm text-[11px] text-outline pt-1">
+<label class="flex items-center space-x-1.5 cursor-pointer">
+<input checked="" class="rounded border-outline-variant text-primary-container focus:ring-0 bg-surface-container" type="checkbox"/>
+<span class="text-on-surface-variant">Adjuntar Factura Veri*Factu PDF</span>
+</label>
+<span class="text-secondary">Plantilla: Formal VIP</span>
+</div>
+<!-- Send WA CTA Button -->
+<button class="w-full py-2 bg-tertiary-container hover:bg-tertiary text-on-tertiary rounded font-label-md text-label-md font-bold flex items-center justify-center space-x-2 transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined text-lg" data-icon="chat">chat</span>
+<span>Enviar por WhatsApp Concierge (+34 611...)</span>
+</button>
+</div>
+</div>
+<!-- Drawer Footer Meta -->
+<div class="p-3 bg-surface-container-low border-t border-outline-variant/30 flex items-center justify-between font-mono-data-sm text-mono-data-sm text-outline">
+<span>Log: Conciliado POS #04 a las 21:05</span>
+<span class="text-secondary font-semibold">Trazabilidad Fiscal OK</span>
+</div>
+</aside>
+</main>
+</div>
+</body></html>

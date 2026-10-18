@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-background text-on-surface antialiased" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>ComandaSaaS Control - Portal de Auditoría y Control del Dueño</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#e8e8e7",
+            "outline-variant": "#dfc0b7",
+            "tertiary": "#4f5d75",
+            "surface-container-lowest": "#ffffff",
+            "on-background": "#1a1c1c",
+            "on-surface-variant": "#58423c",
+            "on-tertiary-fixed": "#0d1c31",
+            "on-tertiary-container": "#fefcff",
+            "surface-container-highest": "#e2e2e2",
+            "background": "#f9f9f8",
+            "on-primary": "#ffffff",
+            "surface-bright": "#f9f9f8",
+            "secondary-fixed-dim": "#c3c6d0",
+            "on-primary-container": "#fffbff",
+            "surface-variant": "#e2e2e2",
+            "on-tertiary-fixed-variant": "#39475e",
+            "primary-container": "#c54f2c",
+            "on-tertiary": "#ffffff",
+            "surface": "#f9f9f8",
+            "tertiary-container": "#67758e",
+            "surface-container-low": "#f3f4f3",
+            "on-primary-fixed": "#3b0900",
+            "secondary": "#5b5e67",
+            "surface-tint": "#a73918",
+            "secondary-fixed": "#dfe2ec",
+            "on-secondary-fixed-variant": "#43474f",
+            "inverse-primary": "#ffb5a0",
+            "tertiary-fixed-dim": "#b9c7e3",
+            "on-secondary-fixed": "#181c23",
+            "primary-fixed": "#ffdbd1",
+            "on-secondary-container": "#61646d",
+            "error-container": "#ffdad6",
+            "surface-dim": "#dadad9",
+            "error": "#ba1a1a",
+            "surface-container": "#eeeeed",
+            "on-primary-fixed-variant": "#862201",
+            "on-surface": "#1a1c1c",
+            "on-error-container": "#93000a",
+            "inverse-surface": "#2f3130",
+            "primary-fixed-dim": "#ffb5a0",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed": "#d5e3ff",
+            "inverse-on-surface": "#f1f1f0",
+            "on-error": "#ffffff",
+            "outline": "#8b716a",
+            "secondary-container": "#dfe2ec",
+            "primary": "#a43716"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-xl": "2rem",
+            "space-2xl": "3rem",
+            "gutter": "1rem",
+            "margin-tablet": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-lg": "1.25rem",
+            "space-md": "0.75rem",
+            "margin": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-desktop": "2.5rem"
+          },
+          "fontFamily": {
+            "body-sm": ["Geist", "sans-serif"],
+            "headline-lg": ["Geist", "sans-serif"],
+            "label-caps": ["Geist", "sans-serif"],
+            "headline-sm": ["Geist", "sans-serif"],
+            "body-md": ["Geist", "sans-serif"],
+            "headline-xl": ["Geist", "sans-serif"],
+            "display-lg": ["Geist", "sans-serif"],
+            "headline-xl-mobile": ["Geist", "sans-serif"],
+            "data-mono": ["JetBrains Mono", "monospace"],
+            "data-mono-sm": ["JetBrains Mono", "monospace"],
+            "body-lg": ["Geist", "sans-serif"],
+            "headline-md": ["Geist", "sans-serif"]
+          },
+          "fontSize": {
+            "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.02em", "fontWeight": "500" }],
+            "label-caps": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0.08em", "fontWeight": "600" }],
+            "headline-sm": ["1.125rem", { "lineHeight": "1.5rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-md": ["0.875rem", { "lineHeight": "1.375rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-xl": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.025em", "fontWeight": "600" }],
+            "display-lg": ["3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "600" }],
+            "headline-xl-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "data-mono": ["0.8125rem", { "lineHeight": "1.25rem", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "data-mono-sm": ["0.6875rem", { "lineHeight": "1rem", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-lg": ["1rem", { "lineHeight": "1.625rem", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-md": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.015em", "fontWeight": "500" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Hairline border rule and soft rendering */
+    * {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .custom-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen text-on-surface font-body-md flex justify-center selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Mobile App Frame (Strict 390px Viewport) -->
+<div class="w-full max-w-[390px] min-h-screen bg-background relative flex flex-col pb-36 border-x border-surface-container-high shadow-sm">
+<!-- Top Status Bar & TopAppBar Anchor -->
+<header class="sticky top-0 z-40 bg-surface border-b border-surface-container-high">
+<!-- System Telemetry Micro Bar -->
+<div class="px-4 pt-1.5 pb-1 flex items-center justify-between text-secondary bg-surface border-b border-surface-container/60">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary tracking-tight">Sync 0ms SQLite OK</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps bg-surface-container-low px-1.5 py-0.5 rounded text-secondary border border-surface-container-high">Hoy 24 Oct</span>
+<span class="font-data-mono-sm text-data-mono-sm text-on-surface font-medium">21:28</span>
+</div>
+</div>
+<!-- TopAppBar Shared Component Blueprint Execution -->
+<div class="flex justify-between items-center w-full px-4 h-12 max-w-screen-sm mx-auto bg-surface">
+<div class="flex items-center gap-2.5">
+<!-- Leading Icon -->
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary border border-surface-container-high">
+<span class="material-symbols-outlined text-[19px]">storefront</span>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm-mobile text-on-surface tracking-tight font-bold">Burga Fast &amp; Craft</span>
+</div>
+<button class="flex items-center gap-1 font-body-sm text-body-sm text-secondary hover:text-on-surface transition-colors">
+<span>Palermo Soho</span>
+<span class="material-symbols-outlined text-[14px]">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Trailing Actions & Owner Avatar -->
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center px-1.5 py-0.5 rounded font-label-caps text-label-caps font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            LIVE
+          </span>
+<button aria-label="Notificaciones" class="relative w-8 h-8 flex items-center justify-center rounded text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full"></span>
+</button>
+<div class="w-7 h-7 rounded-lg bg-inverse-surface text-surface-container-lowest font-data-mono text-[11px] font-semibold flex items-center justify-center">
+            RV
+          </div>
+</div>
+</div>
+<!-- Context Bar: Modo Propietario -->
+<div class="px-4 py-2 bg-surface-container-low border-t border-surface-container-high/60 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps font-bold px-1.5 py-0.5 rounded bg-primary text-on-primary tracking-wider">MODO PROPIETARIO</span>
+<span class="font-body-sm text-body-sm text-secondary truncate max-w-[200px]">Auditoría en Tiempo Real</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-caps text-label-caps text-on-surface-variant font-medium">Turno Noche</span>
+</div>
+</div>
+</header>
+<!-- Main Operational Scroll Area -->
+<main class="flex-1 px-3.5 pt-3.5 space-y-4">
+<!-- Section: 2x2 Financial KPI Grid -->
+<section aria-labelledby="kpi-heading">
+<div class="flex items-center justify-between mb-2">
+<h2 class="font-label-caps text-label-caps text-secondary uppercase tracking-wider" id="kpi-heading">Métricas Financieras de Hoy</h2>
+<span class="font-data-mono-sm text-data-mono-sm text-secondary">Corte 21:28 hs</span>
+</div>
+<div class="grid grid-cols-2 gap-2.5">
+<!-- Card 1: Facturación del Día -->
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-surface-container-high flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-caps text-label-caps text-secondary font-medium">FACTURACIÓN DEL DÍA</span>
+<span class="font-data-mono-sm text-[10px] text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded font-medium">+18.4%</span>
+</div>
+<div class="font-data-mono text-[17px] font-semibold tracking-tight text-on-surface">
+                $ 482.350,00
+              </div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-surface-container-high/60">
+<p class="font-data-mono-sm text-data-mono-sm text-secondary">142 tickets</p>
+<p class="font-body-sm text-[11px] text-primary font-medium mt-0.5">Meta 114.8% alcanzada</p>
+</div>
+</div>
+<!-- Card 2: Tickets Cobrados -->
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-surface-container-high flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-caps text-label-caps text-secondary font-medium">TICKETS COBRADOS</span>
+<span class="material-symbols-outlined text-secondary text-[16px]">receipt_long</span>
+</div>
+<div class="font-data-mono text-[17px] font-semibold tracking-tight text-on-surface">
+                142 <span class="font-body-sm text-[11px] text-secondary font-normal">comandas</span>
+</div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-surface-container-high/60">
+<p class="font-data-mono-sm text-data-mono-sm text-secondary">T. Prom: $ 3.396,80</p>
+<p class="font-body-sm text-[11px] text-on-surface truncate mt-0.5 font-medium">Mesa #12 ($24.800)</p>
+</div>
+</div>
+<!-- Card 3: Efectivo en Caja -->
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-surface-container-high flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-caps text-label-caps text-secondary font-medium">EFECTIVO EN CAJA</span>
+<span class="font-data-mono-sm text-[10px] text-emerald-800 bg-emerald-50 px-1 py-0.5 rounded font-medium">OK Dif $0</span>
+</div>
+<div class="font-data-mono text-[17px] font-semibold tracking-tight text-on-surface">
+                $ 128.500,00
+              </div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-surface-container-high/60">
+<p class="font-data-mono-sm text-data-mono-sm text-secondary">T. Mañana: $44.000</p>
+<p class="font-data-mono-sm text-data-mono-sm text-secondary mt-0.5">T. Noche: $84.500</p>
+</div>
+</div>
+<!-- Card 4: Fiados Pendientes -->
+<div class="bg-surface-container-lowest p-3 rounded-lg border border-surface-container-high flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-caps text-label-caps text-secondary font-medium">FIADOS PENDIENTES</span>
+<span class="font-data-mono-sm text-[10px] text-amber-800 bg-amber-50 px-1 py-0.5 rounded font-medium">3 cuentas</span>
+</div>
+<div class="font-data-mono text-[17px] font-semibold tracking-tight text-primary">
+                $ 34.200,00
+              </div>
+</div>
+<div class="mt-2.5 pt-2 border-t border-surface-container-high/60">
+<p class="font-body-sm text-[11px] text-secondary">Riesgo comercial:</p>
+<p class="font-data-mono-sm text-data-mono-sm text-on-surface font-medium mt-0.5">7.1% del flujo total</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Turno Activo & Arqueo Ciego en Vivo -->
+<section class="bg-surface-container-lowest rounded-xl border border-surface-container-high p-3.5 space-y-3">
+<div class="flex items-center justify-between pb-2 border-b border-surface-container-high/60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[19px]">point_of_sale</span>
+<h3 class="font-headline-sm text-[14px] font-semibold text-on-surface">Arqueo de Gaveta en Vivo</h3>
+</div>
+<span class="font-label-caps text-label-caps bg-surface-container-low text-on-surface px-2 py-0.5 rounded border border-surface-container-high font-semibold">
+            TURNO ACTIVO #104
+          </span>
+</div>
+<!-- Cashier Identifier Strip -->
+<div class="flex items-center justify-between bg-surface-container-low p-2 rounded-lg border border-surface-container-high/50">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded bg-tertiary text-on-tertiary flex items-center justify-center font-data-mono text-[10px] font-bold">
+              LM
+            </div>
+<div>
+<p class="font-body-sm text-body-sm font-medium text-on-surface leading-tight">Lucas M. · Terminal T-01</p>
+<p class="font-data-mono-sm text-data-mono-sm text-secondary">Apertura: 20:00 hs (1h 28m en servicio)</p>
+</div>
+</div>
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+</div>
+<!-- Arqueo Breakdown Grid -->
+<div class="grid grid-cols-2 gap-2 text-left pt-1">
+<div class="p-2 rounded bg-surface border border-surface-container-high/40">
+<span class="font-label-caps text-[10px] text-secondary block">FONDO INICIAL</span>
+<span class="font-data-mono text-body-md font-semibold text-on-surface">$ 20.000,00</span>
+</div>
+<div class="p-2 rounded bg-surface border border-surface-container-high/40">
+<span class="font-label-caps text-[10px] text-secondary block">EFECTIVO DECLARADO</span>
+<span class="font-data-mono text-body-md font-semibold text-emerald-800">$ 84.500,00</span>
+</div>
+<div class="p-2 rounded bg-surface border border-surface-container-high/40">
+<span class="font-label-caps text-[10px] text-secondary block">MP / TARJETAS</span>
+<span class="font-data-mono text-body-md font-semibold text-on-surface">$ 265.400,00</span>
+</div>
+<div class="p-2 rounded bg-surface border border-surface-container-high/40">
+<span class="font-label-caps text-[10px] text-secondary block">RETIROS / GASTOS</span>
+<span class="font-data-mono text-body-md font-semibold text-error">-$ 12.000,00</span>
+</div>
+</div>
+<!-- Reconciliation Status Callout -->
+<div class="p-2.5 rounded-lg bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]">verified</span>
+<div>
+<p class="font-body-sm text-[12px] text-emerald-950 font-medium">Teórico vs Real: $ 92.500 / $ 92.500</p>
+<p class="font-data-mono-sm text-data-mono-sm text-emerald-800 font-semibold">Diferencia: $ 0,00 (Cuadre Exacto)</p>
+</div>
+</div>
+<span class="font-label-caps text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">100% OK</span>
+</div>
+<button class="w-full h-8 rounded bg-surface hover:bg-surface-container border border-surface-container-high font-body-sm text-body-sm text-on-surface font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span>Ver Desglose de Operaciones</span>
+<span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+</button>
+</section>
+<!-- Section: Alertas de Seguridad & Antifraude (Audit Feed) -->
+<section class="space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<h3 class="font-headline-sm text-[14px] font-semibold text-on-surface">Auditoría Antifraude</h3>
+<span class="font-label-caps text-label-caps bg-error text-on-error px-1.5 py-0.5 rounded font-bold">5 alertas hoy</span>
+</div>
+<button class="font-body-sm text-[11px] text-primary hover:underline">Historial</button>
+</div>
+<!-- Filter Pills Bar -->
+<div class="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar text-nowrap">
+<button class="px-2.5 py-1 rounded-full bg-inverse-surface text-surface-container-lowest font-label-caps text-label-caps font-medium">Todas (5)</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest border border-surface-container-high text-secondary hover:text-on-surface font-label-caps text-label-caps">Gaveta (1)</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest border border-surface-container-high text-secondary hover:text-on-surface font-label-caps text-label-caps">Descuentos (2)</button>
+<button class="px-2.5 py-1 rounded-full bg-surface-container-lowest border border-surface-container-high text-secondary hover:text-on-surface font-label-caps text-label-caps">Cancelaciones (2)</button>
+</div>
+<!-- Alert Item 1: Sensor Hardware Gaveta -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border-l-2 border-l-error border-y border-r border-surface-container-high space-y-2">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-1.5">
+<span class="font-label-caps text-[10px] bg-red-100 text-error px-1.5 py-0.5 rounded font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">lock_open</span>
+                19:15:33 · Sensor RJ-11
+              </span>
+<span class="font-data-mono-sm text-[10px] text-secondary">Terminal T-01</span>
+</div>
+<span class="w-2 h-2 rounded-full bg-error"></span>
+</div>
+<div>
+<p class="font-body-sm text-[13px] font-semibold text-on-surface leading-snug">
+              Apertura manual de gaveta sin comanda asociada
+            </p>
+<p class="font-body-sm text-[11px] text-secondary mt-0.5">
+              Disparo por llave física / sin ticket AFIP emitido en los 90s previos.
+            </p>
+</div>
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 h-7 rounded bg-error text-on-error font-body-sm text-[11px] font-medium flex items-center justify-center gap-1 hover:bg-red-700 transition-colors">
+<span class="material-symbols-outlined text-[14px]">search_check</span>
+              Investigar
+            </button>
+<button class="px-3 h-7 rounded bg-surface border border-surface-container-high text-secondary hover:text-on-surface font-body-sm text-[11px] font-medium transition-colors">
+              Visto Bueno
+            </button>
+</div>
+</div>
+<!-- Alert Item 2: Cancelación de Plato con Comanda Marchada -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border border-surface-container-high space-y-2">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-1.5">
+<span class="font-label-caps text-[10px] bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded font-bold">
+                20:48:19 · Ticket #ORD-1042
+              </span>
+<span class="font-data-mono-sm text-[10px] text-secondary">Cajera: Sofía C.</span>
+</div>
+<span class="font-data-mono text-[11px] font-semibold text-primary">-$ 4.800,00</span>
+</div>
+<div>
+<p class="font-body-sm text-[13px] font-medium text-on-surface leading-snug">
+              Ítem 'Doble Cheeseburger' eliminado luego de marchar a cocina
+            </p>
+<p class="font-body-sm text-[11px] text-secondary mt-0.5">
+              Motivo: Cambio por intolerancia no especificada previamente.
+            </p>
+</div>
+<div class="flex items-center gap-2 pt-1">
+<button class="flex-1 h-7 rounded bg-surface-container-high hover:bg-surface-variant text-on-surface font-body-sm text-[11px] font-medium flex items-center justify-center gap-1 transition-colors">
+              Aprobar Pérdida
+            </button>
+<button class="flex-1 h-7 rounded bg-surface border border-surface-container-high text-primary hover:bg-primary-fixed-dim/20 font-body-sm text-[11px] font-medium flex items-center justify-center gap-1 transition-colors">
+              Investigar
+            </button>
+</div>
+</div>
+<!-- Alert Item 3: Descuento Manual Superior a Política -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border border-surface-container-high space-y-1.5">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-1.5">
+<span class="font-label-caps text-[10px] bg-surface-container text-secondary px-1.5 py-0.5 rounded font-semibold">
+                21:14:02 · Mesa 04
+              </span>
+<span class="font-data-mono-sm text-[10px] text-secondary">Mozo: Lucas G.</span>
+</div>
+<span class="font-data-mono text-[11px] font-semibold text-secondary">-20%</span>
+</div>
+<p class="font-body-sm text-[12px] text-on-surface">
+            Descuento manual aplicado: <strong class="font-data-mono font-semibold text-on-surface">$ 3.400,00</strong>.
+          </p>
+<div class="flex items-center justify-between text-[11px] text-secondary pt-0.5">
+<span>Motivo: Cortesía corporativa</span>
+<span class="text-emerald-700 font-medium">Autorizado PIN Gerente</span>
+</div>
+</div>
+</section>
+<!-- Section: Cuentas Corrientes & Clientes Fiados -->
+<section class="space-y-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[19px]">receipt</span>
+<h3 class="font-headline-sm text-[14px] font-semibold text-on-surface">Cuentas Corrientes Activas</h3>
+<span class="font-label-caps text-label-caps bg-surface-container-low text-secondary px-1.5 py-0.5 rounded">3 cuentas</span>
+</div>
+<span class="font-data-mono text-[11px] font-bold text-on-surface">Total: $ 34.200</span>
+</div>
+<!-- Client 1: Estudio Jurídico Alvear -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border border-surface-container-high space-y-2">
+<div class="flex items-start justify-between">
+<div>
+<h4 class="font-body-sm text-[13px] font-semibold text-on-surface leading-tight">Estudio Jurídico Alvear</h4>
+<p class="font-data-mono-sm text-[10px] text-secondary">CC-04 · CUIT 30-71449812-4</p>
+</div>
+<div class="text-right">
+<span class="font-data-mono text-body-md font-bold text-on-surface">$ 18.450,00</span>
+<span class="block font-data-mono-sm text-[10px] text-secondary">4 comandas</span>
+</div>
+</div>
+<!-- Credit Limit Bar -->
+<div>
+<div class="flex justify-between font-label-caps text-[9px] text-secondary mb-1">
+<span>CRÉDITO UTILIZADO (36%)</span>
+<span>LÍMITE $ 50.000</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 36%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-body-sm text-[11px] text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px] text-emerald-600">schedule</span>
+              Vence en 6 días
+            </span>
+<button class="h-7 px-2.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-body-sm text-[11px] font-medium flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[13px]">chat</span>
+              Cobrar por WhatsApp
+            </button>
+</div>
+</div>
+<!-- Client 2: Agencia Prisma Tech -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border border-surface-container-high space-y-2">
+<div class="flex items-start justify-between">
+<div>
+<h4 class="font-body-sm text-[13px] font-semibold text-on-surface leading-tight">Agencia Prisma Tech</h4>
+<p class="font-data-mono-sm text-[10px] text-secondary">CC-11 · Almuerzos Equipo</p>
+</div>
+<div class="text-right">
+<span class="font-data-mono text-body-md font-bold text-on-surface">$ 12.150,00</span>
+<span class="block font-data-mono-sm text-[10px] text-secondary">2 comandas</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-[9px] text-secondary mb-1">
+<span>CRÉDITO UTILIZADO (40%)</span>
+<span>LÍMITE $ 30.000</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 40%"></div>
+</div>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-label-caps text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">Al día</span>
+<button class="h-7 px-2.5 rounded bg-emerald-700 hover:bg-emerald-800 text-white font-body-sm text-[11px] font-medium flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[13px]">chat</span>
+              Cobrar por WhatsApp
+            </button>
+</div>
+</div>
+<!-- Client 3: Federico Gómez (Vecino Mora) -->
+<div class="bg-surface-container-lowest p-3 rounded-xl border-l-2 border-l-primary border-y border-r border-surface-container-high space-y-2">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-1.5">
+<h4 class="font-body-sm text-[13px] font-semibold text-on-surface leading-tight">Federico Gómez</h4>
+<span class="font-label-caps text-[9px] bg-red-100 text-error px-1 py-0.2 rounded font-bold">Mora</span>
+</div>
+<p class="font-data-mono-sm text-[10px] text-secondary">Vecino - CC-02</p>
+</div>
+<div class="text-right">
+<span class="font-data-mono text-body-md font-bold text-primary">$ 3.600,00</span>
+<span class="block font-data-mono-sm text-[10px] text-secondary">1 comanda</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-[9px] text-error font-medium mb-1">
+<span>RIESGO ALTO (72% LÍMITE)</span>
+<span>Vencido hace 3 días</span>
+</div>
+<div class="w-full bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 72%"></div>
+</div>
+</div>
+<div class="flex items-center justify-end pt-1">
+<button class="w-full h-7 rounded bg-primary hover:bg-primary-container text-on-primary font-body-sm text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[13px]">notification_important</span>
+              Reclamar Saldo Inmediato
+            </button>
+</div>
+</div>
+</section>
+<!-- Section: Hardware Infrastructure Strip -->
+<section class="p-2.5 rounded-lg bg-surface border border-surface-container-high text-center">
+<div class="flex items-center justify-center gap-2 text-secondary font-data-mono-sm text-[10px]">
+<span class="flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+            AFIP RG 4291 OK
+          </span>
+<span>·</span>
+<span>Impresora 192.168.1.120</span>
+<span>·</span>
+<span>Gaveta RJ-11 Lista</span>
+</div>
+</section>
+</main>
+<!-- Sticky Bottom Navigation Shell -->
+<div class="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+<div class="w-full max-w-[390px] bg-surface-container-lowest border-t border-surface-container-high px-3 py-2 pointer-events-auto space-y-2 shadow-lg">
+<!-- Primary Action Trigger for Executive Oversight -->
+<button class="w-full h-9 rounded-lg bg-primary hover:bg-primary-container active:scale-[0.98] text-on-primary font-body-md text-[13px] font-semibold flex items-center justify-center gap-2 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[17px]">security</span>
+<span>Auditar Turno Activo en Vivo</span>
+<span class="font-data-mono-sm text-[10px] bg-black/20 px-1.5 py-0.5 rounded text-white font-normal">T-01</span>
+</button>
+<!-- BottomNavBar Shared Component Implementation (Active: Resumen) -->
+<nav aria-label="Navegación Principal ComandaSaaS" class="flex justify-around items-center pt-1">
+<!-- Tab 1: Resumen (Active semantic anchor for overview) -->
+<a class="flex flex-col items-center justify-center text-primary font-semibold transition-all active:scale-[0.97]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps mt-0.5">Resumen</span>
+</a>
+<!-- Tab 2: Caja Turno -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-on-surface transition-all active:scale-[0.97]" href="#">
+<span class="material-symbols-outlined text-[20px]">point_of_sale</span>
+<span class="font-label-caps text-label-caps mt-0.5 text-secondary">Caja Turno</span>
+</a>
+<!-- Tab 3: Alertas -->
+<a class="relative flex flex-col items-center justify-center text-secondary hover:text-on-surface transition-all active:scale-[0.97]" href="#">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+<span class="absolute -top-1 right-2 w-3.5 h-3.5 bg-error text-white font-data-mono-sm text-[8px] rounded-full flex items-center justify-center font-bold">5</span>
+<span class="font-label-caps text-label-caps mt-0.5 text-secondary">Alertas</span>
+</a>
+<!-- Tab 4: Cobros -->
+<a class="flex flex-col items-center justify-center text-secondary hover:text-on-surface transition-all active:scale-[0.97]" href="#">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+<span class="font-label-caps text-label-caps mt-0.5 text-secondary">Cobros</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</body></html>

@@ -255,27 +255,55 @@ export function applyCatalogTheme(themeId, targetElement = null) {
   const el = targetElement || (typeof document !== 'undefined' ? document.documentElement : null);
   if (!el) return theme;
 
+  const isLightMode = (typeof document !== 'undefined' && document.documentElement?.getAttribute('data-theme') === 'light') ||
+                      (el.getAttribute && el.getAttribute('data-theme') === 'light');
+
   const t = theme.tokens;
-  el.style.setProperty('--cat-bg', t.bg);
-  el.style.setProperty('--cat-surface', t.surface);
-  el.style.setProperty('--cat-surface-2', t.surface2);
-  el.style.setProperty('--cat-surface-3', t.surface3);
-  el.style.setProperty('--cat-border', t.border);
-  el.style.setProperty('--cat-border-strong', t.borderStrong);
-  el.style.setProperty('--cat-red', t.primary);
-  el.style.setProperty('--cat-red-hover', t.primaryHover);
-  el.style.setProperty('--cat-primary-glow', t.primaryGlow);
-  el.style.setProperty('--cat-green', t.accent);
-  el.style.setProperty('--cat-text', t.text);
-  el.style.setProperty('--cat-text-muted', t.textMuted);
-  el.style.setProperty('--cat-text-secondary', t.textSecondary);
-  el.style.setProperty('--cat-banner-bg', t.bannerBg);
-  el.style.setProperty('--cat-banner-size', t.bannerSize);
-  el.style.setProperty('--cat-banner-color', t.bannerColor);
-  el.style.setProperty('--cat-banner-title-color', t.bannerTitleColor);
-  el.style.setProperty('--cat-banner-title-bg', t.bannerTitleBg);
-  el.style.setProperty('--cat-chip-btn-bg', t.chipBtnBg);
-  el.style.setProperty('--cat-font', t.fontFamily);
+
+  if (isLightMode && !theme.isLight) {
+    // Modo Claro activado globalmente: conservar acento de marca pero adaptar superficies a claro de alta legibilidad
+    el.style.setProperty('--cat-bg', '#f9f9f8');
+    el.style.setProperty('--cat-surface', '#ffffff');
+    el.style.setProperty('--cat-surface-2', '#f1f5f9');
+    el.style.setProperty('--cat-surface-3', '#e2e8f0');
+    el.style.setProperty('--cat-border', '#e2e8f0');
+    el.style.setProperty('--cat-border-strong', '#cbd5e1');
+    el.style.setProperty('--cat-red', t.primary);
+    el.style.setProperty('--cat-red-hover', t.primaryHover);
+    el.style.setProperty('--cat-primary-glow', t.primaryGlow);
+    el.style.setProperty('--cat-green', t.accent);
+    el.style.setProperty('--cat-text', '#0f172a');
+    el.style.setProperty('--cat-text-muted', '#64748b');
+    el.style.setProperty('--cat-text-secondary', '#334155');
+    el.style.setProperty('--cat-banner-bg', t.bannerBg);
+    el.style.setProperty('--cat-banner-size', t.bannerSize);
+    el.style.setProperty('--cat-banner-color', '#ffffff');
+    el.style.setProperty('--cat-banner-title-color', t.bannerTitleColor || t.primary);
+    el.style.setProperty('--cat-banner-title-bg', '#ffffff');
+    el.style.setProperty('--cat-chip-btn-bg', t.chipBtnBg || t.primary);
+    el.style.setProperty('--cat-font', t.fontFamily);
+  } else {
+    el.style.setProperty('--cat-bg', t.bg);
+    el.style.setProperty('--cat-surface', t.surface);
+    el.style.setProperty('--cat-surface-2', t.surface2);
+    el.style.setProperty('--cat-surface-3', t.surface3);
+    el.style.setProperty('--cat-border', t.border);
+    el.style.setProperty('--cat-border-strong', t.borderStrong);
+    el.style.setProperty('--cat-red', t.primary);
+    el.style.setProperty('--cat-red-hover', t.primaryHover);
+    el.style.setProperty('--cat-primary-glow', t.primaryGlow);
+    el.style.setProperty('--cat-green', t.accent);
+    el.style.setProperty('--cat-text', t.text);
+    el.style.setProperty('--cat-text-muted', t.textMuted);
+    el.style.setProperty('--cat-text-secondary', t.textSecondary);
+    el.style.setProperty('--cat-banner-bg', t.bannerBg);
+    el.style.setProperty('--cat-banner-size', t.bannerSize);
+    el.style.setProperty('--cat-banner-color', t.bannerColor);
+    el.style.setProperty('--cat-banner-title-color', t.bannerTitleColor);
+    el.style.setProperty('--cat-banner-title-bg', t.bannerTitleBg);
+    el.style.setProperty('--cat-chip-btn-bg', t.chipBtnBg);
+    el.style.setProperty('--cat-font', t.fontFamily);
+  }
 
   return theme;
 }

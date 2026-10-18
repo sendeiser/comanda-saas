@@ -7,7 +7,7 @@
     "width": 1440,
     "height": 900,
     "screenshotPath": ".stitch\\crawler-screenshots\\landing-desktop.png",
-    "sizeBytes": 541133
+    "sizeBytes": 541836
   },
   {
     "route": "pos-terminal",
@@ -17,7 +17,7 @@
     "width": 1440,
     "height": 900,
     "screenshotPath": ".stitch\\crawler-screenshots\\pos-terminal-desktop.png",
-    "sizeBytes": 264806
+    "sizeBytes": 265064
   },
   {
     "route": "kitchen-kds",
@@ -27,7 +27,7 @@
     "width": 1440,
     "height": 900,
     "screenshotPath": ".stitch\\crawler-screenshots\\kitchen-kds-desktop.png",
-    "sizeBytes": 264806
+    "sizeBytes": 265255
   },
   {
     "route": "public-catalog",
@@ -37,7 +37,7 @@
     "width": 1440,
     "height": 900,
     "screenshotPath": ".stitch\\crawler-screenshots\\public-catalog-desktop.png",
-    "sizeBytes": 435235
+    "sizeBytes": 479338
   },
   {
     "route": "saas-admin",
@@ -47,7 +47,7 @@
     "width": 1440,
     "height": 900,
     "screenshotPath": ".stitch\\crawler-screenshots\\saas-admin-desktop.png",
-    "sizeBytes": 85924
+    "sizeBytes": 99546
   },
   {
     "route": "owner-audit",
@@ -67,7 +67,7 @@
     "width": 390,
     "height": 844,
     "screenshotPath": ".stitch\\crawler-screenshots\\landing-mobile.png",
-    "sizeBytes": 525989
+    "sizeBytes": 525448
   },
   {
     "route": "pos-terminal",
@@ -77,7 +77,7 @@
     "width": 390,
     "height": 844,
     "screenshotPath": ".stitch\\crawler-screenshots\\pos-terminal-mobile.png",
-    "sizeBytes": 107512
+    "sizeBytes": 111069
   },
   {
     "route": "kitchen-kds",
@@ -87,7 +87,7 @@
     "width": 390,
     "height": 844,
     "screenshotPath": ".stitch\\crawler-screenshots\\kitchen-kds-mobile.png",
-    "sizeBytes": 111009
+    "sizeBytes": 111259
   },
   {
     "route": "public-catalog",
@@ -97,7 +97,7 @@
     "width": 390,
     "height": 844,
     "screenshotPath": ".stitch\\crawler-screenshots\\public-catalog-mobile.png",
-    "sizeBytes": 278076
+    "sizeBytes": 303064
   },
   {
     "route": "saas-admin",
@@ -107,7 +107,7 @@
     "width": 390,
     "height": 844,
     "screenshotPath": ".stitch\\crawler-screenshots\\saas-admin-mobile.png",
-    "sizeBytes": 70642
+    "sizeBytes": 91911
   },
   {
     "route": "owner-audit",

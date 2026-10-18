@@ -64,19 +64,48 @@ export default function App() {
 
   useEffect(() => {
     const active = getActiveStore();
-    if (active?.theme) {
-      applyStoreTheme(active.theme);
-    }
+    const primaryColor = settings?.primaryColor || active?.theme?.primaryColor || '#f59e0b';
+    const accentColor = settings?.accentColor || active?.theme?.accentColor || '#10b981';
+    const bgDark = active?.theme?.bgDark || '#0b0f19';
+    const surfaceDark = active?.theme?.surfaceDark || '#111827';
+    const fontFamily = active?.theme?.fontFamily || "'Plus Jakarta Sans', sans-serif";
+
+    applyStoreTheme({
+      primaryColor,
+      accentColor,
+      bgDark,
+      surfaceDark,
+      fontFamily
+    });
+
     const handleStoreUpdated = () => {
       const updated = getActiveStore();
-      if (updated?.theme) {
-        applyStoreTheme(updated.theme);
-      }
-      setSettings(storageService.getSettings());
+      const currentSettings = storageService.getSettings();
+      const nextPrimary = currentSettings?.primaryColor || updated?.theme?.primaryColor || '#f59e0b';
+      const nextAccent = currentSettings?.accentColor || updated?.theme?.accentColor || '#10b981';
+      applyStoreTheme({
+        primaryColor: nextPrimary,
+        accentColor: nextAccent,
+        bgDark: updated?.theme?.bgDark || '#0b0f19',
+        surfaceDark: updated?.theme?.surfaceDark || '#111827',
+        fontFamily: updated?.theme?.fontFamily || "'Plus Jakarta Sans', sans-serif"
+      });
+      setSettings(currentSettings);
     };
+
+    const handleSettingsUpdated = (e) => {
+      if (e?.detail) {
+        setSettings(e.detail);
+      }
+    };
+
     window.addEventListener('comandafast:store_updated', handleStoreUpdated);
-    return () => window.removeEventListener('comandafast:store_updated', handleStoreUpdated);
-  }, []);
+    window.addEventListener('comandafast:settings_updated', handleSettingsUpdated);
+    return () => {
+      window.removeEventListener('comandafast:store_updated', handleStoreUpdated);
+      window.removeEventListener('comandafast:settings_updated', handleSettingsUpdated);
+    };
+  }, [settings?.primaryColor, settings?.accentColor]);
 
   const [activeWhatsAppCount, setActiveWhatsAppCount] = useState(0);
   const [orderToLoadInPOS, setOrderToLoadInPOS] = useState(null);
@@ -1235,7 +1264,7 @@ export default function App() {
   // SECRET OWNER AUDIT PORTAL (Completely independent page without POS header)
   if (isOwnerPortalRoute) {
     return (
-      <div className="owner-portal-fullscreen" style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-primary)', padding: '1rem', overflowY: 'auto' }}>
+      <div className="owner-portal-fullscreen">
         {isOwnerAuthenticated ? (
           <OwnerAuditPortal 
             orders={orders}
@@ -1246,10 +1275,12 @@ export default function App() {
             onRefreshSystem={handleRefreshAllSystem}
           />
         ) : (
-          <OwnerLogin 
-            onLoginSuccess={() => setIsOwnerAuthenticated(true)}
-            onBackToPos={handleExitOwnerPortal}
-          />
+          <div style={{ minHeight: '100vh', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+            <OwnerLogin 
+              onLoginSuccess={() => setIsOwnerAuthenticated(true)}
+              onBackToPos={handleExitOwnerPortal}
+            />
+          </div>
         )}
       </div>
     );
